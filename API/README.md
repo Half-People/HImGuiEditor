@@ -12,3 +12,10 @@ The following are the APIs used
 [JSON  I use in project save and translation cache](https://json.nlohmann.me/)
 
 [stb_image I use image loading](https://github.com/nothings/stb/blob/master/stb_image.h)
+
+There is also imgui API in the project
+--------------------------------------------------------------------------
+
+[ImGui](https://github.com/ocornut/imgui)
+
+[ImGuiColorTextEdit](https://github.com/BalazsJako/ImGuiColorTextEdit)
