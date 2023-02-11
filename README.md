@@ -1,4 +1,9 @@
 # HImGuiEditor
+
+Download
+----------------------------------------
+[Download Release](https://github.com/Half-People/HImGuiEditor/releases)
+
 Contents
 ----------------------------------------
 - Built-in translation function can translate more than 100 languages
