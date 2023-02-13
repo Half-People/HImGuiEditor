@@ -19,6 +19,7 @@ namespace ExportCodeNS
 		SaveExportText.append("\n").append("	ImGui::CreateContext(NULL);");
 		//	ImGuiIO& io = ImGui::GetIO(); (void)io;
 		SaveExportText.append("\n").append("	ImGuiIO& io = ImGui::GetIO(); (void)io;");
+		SaveExportText.append("\n").append("	io.Fonts->AddFontFromFileTTF(\"kaiu.ttf\", 20, NULL, io.Fonts->GetGlyphRangesChineseFull());");
 		if (NeedDocking)
 		{
 			//	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
