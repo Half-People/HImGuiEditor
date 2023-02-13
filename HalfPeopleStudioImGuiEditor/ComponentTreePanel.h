@@ -37,7 +37,7 @@ static void ComponentTreeItems(HWidget* Widget,ImDrawList* DL)
 				HWidget* SaveDragWidget = SelectWidget;
 				if (SaveDragWidget->Flag == HWidgetFlag_Content || SaveDragWidget->Flag == HWidgetFlag_WindowRootWidget || SaveDragWidget->Flag == HWidgetFlag_WindowRootWidgetAndMove)
 				{
-					Widget->MoveWidget_RD(SaveDragWidget, SaveDragWidget->Flag);
+					Widget->MoveWidget_RD(SaveDragWidget, HWidgetFlag_Null);
 				}
 				else
 				{
@@ -73,6 +73,8 @@ static void ComponentTreeItems(HWidget* Widget,ImDrawList* DL)
 
 static void ComponentTreeAnalyzeChildren(HWidget* Widget,ImDrawList * DrawList)
 {
+	if (!Widget)
+		return;
 	if (Widget->Content)
 	{
 		//ImGui::BeginGroup();

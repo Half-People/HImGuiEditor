@@ -37,7 +37,7 @@ int main()
 
 	RootWindows->InitWindows();
 
-	RootWindows->CreateWindows("HalfPeopleStudio ImGui Editor", 800, 900);
+	RootWindows->CreateWindows("HalfPeopleStudio ImGui Editor", 1920, 1080);
 
 	HLoadImage("DependentFile\\DFL.HLogo", DefaultLogo);
 	HLoadImage("DependentFile\\Image\\Delete.png", DeleteIcon);
@@ -62,7 +62,6 @@ int main()
 	GUIStyle = ImGui::GetStyle();
 
 	io.Fonts->AddFontFromFileTTF("DependentFile\\kaiu.ttf", 20, NULL, io.Fonts->GetGlyphRangesChineseFull());
-
 	std::cout << "\n InitializeBeforeRendering" << RootWindows->InitializeBeforeRendering();
 
 	CreateDefaulWidget();
@@ -71,11 +70,21 @@ int main()
 
 	InitSettingPanel();
 	InitexportCode();
-
+	InitPorjectSetting();
+	SplashScreenInit
 	InitComponentTreePanel
-
-		TranslateAllObject();
-
+	InitPluginPanel
+	InitPagingPanel
+	InitMainMenuBar
+	InitFlagList();
+	InitWindowDetailsPanel
+	InitDetailsPanel
+	InitControlPanel
+	InitDeleteWidgetPanel
+	InitEditViewport
+	ExportMenuInit
+	RightClickMenuInit
+	TranslateAllObject();
 	PostTranslationInit();
 
 	EditorStyle = ImGui::GetStyle();
@@ -89,7 +98,6 @@ int main()
 		KeyTick();
 		DrawMainMenuBar();
 
-		ImGui::ShowDemoWindow();
 		DrawSettingPanel();
 		DrawControlPanel();
 		DrawDetailsPanel();

@@ -5,12 +5,12 @@
 
 namespace SplashScreen
 {
-	//void OpenSplashScreen()
-	//{
-	//	ImGui::OpenPopup("SplashScreen");
-	//	//ImGui::SetNextWindowSize(ImVec2(300, 300));
-	//}
-
+	static std::string WindowTitle = "Select Porject";
+	
+}
+#define SplashScreenInit TranslateObject.push_back(&SplashScreen::WindowTitle);
+namespace SplashScreen
+{
 	static bool NeedOpenSplashScreen = true;
 	static json RecentlyOpenedPorject;
 
@@ -28,21 +28,38 @@ namespace SplashScreen
 	}
 
 
+
 	static void DrawSplashScreen()
 	{
+
 		if (NeedOpenSplashScreen)
 		{
 			std::ifstream fileR("DependentFile\\configuration file\\RecentlyOpenedPorject.json");
 			if (fileR.is_open())
 			{
 				RecentlyOpenedPorject = VerifyProjectContent(json::parse(fileR));
-				ImGui::OpenPopup("SplashScreen");
-				NeedOpenSplashScreen = false;
+				bool CanOpen = false;
+
+				for (size_t i = 0; i < RecentlyOpenedPorject.size(); i++)
+				{
+					std::ifstream PJ( RecentlyOpenedPorject.at(i)["PorjectPath"].get<std::string>());
+					if (PJ.good())
+					{
+						CanOpen = true;
+						i = RecentlyOpenedPorject.size();
+					}
+				}
+
+				if (CanOpen)
+				{
+					ImGui::OpenPopup(std::string(WindowTitle).append("##SplashScreen").c_str());
+					NeedOpenSplashScreen = false;
+				}
 			}
 			fileR.close();
 		}
 
-		if (ImGui::BeginPopupModal("SplashScreen"))
+		if (ImGui::BeginPopupModal(std::string(WindowTitle).append("##SplashScreen").c_str()))
 		{
 			static int SelectIndex = -1;
 			ImGui::BeginChild("xm",ImVec2(0,ImGui::GetWindowSize().y - 75));

@@ -8,6 +8,17 @@
 #include "HFileBrowser.h"
 
 
+namespace PorjectSettingTranslateList
+{
+	std::string PorjectSetting = "project settings";
+	std::string MainWindow = "MainWindow";
+}
+
+static void InitPorjectSetting(){
+	TranslateObject.push_back(&PorjectSettingTranslateList::PorjectSetting);
+	TranslateObject.push_back(&PorjectSettingTranslateList::MainWindow);
+}
+
 static json SavePorjectSetting()
 {
 	json PorjectSettingSave;
@@ -163,23 +174,23 @@ static void DrawPorjectSetting()
 	if (!ShowPorjectSettingPanel)
 		return;
 
-	if (ImGui::Begin("Porject Setting",&ShowPorjectSettingPanel))
+	if (ImGui::Begin(std::string(PorjectSettingTranslateList::PorjectSetting).append("###Porject Setting").c_str(),&ShowPorjectSettingPanel))
 	{
 		ImGui::BeginChild("PorjectSettingSelect", ImVec2(150, 0), true);
 		if (ImGui::Selectable(PreferencesVar::TranslateText::TranslateData.at(5).c_str(), SettingSelectIndex ==0))
 			SettingSelectIndex = 0;
-		if (ImGui::Selectable("Main Window", SettingSelectIndex == 1))
+		if (ImGui::Selectable(std::string(PorjectSettingTranslateList::MainWindow).append("##Main Window").c_str(), SettingSelectIndex == 1))
 			SettingSelectIndex = 1;
 
 		ImGui::EndChild();
 		ImGui::SameLine(0, 5);
 		ImGui::BeginGroup();
-		if (ImGui::Button("Export"))
+		if (ImGui::Button(HT_Export))
 		{
 			FileBrowser::OpenBrowser(ExportPorjectSettingCallback,true);
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Import"))
+		if (ImGui::Button(HT_Import))
 		{
 			//LoadPorjectSetting();
 			FileBrowser::OpenBrowser(ImportPorjectSettingCallback, false,".HEditorPorjectSetting.");

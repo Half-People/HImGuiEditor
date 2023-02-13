@@ -168,6 +168,7 @@
     <ClInclude Include="DetailsPanel.h" />
     <ClInclude Include="ExportCode.h" />
     <ClInclude Include="ExportCodePanel.h" />
+    <ClInclude Include="FlagsList.h" />
     <ClInclude Include="HArrow\HArrow.h" />
     <ClInclude Include="KeyAndAutoSave.h" />
     <ClInclude Include="HFileBrowser.h" />

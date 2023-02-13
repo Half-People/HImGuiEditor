@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <curl/curl.h>
-//#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <thread>
 #include <nlohmann/json.hpp>
@@ -11,7 +11,10 @@ using json = nlohmann::json;
 static std::vector<std::string> CommonTranslationData = {
     "Confirm",
     "Cancel",
-    "Reset"
+    "Reset",
+    "Import",//3
+    "Export",//4
+    "Flags"
 };
 static int TranslateTargetLang = -1;
 static std::vector<std::string*> TranslateObject;
@@ -235,6 +238,9 @@ static std::thread* TranslateThread = NULL;
 #define HT_Confirm    CommonTranslationData.at(0).c_str()
 #define HT_Cancel     CommonTranslationData.at(1).c_str()
 #define HT_Reset      CommonTranslationData.at(2).c_str()
+#define HT_Import     CommonTranslationData.at(3).c_str()
+#define HT_Export     CommonTranslationData.at(4).c_str()
+#define HT_Flags      CommonTranslationData.at(5).c_str()
 
 namespace HTranslate
 {
@@ -411,7 +417,7 @@ namespace HTranslate
                 Schedule = i / (float)(TranslateObject.size()-1);
                 *TranslateObject.at(i) = TranslateTargetObject(*TranslateObject.at(i));
                 TranslateSave["TranslateBuff"][i] = json::string_t(*TranslateObject.at(i));
-                //std::cout << "\n TranslateAllObjectThread -> HTranslate-> INFO -> Translate Buffer : " << HTranslate::UTF8_To_string(*TranslateObject.at(i));
+                std::cout << "\n TranslateAllObjectThread -> HTranslate-> INFO -> Translate Buffer : " << HTranslate::UTF8_To_string(*TranslateObject.at(i));
             }
 
 

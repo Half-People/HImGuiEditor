@@ -1235,6 +1235,27 @@ static void DeleteWidget(HWidget* SaveWidget)
 	}
 }
 
+
+
+namespace RightClickMenuT
+{
+	static std::string RemoveWidget = "Remove Widget";
+	static std::string layout = "layout";
+	static std::string Default = "Default";
+	static std::string Move = "Move";
+	static std::string SortRight = "Sort Right";
+	static std::string ShowDragSpace = "ShowDragSpace";
+	static std::string CanSelect = "Can Select";
+}
+#define RightClickMenuInit TranslateObject.push_back(&RightClickMenuT::RemoveWidget);\
+TranslateObject.push_back(&RightClickMenuT::layout);\
+TranslateObject.push_back(&RightClickMenuT::Default);\
+TranslateObject.push_back(&RightClickMenuT::Move);\
+TranslateObject.push_back(&RightClickMenuT::SortRight);\
+TranslateObject.push_back(&RightClickMenuT::ShowDragSpace);\
+TranslateObject.push_back(&RightClickMenuT::CanSelect);
+
+
 void AddRightClickMenu(HWidget* Widget)
 {
 	if (!Widget)
@@ -1243,46 +1264,47 @@ void AddRightClickMenu(HWidget* Widget)
 	if (ImGui::BeginPopupContextItem(std::to_string((int)Widget).c_str()))
 	{
 		ImGui::Text(Widget->WidgetName->c_str());
-		if (ImGui::MenuItem("Remove Widget"))
+		ImGui::Separator();
+		if (ImGui::MenuItem(RightClickMenuT::RemoveWidget.c_str()))
 		{
 			DeleteWidget(Widget);
 		}
 
-		if (ImGui::BeginMenu("Move"))
+		if (ImGui::BeginMenu(RightClickMenuT::layout.c_str()))
 		{
 			if (Widget->Flag == HWidgetFlag_ContentMove || Widget->Flag == HWidgetFlag_Content)
 			{
-				if (ImGui::MenuItem("Default", "", Widget->Flag == HWidgetFlag_Content))
+				if (ImGui::MenuItem(RightClickMenuT::Default.c_str(), "", Widget->Flag == HWidgetFlag_Content))
 				{
 					Widget->Flag = HWidgetFlag_Content;
 				}
-				if (ImGui::MenuItem("Move", "", Widget->Flag == HWidgetFlag_ContentMove))
+				if (ImGui::MenuItem(RightClickMenuT::Move.c_str(), "", Widget->Flag == HWidgetFlag_ContentMove))
 				{
 					Widget->Flag = HWidgetFlag_ContentMove;
 				}
 			}
 			else if (Widget->Flag == HWidgetFlag_WindowRootWidget || Widget->Flag == HWidgetFlag_WindowRootWidgetAndMove)
 			{
-				if (ImGui::MenuItem("Default", "", Widget->Flag == HWidgetFlag_WindowRootWidget))
+				if (ImGui::MenuItem(RightClickMenuT::Default.c_str(), "", Widget->Flag == HWidgetFlag_WindowRootWidget))
 				{
 					Widget->Flag = HWidgetFlag_WindowRootWidget;
 				}
-				if (ImGui::Selectable("Move", Widget->Flag == HWidgetFlag_WindowRootWidgetAndMove))
+				if (ImGui::Selectable(RightClickMenuT::Move.c_str(), Widget->Flag == HWidgetFlag_WindowRootWidgetAndMove))
 				{
 					Widget->Flag = HWidgetFlag_WindowRootWidgetAndMove;
 				}
 			}
 			else
 			{
-				if (ImGui::Selectable("Sort Right", Widget->Flag == HWidgetFlag_TurnRight))
+				if (ImGui::Selectable(RightClickMenuT::SortRight.c_str(), Widget->Flag == HWidgetFlag_TurnRight))
 				{
 					Widget->Flag = HWidgetFlag_TurnRight;
 				}
-				if (ImGui::Selectable("Default", Widget->Flag == HWidgetFlag_Null))
+				if (ImGui::Selectable(RightClickMenuT::Default.c_str(), Widget->Flag == HWidgetFlag_Null))
 				{
 					Widget->Flag = HWidgetFlag_Null;
 				}
-				if (ImGui::Selectable("Move", Widget->Flag == HWidgetFlag_Move))
+				if (ImGui::Selectable(RightClickMenuT::Move.c_str(), Widget->Flag == HWidgetFlag_Move))
 				{
 					Widget->Flag = HWidgetFlag_Move;
 					//Widget->MovePos = ImGui::GetCursorPos();
@@ -1292,9 +1314,9 @@ void AddRightClickMenu(HWidget* Widget)
 			ImGui::EndMenu();
 		}
 
-		ImGui::MenuItem("ShowDragSpace", "", &Widget->ShowDragSpace);
+		ImGui::MenuItem(RightClickMenuT::ShowDragSpace.c_str(), "", &Widget->ShowDragSpace);
 
-		ImGui::MenuItem("CanSelectWidget", "", &Widget->CanSelectWidget);
+		ImGui::MenuItem(RightClickMenuT::CanSelect.c_str(), "", &Widget->CanSelectWidget);
 
 		ImGui::EndPopup();
 	}

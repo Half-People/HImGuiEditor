@@ -128,12 +128,15 @@
 //	}
 //	ImGui::End();
 //}
+std::string PluginPanelWindowTitle = "Plugin Panel";
+#define InitPluginPanel TranslateObject.push_back(&PluginPanelWindowTitle);
 
 static void DrawPluginPanel()
 {
+	
 	if (!ShowPluginPanel)
 		return;
-	if (ImGui::Begin("Plugin Panel", &ShowPluginPanel))
+	if (ImGui::Begin(std::string(PluginPanelWindowTitle).append("###Plugin Panel").c_str(), &ShowPluginPanel))
 	{
 		for (size_t i = 0; i < HPluginInfo.size(); i++)
 		{

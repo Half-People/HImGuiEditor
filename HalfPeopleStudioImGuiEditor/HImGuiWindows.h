@@ -6,6 +6,10 @@
 //#include "PagingPanel.h"
 #include <iostream>
 
+
+static std::string EditView = "EditViewport";
+#define InitEditViewport TranslateObject.push_back(&EditView);
+
 static ImTextureID EditViewBg,MouseModeImg,ArrowModeImg;
 class HImGuiWindows;
 static std::vector<HImGuiWindows*> ImGuiWindows;
@@ -341,7 +345,7 @@ private:
 	bool DrawInit()
 	{
 		bool Save = true;
-		if (ImGui::Begin("EditViewport"))
+		if (ImGui::Begin(std::string(EditView).append("###EditViewport").c_str()))
 		{
 			Save = false;
 			ImDrawList * DL = ImGui::GetWindowDrawList();

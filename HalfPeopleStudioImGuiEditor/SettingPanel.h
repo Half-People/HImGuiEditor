@@ -17,7 +17,7 @@ namespace PreferencesVar
 	{
 		static std::vector<std::string> TranslateData
 		{
-			"Preferences",
+			"PreferencesSetting",
 			"Interface",
 			"Translate",
 			"Language",

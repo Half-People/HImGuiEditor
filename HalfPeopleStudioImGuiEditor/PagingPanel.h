@@ -5,17 +5,17 @@
 #include "Porject.h"
 #include "MainMenuBarVar.h"
 
-//class HPag
-//{
-//public:
-//	HPag();
-//	~HPag();
-//
-//private:
-//};
-//std::vector<>
 static ImTextureID PluginImage,PorjectSettingImage,SaveImage;
+static std::string PagingPanelWindowTitle = "Paging Panel";
 
+namespace PagingPanelRemoveWindow
+{
+	static std::string RemoveWindows = "RemoveWindows";
+	static std::string Text = "Are you sure to delete this window and the data will disappear after saving";
+}
+#define InitPagingPanel TranslateObject.push_back(&PagingPanelWindowTitle);\
+TranslateObject.push_back(&PagingPanelRemoveWindow::RemoveWindows);\
+TranslateObject.push_back(&PagingPanelRemoveWindow::Text);
 static void SelectFolderCallBack(std::string Path)
 {
 	printf("\n SelectPath : ");
@@ -24,7 +24,7 @@ static void SelectFolderCallBack(std::string Path)
 
 static void DrawPagingPanel()
 {
-	if (ImGui::Begin("PagingPanel", 0, ImGuiWindowFlags_NoMove))// ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar))
+	if (ImGui::Begin(std::string(PagingPanelWindowTitle).append("###PagingPanel").c_str(), 0,ImGuiWindowFlags_NoMove))// ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar))
 	{
 		ImVec2 WindowSizeSave = ImGui::GetWindowSize();
 		WindowSizeSave.y -= 60;//50
@@ -82,11 +82,11 @@ static void DrawPagingPanel()
 					}
 					if (!wopen)
 					{
-						ImGui::OpenPopup(std::to_string(i).append("_RemoveWindows##HRemoveWindows").c_str());
+						ImGui::OpenPopup(std::string(PagingPanelRemoveWindow::RemoveWindows).append("###RemoveWindows").append(std::to_string(i)).c_str());
 					}
-					if (ImGui::BeginPopupModal(std::to_string(i).append("_RemoveWindows##HRemoveWindows").c_str()))
+					if (ImGui::BeginPopupModal(std::string(PagingPanelRemoveWindow::RemoveWindows).append("###RemoveWindows").append(std::to_string(i)).c_str()))
 					{
-						ImGui::Text("Are you sure to delete this window and the data will disappear after saving");
+						ImGui::Text(PagingPanelRemoveWindow::Text.c_str());
 						ImGui::Separator();
 						float WindowHalfSizeX = ImGui::GetWindowSize().x/2;
 						if (ImGui::Button(HT_Cancel,ImVec2(WindowHalfSizeX,0)))

@@ -155,6 +155,9 @@
     <ClInclude Include="KeyAndAutoSave.h">
       <Filter>Editor\Tool</Filter>
     </ClInclude>
+    <ClInclude Include="FlagsList.h">
+      <Filter>Editor\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">

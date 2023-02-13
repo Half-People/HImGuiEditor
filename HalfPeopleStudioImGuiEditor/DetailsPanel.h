@@ -3,15 +3,36 @@
 #include "MainMenuBar.h"
 #include "HWidget.h"
 
+namespace DetailsPanelT {
+	static std::string WindowTitle = "DetailsPanel";
+	static std::string SizeAndPos = "Size And Pos";
+	static std::string WidgetSize = "Widget Size";
+	static std::string WidgetPos = "WidgetPos";
+	static std::string WidgetDebugInfo = "Widget Debug Info";
+}
+
+#define InitDetailsPanel TranslateObject.push_back(&DetailsPanelT::WindowTitle);\
+ TranslateObject.push_back(&DetailsPanelT::SizeAndPos);\
+ TranslateObject.push_back(&DetailsPanelT::WidgetSize);\
+ TranslateObject.push_back(&DetailsPanelT::WidgetPos);\
+ TranslateObject.push_back(&DetailsPanelT::WidgetDebugInfo);\
+
 void DrawDetailsPanel()
 {
 	if (!ShowDetailsPanel)
 		return;
-	if (ImGui::Begin("DetailsPanel", &ShowDetailsPanel))
+	if (ImGui::Begin(std::string(DetailsPanelT::WindowTitle).append("###DetailsPanel").c_str(), &ShowDetailsPanel))
 	{
 		if (SelectWidget)
 		{
-			if (ImGui::TreeNode("Size And Pos"))
+			if (!SelectWidget->Father)
+			{
+				ImGui::End();
+				return;
+			}
+
+
+			if (ImGui::TreeNode(DetailsPanelT::SizeAndPos.c_str()))
 			{
 				if (SelectWidget->HArrowFlag == HArrow_SizeFlag_OnlyX)
 				{
@@ -20,11 +41,11 @@ void DrawDetailsPanel()
 				else
 				{
 					if(SelectWidget->HArrowFlag == HArrow_SizeFlag_Default)
-						ImGui::DragFloat2("Widget Size", (float*)&SelectWidget->WidgetSize,0.5,0,10000);
+						ImGui::DragFloat2(DetailsPanelT::WidgetSize.c_str(), (float*)&SelectWidget->WidgetSize,0.5,0,10000);
 				}
 
 				if(SelectWidget->Flag == HWidgetFlag_ContentMove || SelectWidget->Flag == HWidgetFlag_Move || SelectWidget->Flag == HWidgetFlag_WindowRootWidgetAndMove)
-					ImGui::DragFloat2("Widget Pos", (float*)&SelectWidget->MovePos,0.5,0,1000000);
+					ImGui::DragFloat2(DetailsPanelT::WidgetPos.c_str(), (float*)&SelectWidget->MovePos,0.5,0,1000000);
 
 
 
@@ -48,7 +69,7 @@ void DrawDetailsPanel()
 				ImGui::SetCursorPosY(ImGui::GetWindowSize().y - 30);
 			}
 
-			ShowInfo = ImGui::TreeNode("Widget Debug Info");
+			ShowInfo = ImGui::TreeNode(DetailsPanelT::WidgetDebugInfo.c_str());
 
 			if(ShowInfo)
 			{

@@ -56,11 +56,14 @@ void VerifyHWidgetList()
 	}
 }
 
+static std::string ControlPanelTitle = "ControlPanel";
+#define InitControlPanel TranslateObject.push_back(&ControlPanelTitle);
+
 void DrawControlPanel()
 {
 	if (!ShowControlPanel)
 		return;
-	if (ImGui::Begin("ControlPanel", &ShowControlPanel))
+	if (ImGui::Begin(std::string(ControlPanelTitle).append("###ControlPanel").c_str(), &ShowControlPanel))
 	{
 		float MaxSize = ImGui::GetWindowSize().x + ImGui::GetWindowPos().x;
 

@@ -852,17 +852,26 @@ namespace ExportCodeNS
 	void (*NextBrowserCallBack)(std::string Path);
 }
 
+
+namespace ExportMenuT
+{
+	static std::string ExportVisualStudioPorject = "Export VisualStudio Porject";
+	static std::string OnlyExportSourceCode = "Only Export Source Code";
+}
+#define ExportMenuInit TranslateObject.push_back(&ExportMenuT::ExportVisualStudioPorject);\
+TranslateObject.push_back(&ExportMenuT::OnlyExportSourceCode);\
+
 static void DrawExportMenu()
 {
-	if (ImGui::BeginMenu("Export"))
+	if (ImGui::BeginMenu(HT_Export))
 	{
-		if (ImGui::Selectable("Export VisualStudio Porject"))
+		if (ImGui::Selectable(ExportMenuT::ExportVisualStudioPorject.c_str()))
 		{
 			ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportVS2019PorjectCallBack;
 			ExportCodeNS::CanOpenBrowser = true;
 		}
 
-		if (ImGui::Selectable("Only Export Source Code"))
+		if (ImGui::Selectable(ExportMenuT::OnlyExportSourceCode.c_str()))
 		{
 			ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportSourceCode;
 			ExportCodeNS::CanOpenBrowser = true;

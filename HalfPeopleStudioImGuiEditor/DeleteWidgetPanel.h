@@ -13,10 +13,13 @@ float Min(ImVec2 In)
 	return In.x;
 }
 
+static std::string DeleteWidgetPanelTitle = "DeleteWidgetPanel";
+#define InitDeleteWidgetPanel  TranslateObject.push_back(&DeleteWidgetPanelTitle);
+
 
 static void DrawDeleteWidgetPanel()
 {
-	if (ImGui::Begin("DeleteWidgetPanel"))
+	if (ImGui::Begin(std::string(DeleteWidgetPanelTitle).append("###DeleteWidgetPanel").c_str()))
 	{
 		ImVec2 ChildSize = ImGui::GetWindowSize();
 		ChildSize.x -= 20;
