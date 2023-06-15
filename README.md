@@ -1,4 +1,7 @@
 # HImGuiEditor
+Wiki
+---------------------------------------
+[Wiki](https://github.com/Half-People/HImGuiEditor/wiki)
 
 Download
 ----------------------------------------
