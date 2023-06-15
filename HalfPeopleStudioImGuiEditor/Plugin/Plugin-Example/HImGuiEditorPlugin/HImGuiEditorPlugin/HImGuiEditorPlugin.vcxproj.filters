@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="標頭檔">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="資源檔">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="標頭檔\Inculd">
+      <UniqueIdentifier>{902fb6ce-5af6-4923-9aab-93334ade2a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="標頭檔\ImGui">
+      <UniqueIdentifier>{5c8e1520-60d7-4f81-82fc-3b1bf855c8c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PluginMain">
+      <UniqueIdentifier>{901e7a16-88aa-4aa9-892a-90807b7c7da2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dll_Function">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ImGui_Api">
+      <UniqueIdentifier>{ac9d461e-e3b4-410b-b42c-0702cf91d044}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HTranslate.h">
+      <Filter>標頭檔\Inculd</Filter>
+    </ClInclude>
+    <ClInclude Include="HWidget.h">
+      <Filter>標頭檔\Inculd</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui.h">
+      <Filter>標頭檔\Inculd</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui_internal.h">
+      <Filter>標頭檔\Inculd</Filter>
+    </ClInclude>
+    <ClInclude Include="HPlugin.h">
+      <Filter>PluginMain</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Dll_Function</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Dll_Function</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiTextEdit\ImGuiColorTextEdit-master\TextEditor.h">
+      <Filter>ImGui_Api</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Dll_Function</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Dll_Function</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>標頭檔\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiTextEdit\ImGuiColorTextEdit-master\TextEditor.cpp">
+      <Filter>ImGui_Api</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
