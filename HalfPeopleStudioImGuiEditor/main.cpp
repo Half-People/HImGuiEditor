@@ -20,6 +20,9 @@
 #include "SplashScreenPanel.h"
 #include "Plugin.h"
 #include "KeyAndAutoSave.h"
+#include "ImFileDialogTool.h"
+
+
 
 int main()
 {
@@ -39,19 +42,26 @@ int main()
 
 	RootWindows->CreateWindows("HalfPeopleStudio ImGui Editor", 1920, 1080);
 
+	//Updata Bg image
+	if (HHaveFile("DependentFile\\Image\\EditViewBg.HBG_Bff"))
+	{
+		remove("DependentFile\\Image\\EditViewBg.HBG");
+		rename("DependentFile\\Image\\EditViewBg.HBG_Bff", "DependentFile\\Image\\EditViewBg.HBG");
+	}
+
 	HLoadImage("DependentFile\\DFL.HLogo", DefaultLogo);
 	HLoadImage("DependentFile\\Image\\Delete.png", DeleteIcon);
 	HLoadImage("DependentFile\\Image\\Plugin.png", PluginImage);
 	HLoadImage("DependentFile\\Image\\Setting.png", PorjectSettingImage);
 	HLoadImage("DependentFile\\Image\\Save.png", SaveImage);
-	HLoadImage("DependentFile\\Image\\EditViewBg.jpg", EditViewBg);
+	HLoadImage("DependentFile\\Image\\EditViewBg.HBG", EditViewBg);
 	HLoadImage("DependentFile\\Image\\Mouse.png", MouseModeImg);
 	HLoadImage("DependentFile\\Image\\Move.png", ArrowModeImg);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext(NULL);
 
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGuiIO& io = ImGui::GetIO();
 
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	io.ConfigFlags |= ImGuiViewportFlags_NoDecoration;
@@ -61,37 +71,46 @@ int main()
 	ImGui::StyleColorsDark();
 	GUIStyle = ImGui::GetStyle();
 
+	
 	io.Fonts->AddFontFromFileTTF("DependentFile\\kaiu.ttf", 20, NULL, io.Fonts->GetGlyphRangesChineseFull());
+	//GUIFont = io.Fonts->AddFontDefault();
+	FontBuff.Init();
+
+
 	std::cout << "\n InitializeBeforeRendering" << RootWindows->InitializeBeforeRendering();
 
 	CreateDefaulWidget();
 	LoadWidgetPlugin();
 	VerifyHWidgetList();
+	InitImFileDialog
 
 	InitSettingPanel();
 	InitexportCode();
 	InitPorjectSetting();
 	SplashScreenInit
-	InitComponentTreePanel
-	InitPluginPanel
-	InitPagingPanel
-	InitMainMenuBar
-	InitFlagList();
+		InitComponentTreePanel
+		InitPluginPanel
+		InitPagingPanel
+		InitMainMenuBar
+		InitFlagList();
 	InitWindowDetailsPanel
-	InitDetailsPanel
-	InitControlPanel
-	InitDeleteWidgetPanel
-	InitEditViewport
-	ExportMenuInit
-	RightClickMenuInit
-	TranslateAllObject();
+		InitDetailsPanel
+		InitControlPanel
+		InitDeleteWidgetPanel
+		InitEditViewport
+		ExportMenuInit
+		RightClickMenuInit
+		TranslateAllObject();
 	PostTranslationInit();
+	
 
 	EditorStyle = ImGui::GetStyle();
 	AutoSaveInit();
 	while (RootWindows->WhetherToEnableRenderingLoop())
 	{
 		ImGui::GetStyle() = EditorStyle;
+		FontBuff.WiteDrawEnd(RootWindows);
+
 		RootWindows->FrameInit();
 		ImGui::DockSpaceOverViewport();
 		SplashScreen::DrawSplashScreen();
@@ -109,13 +128,14 @@ int main()
 		DrawWindowDetailsPanel();
 		DrawExportCode();
 
-		ImGui::GetStyle() = GUIStyle;
+
 		DrawPorjectSetting();
-
-		ImGuiWindows.at(SelectHImGuiWindows)->Draw();
-
+		
+		
+		ImGuiWindows.at(SelectHImGuiWindows)->Draw(); //PopFont in HImGuiWindowDrawInit function
+		
 		RootWindows->FrameEnd();
-
+		//FontBuff.DelayedApplicationFontsInMainLoop(io);
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -123,6 +143,7 @@ int main()
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
+		
 	}
 	AutoSaveThread.detach();
 }

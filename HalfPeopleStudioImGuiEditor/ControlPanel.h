@@ -17,6 +17,11 @@ void CreateDefaulWidget()
 	WidgetList.push_back(new TreeNode);
 	WidgetList.push_back(new Group);
 	WidgetList.push_back(new Child);
+	WidgetList.push_back(new InputText);
+	WidgetList.push_back(new InputTextMultiline);
+	WidgetList.push_back(new DragFloat);
+	WidgetList.push_back(new ColorEdit);
+	WidgetList.push_back(new ColorButton);
 }
 
 void VerifyHWidgetList()
@@ -32,17 +37,17 @@ void VerifyHWidgetList()
 			for (size_t i = 0; i < WidgetList.size(); i++)
 			{
 				// std::cout << "Index : " << i << "     " << *WidgetList.at(i)->WidgetName << "    " << *SaveName;
-				std::cout << "\n ControlPanel -> VerifyHWidgetList -> Info -> Verifying :  " << Q+1<<"/"<< WidgetList.size() << "  SubProgress : " << i+1 << "/" << WidgetList.size() << "    " << *SaveName << " <--> " << *WidgetList.at(i)->WidgetName;
-				if (*WidgetList.at(i)->WidgetName == *SaveName && i!=Q)
+				std::cout << "\n ControlPanel -> VerifyHWidgetList -> Info -> Verifying :  " << Q + 1 << "/" << WidgetList.size() << "  SubProgress : " << i + 1 << "/" << WidgetList.size() << "    " << *SaveName << " <--> " << *WidgetList.at(i)->WidgetName;
+				if (*WidgetList.at(i)->WidgetName == *SaveName && i != Q)
 				{
 					HaveTheSame = true;
 					int pos = SaveName->rfind("_");
-					if (pos!=-1)
+					if (pos != -1)
 					{
 						std::string CP = *SaveName;
-						int SaveIndex = atoi(CP.substr(pos+1, 1000000).c_str());
-						*SaveName = SaveName->substr(0, pos+1);
-						*SaveName = SaveName->append( std::to_string(SaveIndex + 1));
+						int SaveIndex = atoi(CP.substr(pos + 1, 1000000).c_str());
+						*SaveName = SaveName->substr(0, pos + 1);
+						*SaveName = SaveName->append(std::to_string(SaveIndex + 1));
 					}
 					else
 					{

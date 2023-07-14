@@ -13,11 +13,11 @@
 #include "ControlPanel.h"
 #include "DeleteWidgetPanel.h"
 
-void LoadPorjectCallBack(std::string Path)
-{
-	Porject::PorjectPath = Path;
-	Porject::LoadPorject();
-}
+//void LoadPorjectCallBack(std::string Path)
+//{
+//	Porject::PorjectPath = Path;
+//	Porject::LoadPorject();
+//}
 namespace MainMenuBarT {
 	static std::string File = "File";
 	static std::string SavePorject = "SavePorject";
@@ -60,11 +60,10 @@ TranslateObject.push_back(&MainMenuBarT::ShowStackTool);\
 TranslateObject.push_back(&MainMenuBarT::ShowImGuiDemoWindow);\
 TranslateObject.push_back(&MainMenuBarT::ShowMetricsWindow);\
 
-
 void DrawMainMenuBar()
 {
 	static bool ShowAbou = false;
-	static bool ShowStackToolWindow_B = false, ShowMetricsWindow_B = false, ShowDemoWindow_B=false;
+	static bool ShowStackToolWindow_B = false, ShowMetricsWindow_B = false, ShowDemoWindow_B = false;
 	int FileBrowseMode = 0;
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -95,7 +94,7 @@ void DrawMainMenuBar()
 		{
 			if (ImGui::MenuItem(PreferencesVar::TranslateText::TranslateData.at(0).c_str(), "", &ShowSettingPanel))
 			{
-				if(ShowSettingPanel)
+				if (ShowSettingPanel)
 					LoadSettingData();
 			}
 
@@ -113,9 +112,9 @@ void DrawMainMenuBar()
 
 		if (ImGui::BeginMenu(MainMenuBarT::Help.c_str()))
 		{
-			ImGui::MenuItem(MainMenuBarT::Abou.c_str(), "Abou",&ShowAbou);
+			ImGui::MenuItem(MainMenuBarT::Abou.c_str(), "Abou", &ShowAbou);
 
-			if (ImGui::BeginMenu(MainMenuBarT::Tool.c_str(),"Tools"))
+			if (ImGui::BeginMenu(MainMenuBarT::Tool.c_str(), "Tools"))
 			{
 				ImGui::MenuItem(MainMenuBarT::ShowStackTool.c_str(), "ShowStackTool", &ShowStackToolWindow_B);
 				ImGui::MenuItem(MainMenuBarT::ShowMetricsWindow.c_str(), "ShowMetricsWindow", &ShowMetricsWindow_B);
@@ -128,17 +127,17 @@ void DrawMainMenuBar()
 
 		if (PreferencesVar::ShowFPS)
 		{
-			ImGui::SetCursorPosX(ImGui::GetWindowSize().x-90);
+			ImGui::SetCursorPosX(ImGui::GetWindowSize().x - 90);
 			ImGui::Text("FPS : %d", (int)ImGui::GetIO().Framerate);
 		}
-			ImGui::EndMainMenuBar();
+		ImGui::EndMainMenuBar();
 	}
 
-	if(ShowStackToolWindow_B)
+	if (ShowStackToolWindow_B)
 		ImGui::ShowStackToolWindow(&ShowStackToolWindow_B);
 	if (ShowMetricsWindow_B)
 		ImGui::ShowMetricsWindow(&ShowMetricsWindow_B);
-	if(ShowDemoWindow_B)
+	if (ShowDemoWindow_B)
 		ImGui::ShowDemoWindow(&ShowDemoWindow_B);
 	DrawExportBrowser();
 
@@ -148,15 +147,24 @@ void DrawMainMenuBar()
 	}
 	else if (FileBrowseMode == 2)
 	{
-		FileBrowser::OpenBrowser(LoadPorjectCallBack,false,".H_ImGui_PJ","HImGuiEditot_Porject");
+		//FileBrowser::OpenBrowser(LoadPorjectCallBack,false,".H_ImGui_PJ","HImGuiEditot_Porject");
+		ifd::FileDialog::Instance().Open("HImGuiEditot_Porject", "HImGuiEditot Porject", "HImGuiEditotPorject file (*.H_ImGui_PJ){.H_ImGui_PJ}");
 	}
-	Porject::DrawCreatePorject("HImGuiEditot_Porject");
+	//Porject::DrawCreatePorject("HImGuiEditot_Porject");
+	if (ifd::FileDialog::Instance().IsDone("HImGuiEditot_Porject")) {
+		if (ifd::FileDialog::Instance().HasResult()) {
+			std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+			printf("OPEN[%s]\n", res.c_str());
+			Porject::PorjectPath = res;
+			Porject::LoadPorject();
+		}
+		ifd::FileDialog::Instance().Close();
+	}
 
 	// DrawAbou
 	if (ShowAbou)
 	{
-
-		if (ImGui::Begin(MainMenuBarT::Abou.c_str(),&ShowAbou,ImGuiWindowFlags_NoResize))
+		if (ImGui::Begin(MainMenuBarT::Abou.c_str(), &ShowAbou, ImGuiWindowFlags_NoResize))
 		{
 			//ImGui::SetWindowSize(ImVec2(910,388));
 			//std::cout << "\nWindowSize" << ImGui::GetWindowSize().x << "  " << ImGui::GetWindowSize().y;
@@ -168,19 +176,19 @@ void DrawMainMenuBar()
 			ImGui::Text(std::string(MainMenuBarT::AbouData3).c_str());
 			ImGui::Text(std::string(MainMenuBarT::AbouData4).c_str());
 			ImGui::Text(std::string(MainMenuBarT::AbouData5).c_str());
-//			ImGui::Text(" Why we develop this product.\n The purpose is to make editing\n ImGui clearer and easier for users.\n thus speeding up development");
+			//			ImGui::Text(" Why we develop this product.\n The purpose is to make editing\n ImGui clearer and easier for users.\n thus speeding up development");
 			if (ImGui::Button("HalfPeopleStudio "))
 				OsOpenInShell("https://half-people.github.io/HalfPeopleStudioWeb/");
 			ImGui::SameLine();
 			if (ImGui::Button(" YouTube "))
 				OsOpenInShell("https://www.youtube.com/channel/UCKv63XONExN6JtUriTqP9Ew");
 			ImGui::SameLine();
-			if(ImGui::Button(" BiliBili "))
+			if (ImGui::Button(" BiliBili "))
 				OsOpenInShell("https://space.bilibili.com/443124242");
 			ImGui::Text(" ");
 			ImGui::Text(std::string(MainMenuBarT::AbouData7).c_str());
 			ImGui::Separator();
-			if(ImGui::Button(" ImGui "))
+			if (ImGui::Button(" ImGui "))
 				OsOpenInShell("https://github.com/ocornut/imgui");
 			ImGui::SameLine();
 			if (ImGui::Button(" ImGuiColorTextEdit "))
@@ -197,6 +205,9 @@ void DrawMainMenuBar()
 			ImGui::SameLine();
 			if (ImGui::Button("stb_image "))
 				OsOpenInShell("https://github.com/nothings/stb");
+			ImGui::SameLine();
+			if (ImGui::Button("ImFileDialog "))
+				OsOpenInShell("https://github.com/dfranx/ImFileDialog");
 
 			ImGui::Separator();
 			if (ImGui::Button(std::string(MainMenuBarT::AbouData6).c_str()))
@@ -204,7 +215,7 @@ void DrawMainMenuBar()
 				OsOpenInShell("https://half-people.github.io/HalfPeopleStudioWeb/%E8%B4%8A%E5%8A%A9/Sponsor.html");
 			}
 
-			ImDrawList* DL =  ImGui::GetWindowDrawList();
+			ImDrawList* DL = ImGui::GetWindowDrawList();
 
 			ImVec2 Start = ImGui::GetWindowPos();
 			ImVec2 End = ImVec2(910, 388);
@@ -216,8 +227,6 @@ void DrawMainMenuBar()
 		}
 		ImGui::End();
 	}
-
 }
-
 
 //#endif // !H_MainMenuBar

@@ -3,7 +3,7 @@
 #include <imgui.h>
 
 std::vector<std::string> ImGuiWindowFlagListName{
-	"None",
+	"isNone",
 	"NoTitleBar",
 	"NoResize",
 	"NoMove",
@@ -61,7 +61,7 @@ std::vector<ImGuiWindowFlags> ImGuiWindowFlagListFlag
 	ImGuiWindowFlags_NoDocking
 };
 
-void DrawImGuiWindowFlagSetting(ImGuiWindowFlags &Flags)
+void DrawImGuiWindowFlagSetting(ImGuiWindowFlags& Flags)
 {
 	if (ImGui::TreeNode(HT_Flags))
 	{

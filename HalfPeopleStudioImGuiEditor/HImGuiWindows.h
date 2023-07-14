@@ -46,6 +46,8 @@ public:
 		if (!Visible)
 			return;
 
+		ImGui::GetStyle() = GUIStyle;
+		FontBuff.PushFont();
 		if(HaveClose)
 			ImGui::Begin(std::string(Title).append("### HWindows").c_str(), &Visible, WindowFlags);
 		else
@@ -96,6 +98,7 @@ public:
 
 
 		ImGui::End();
+		FontBuff.PopFont();
 	}
 
 	HWidgetExport Export(std::string Offset)
@@ -352,9 +355,6 @@ private:
 			ImVec2 WindowSize = ImGui::GetWindowSize();
 			ImVec2 WindowPos = ImGui::GetWindowPos();
 
-
-
-
 			//ImVec2 SaveStartPos = ImVec2(WindowSize.x - 110,WindowPos.y);
 
 
@@ -375,7 +375,7 @@ private:
 				WindowSize.y += WindowPos.y;
 			}
 
-			DL->AddImage(EditViewBg, WindowPos, WindowSize);
+			DL->AddImage(EditViewBg, ImVec2( WindowPos.x,WindowPos.y), WindowSize);
 
 
 			WindowSize = ImGui::GetWindowSize();
@@ -383,7 +383,7 @@ private:
 			ImGui::SetCursorPosX(WindowSize.x - 110);
 
 			WindowPos.x += WindowSize.x;
-
+			
 			DL->AddRectFilled(ImVec2(WindowPos.x-115, WindowPos.y+30), ImVec2(WindowPos.x-5, WindowPos.y+65),ImColor(15,15,15),5);
 
 			if(EdMode == EditMode_Mouse)
@@ -422,9 +422,11 @@ private:
 			//	}
 			//}
 			//ImGui::EndTabBar();
-			
+
+
 		}
-		ImGui::End();
+		ImGui::End();	
+
 		return Save;
 	}
 };

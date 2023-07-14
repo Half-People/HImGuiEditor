@@ -2,7 +2,6 @@
 #include <string>
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
 void HOpenGLWindow::InitWindows()
 {
 	glfwInit();
@@ -44,6 +43,7 @@ void HOpenGLWindow::FrameInit()
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
+	
 	ImGui::NewFrame();
 }
 
@@ -54,6 +54,12 @@ void HOpenGLWindow::FrameEnd()
 
 	glfwSwapBuffers(Windows);
 	glfwPollEvents();
+}
+
+void HOpenGLWindow::ReCreateObject()
+{
+	ImGui_ImplOpenGL3_DestroyDeviceObjects(); // or ImGui_ImplXXX_InvalidateDeviceObjects();
+	ImGui_ImplOpenGL3_CreateDeviceObjects();
 }
 
 const char* HOpenGLWindow::GetCod_Inculd()

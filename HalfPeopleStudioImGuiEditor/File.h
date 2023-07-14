@@ -10,10 +10,21 @@
 #include <direct.h>
 #include <filesystem>
 
-
 ImTextureID DefaultLogo;
 
-static bool HCopyFile(std::string CopyTarget,std::string CopyToPath)
+static bool HHaveFile(std::string path)
+{
+	std::ifstream file(path);
+	if (file.good())
+	{
+		file.close();
+		return true;
+	}
+	file.close();
+	return false;
+}
+
+static bool HCopyFile(std::string CopyTarget, std::string CopyToPath)
 {
 	std::ofstream CWFile(CopyToPath);
 	if (CWFile.good())
@@ -28,7 +39,7 @@ static bool HCopyFile(std::string CopyTarget,std::string CopyToPath)
 	}
 
 	std::ifstream RFile(CopyTarget);
-	std::ofstream WFile(CopyToPath,std::ios::app);
+	std::ofstream WFile(CopyToPath, std::ios::app);
 	if (!(WFile.good() && RFile.good()))
 	{
 		WFile.close();
@@ -37,7 +48,7 @@ static bool HCopyFile(std::string CopyTarget,std::string CopyToPath)
 	}
 
 	std::string line;
-	while (std::getline(RFile,line))
+	while (std::getline(RFile, line))
 	{
 		WFile << line;
 	}
@@ -71,7 +82,7 @@ static void getFileNames(std::string path, std::vector<std::string>& files)
 	}
 }
 
-static void getFileNames(std::string path, std::vector<std::string>& files, std::vector<std::string>& filename,std::string& filter_)
+static void getFileNames(std::string path, std::vector<std::string>& files, std::vector<std::string>& filename, std::string& filter_)
 {
 	intptr_t hFile = 0;
 
@@ -122,44 +133,39 @@ static void getFileNames(std::string path, std::vector<std::string>& files, std:
 						files.push_back(p.assign(path).append("\\").append(fileinfo.name));
 						filename.push_back(fileinfo.name);
 					}
-
 				}
 			} while (_findnext(hFile, &fileinfo) == 0);
 			_findclose(hFile);
 		}
 	}
-
-
 }
 
-static void getFolderNames(std::string path, std::vector<std::string>& files , std::vector<std::string>& filename)
+static void getFolderNames(std::string path, std::vector<std::string>& files, std::vector<std::string>& filename)
 {
 	intptr_t hFile = 0;
 
 	struct _finddata_t fileinfo;
 	std::string p;
 
-		if ((hFile = _findfirst(p.assign(path).append("\\*").c_str(), &fileinfo)) != -1)
+	if ((hFile = _findfirst(p.assign(path).append("\\*").c_str(), &fileinfo)) != -1)
+	{
+		do
 		{
-			do
+			if ((fileinfo.attrib & _A_SUBDIR))
 			{
-				if ((fileinfo.attrib & _A_SUBDIR))
+				if (strcmp(fileinfo.name, ".") != 0 && strcmp(fileinfo.name, "..") != 0)
 				{
-					if (strcmp(fileinfo.name, ".") != 0 && strcmp(fileinfo.name, "..") != 0)
-					{
-						files.push_back(p.assign(path).append("\\").append(fileinfo.name));
-						filename.push_back(fileinfo.name);
-					}
-
+					files.push_back(p.assign(path).append("\\").append(fileinfo.name));
+					filename.push_back(fileinfo.name);
 				}
-				//else
-				//{
-				//	//files.push_back(p.assign(path).append("\\").append(fileinfo.name));
-				//}
-			} while (_findnext(hFile, &fileinfo) == 0);
-			_findclose(hFile);
-		}
-
+			}
+			//else
+			//{
+			//	//files.push_back(p.assign(path).append("\\").append(fileinfo.name));
+			//}
+		} while (_findnext(hFile, &fileinfo) == 0);
+		_findclose(hFile);
+	}
 }
 
 std::vector<std::string> getListOfDrives() {
@@ -206,7 +212,7 @@ static std::string GetTime()
 {
 	time_t now = time(0);
 	char SaveTimeData[150];
-	ctime_s(SaveTimeData ,150,&now);
+	ctime_s(SaveTimeData, 150, &now);
 	return SaveTimeData;
 }
 
@@ -227,7 +233,6 @@ static std::string GetTime()
 //	}
 //}
 
-
 #define HCopyFolder(A,B) std::filesystem::copy(A, B,std::filesystem::copy_options::recursive)
 
 #ifdef _WIN32
@@ -239,7 +244,6 @@ static std::string GetTime()
 //const char* open_executable = "xdg-open";
 #endif
 #endif
-
 
 void OsOpenInShell(const char* path)
 {

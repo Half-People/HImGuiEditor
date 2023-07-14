@@ -20,6 +20,7 @@ namespace ExportCodeNS
 		//	ImGuiIO& io = ImGui::GetIO(); (void)io;
 		SaveExportText.append("\n").append("	ImGuiIO& io = ImGui::GetIO(); (void)io;");
 		SaveExportText.append("\n").append("	io.Fonts->AddFontFromFileTTF(\"kaiu.ttf\", 20, NULL, io.Fonts->GetGlyphRangesChineseFull());");
+
 		if (NeedDocking)
 		{
 			//	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -798,7 +799,6 @@ namespace ExportCodeNS
 						OutBuff.InculdPath.push_back(ExBuff.InculdPath.at(i));
 				}
 			}
-
 		}
 
 		SpawnImGuiH_FunctionH(OutBuff, Path);
@@ -853,7 +853,6 @@ namespace ExportCodeNS
 	void (*NextBrowserCallBack)(std::string Path);
 }
 
-
 namespace ExportMenuT
 {
 	static std::string ExportVisualStudioPorject = "Export VisualStudio Porject";
@@ -868,14 +867,16 @@ static void DrawExportMenu()
 	{
 		if (ImGui::Selectable(ExportMenuT::ExportVisualStudioPorject.c_str()))
 		{
-			ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportVS2019PorjectCallBack;
-			ExportCodeNS::CanOpenBrowser = true;
+			//ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportVS2019PorjectCallBack;
+			//ExportCodeNS::CanOpenBrowser = true;
+			ifd::FileDialog::Instance().Save("ExportVS2019PorjectDialog", ExportMenuT::ExportVisualStudioPorject.c_str(), "");
 		}
 
 		if (ImGui::Selectable(ExportMenuT::OnlyExportSourceCode.c_str()))
 		{
-			ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportSourceCode;
-			ExportCodeNS::CanOpenBrowser = true;
+			//ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportSourceCode;
+			//ExportCodeNS::CanOpenBrowser = true;
+			ifd::FileDialog::Instance().Save("OnlyExportSourceCode", ExportMenuT::OnlyExportSourceCode.c_str(), "");
 		}
 
 		ImGui::EndMenu();
@@ -884,10 +885,28 @@ static void DrawExportMenu()
 
 static void DrawExportBrowser()
 {
-	if (ExportCodeNS::CanOpenBrowser)
-	{
-		FileBrowser::OpenBrowser(ExportCodeNS::NextBrowserCallBack, true, "ExportCode");
-		ExportCodeNS::CanOpenBrowser = false;
+	//if (ExportCodeNS::CanOpenBrowser)
+	//{
+	//	FileBrowser::OpenBrowser(ExportCodeNS::NextBrowserCallBack, true, "ExportCode");
+	//	ExportCodeNS::CanOpenBrowser = false;
+	//}
+	//FileBrowser::DrawFileBrowser("ExportCode");
+
+	if (ifd::FileDialog::Instance().IsDone("ExportVS2019PorjectDialog")) {
+		if (ifd::FileDialog::Instance().HasResult()) {
+			std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+			printf("Export[%s]\n", res.c_str());
+			ExportCodeNS::ExportVS2019PorjectCallBack(res);
+		}
+		ifd::FileDialog::Instance().Close();
 	}
-	FileBrowser::DrawFileBrowser("ExportCode");
+
+	if (ifd::FileDialog::Instance().IsDone("OnlyExportSourceCode")) {
+		if (ifd::FileDialog::Instance().HasResult()) {
+			std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+			printf("Export[%s]\n", res.c_str());
+			ExportCodeNS::ExportSourceCode(res);
+		}
+		ifd::FileDialog::Instance().Close();
+	}
 }

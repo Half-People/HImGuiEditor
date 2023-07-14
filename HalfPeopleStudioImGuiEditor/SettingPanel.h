@@ -9,6 +9,8 @@
 #include "File.h"
 #include "HImGuiWidgetItem.h"
 #include "HImGuiStyle.h"
+#include "ImFileDialog/ImFileDialog.h"
+#include "HImGuiWindows.h" // <--
 
 namespace PreferencesVar
 {
@@ -267,23 +269,23 @@ namespace PreferencesFun
 			Colors[ImGui::GetStyleColorName(i)] = Color;
 		}
 
-		Sizes["WindowPadding"]              =       ImVec2ToJson(style.WindowPadding);
+		Sizes["WindowPadding"]              =       PreferencesFun::ImVec2ToJson(style.WindowPadding);
 		Sizes["WindowRounding"]             =       style.WindowRounding;
 		Sizes["WindowBorderSize"]           =       style.WindowBorderSize;
-		Sizes["WindowMinSize"]              =       ImVec2ToJson(style.WindowMinSize);
-		Sizes["WindowTitleAlign"]           =       ImVec2ToJson(style.WindowTitleAlign);
+		Sizes["WindowMinSize"]              =       PreferencesFun::ImVec2ToJson(style.WindowMinSize);
+		Sizes["WindowTitleAlign"]           =       PreferencesFun::ImVec2ToJson(style.WindowTitleAlign);
 		Sizes["WindowMenuButtonPosition"]   =       style.WindowMenuButtonPosition;
 		Sizes["ChildRounding"]              =       style.ChildRounding;
 		Sizes["ChildBorderSize"]            =       style.ChildBorderSize;
 		Sizes["PopupRounding"]              =       style.PopupRounding;
 		Sizes["PopupBorderSize"]            =       style.PopupBorderSize;
-		Sizes["FramePadding"]               =       ImVec2ToJson(style.FramePadding);
+		Sizes["FramePadding"]               =       PreferencesFun::ImVec2ToJson(style.FramePadding);
 		Sizes["FrameRounding"]              =       style.FrameRounding;
 		Sizes["FrameBorderSize"]            =       style.FrameBorderSize;
-		Sizes["ItemSpacing"]                =       ImVec2ToJson(style.ItemSpacing);
-		Sizes["ItemInnerSpacing"]           =       ImVec2ToJson(style.ItemInnerSpacing);
-		Sizes["CellPadding"]                =       ImVec2ToJson(style.CellPadding);
-		Sizes["TouchExtraPadding"]          =       ImVec2ToJson(style.TouchExtraPadding);
+		Sizes["ItemSpacing"]                =       PreferencesFun::ImVec2ToJson(style.ItemSpacing);
+		Sizes["ItemInnerSpacing"]           =       PreferencesFun::ImVec2ToJson(style.ItemInnerSpacing);
+		Sizes["CellPadding"]                =       PreferencesFun::ImVec2ToJson(style.CellPadding);
+		Sizes["TouchExtraPadding"]          =       PreferencesFun::ImVec2ToJson(style.TouchExtraPadding);
 		Sizes["IndentSpacing"]              =       style.IndentSpacing;
 		Sizes["ColumnsMinSpacing"]          =       style.ColumnsMinSpacing;
 		Sizes["ScrollbarSize"]              =       style.ScrollbarSize;
@@ -295,10 +297,10 @@ namespace PreferencesFun
 		Sizes["TabBorderSize"]              =       style.TabBorderSize;
 		Sizes["TabMinWidthForCloseButton"]  =       style.TabMinWidthForCloseButton;
 		Sizes["ColorButtonPosition"]        =       style.ColorButtonPosition;
-		Sizes["ButtonTextAlign"]            =       ImVec2ToJson(style.ButtonTextAlign);
-		Sizes["SelectableTextAlign"]        =       ImVec2ToJson(style.SelectableTextAlign);
-		Sizes["DisplayWindowPadding"]       =       ImVec2ToJson(style.DisplayWindowPadding);
-		Sizes["DisplaySafeAreaPadding"]     =       ImVec2ToJson(style.DisplaySafeAreaPadding);
+		Sizes["ButtonTextAlign"]            =       PreferencesFun::ImVec2ToJson(style.ButtonTextAlign);
+		Sizes["SelectableTextAlign"]        =       PreferencesFun::ImVec2ToJson(style.SelectableTextAlign);
+		Sizes["DisplayWindowPadding"]       =       PreferencesFun::ImVec2ToJson(style.DisplayWindowPadding);
+		Sizes["DisplaySafeAreaPadding"]     =       PreferencesFun::ImVec2ToJson(style.DisplaySafeAreaPadding);
 		//Sizes["CurveTessellationTol"]       =       style.CurveTessellationTol;
 		//Sizes["CircleTessellationMaxError"] =       style.CircleTessellationMaxError;
 
@@ -366,7 +368,6 @@ static void DrawSettingPanel()
 
 			if (ImGui::TreeNode(std::string(PreferencesVar::TranslateText::TranslateData.at(2)).append("###Translate").c_str()))
 			{
-				
 				ImGui::SetNextItemWidth(250);
 				if (ImGui::BeginCombo(PreferencesVar::TranslateText::TranslateData.at(3).c_str(), GetTranslateTargetLang(TranslateTargetLang)))
 				{
@@ -440,6 +441,27 @@ static void DrawSettingPanel()
 
 			break;
 		case 1:
+			if (ImGui::Button("Editor Background Image"))
+			{
+				ifd::FileDialog::Instance().Open("Editor_background_image", "Editor Background Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*");
+			}
+
+			if (ifd::FileDialog::Instance().IsDone("Editor_background_image")) {
+				if (ifd::FileDialog::Instance().HasResult()) {
+					std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+					printf("OPEN[%s]\n", res.c_str());
+					if (HHaveFile("DependentFile\\Image\\EditViewBg.HBG_Bff"))
+					{
+						remove("DependentFile\\Image\\EditViewBg.HBG_Bff");
+					}
+					std::filesystem::copy(res, "DependentFile\\Image\\EditViewBg.HBG_Bff");
+					HLoadImage(res.c_str(), EditViewBg);
+				}
+				ifd::FileDialog::Instance().Close();
+			}
+			ImGui::SameLine();
+			ImGui::Image(EditViewBg, ImVec2(150, 150));
+
 			if (ImGui::TreeNode(std::string(PreferencesVar::TranslateText::TranslateData.at(6)).append("###Main").c_str()))
 			{
 				if (ImGui::Button(PreferencesVar::TranslateText::TranslateData.at(7).c_str()))

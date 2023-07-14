@@ -1095,7 +1095,7 @@ private:
 
 	bool BeginDragDropTargetForHWidget()
 	{
-		ImGuiContext& g = *GImGui;
+			ImGuiContext& g = *GImGui;
 		if (!g.DragDropActive)
 			return false;
 
@@ -1235,8 +1235,6 @@ static void DeleteWidget(HWidget* SaveWidget)
 	}
 }
 
-
-
 namespace RightClickMenuT
 {
 	static std::string RemoveWidget = "Remove Widget";
@@ -1254,7 +1252,6 @@ TranslateObject.push_back(&RightClickMenuT::Move);\
 TranslateObject.push_back(&RightClickMenuT::SortRight);\
 TranslateObject.push_back(&RightClickMenuT::ShowDragSpace);\
 TranslateObject.push_back(&RightClickMenuT::CanSelect);
-
 
 void AddRightClickMenu(HWidget* Widget)
 {

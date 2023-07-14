@@ -3,14 +3,15 @@
 //#define H_PORJECT
 
 #include <string>
-#include "HFileBrowser.h"
+//#include "HFileBrowser.h"
+#include "ImFileDialog/ImFileDialog.h"
 
 #include "HImGuiWindows.h"
 #include "PorjectSettingPanel.h"
 namespace Porject
 {
 	static std::string PorjectPath;//= "G:\\HalfPeopleStudioC++ Porject\\HalfPeopleStudioImGuiEditor\\TestPorject";
-	static char PorjectName[50] = {"PorjectName"};
+	static char PorjectName[50] = { "PorjectName" };
 	static bool NeedShowFileBrowser = false;
 
 	static void UpdataRecentlyOpenedPorject()
@@ -30,7 +31,7 @@ namespace Porject
 				HaveFind = true;
 				json Data;
 				Data["PorjectPath"] = PorjectPath;
-				Data["Title"] = std::string(PorjectPath).substr(PorjectPath.rfind("\\")+1, 10000000);
+				Data["Title"] = std::string(PorjectPath).substr(PorjectPath.rfind("\\") + 1, 10000000);
 				Data["OpenTime"] = GetTime();
 
 				Buff.push_back(Data);
@@ -41,7 +42,7 @@ namespace Porject
 		{
 			json Data;
 			Data["PorjectPath"] = PorjectPath;
-			Data["Title"] = std::string(PorjectPath).substr(PorjectPath.rfind("\\")+1, 10000000);
+			Data["Title"] = std::string(PorjectPath).substr(PorjectPath.rfind("\\") + 1, 10000000);
 			Data["OpenTime"] = GetTime();
 
 			Buff.push_back(Data);
@@ -64,9 +65,6 @@ namespace Porject
 				Buff.push_back(RecentlyOpenedPorject.at(i));
 			}
 		}
-
-
-
 
 		std::ofstream fileS("DependentFile\\configuration file\\RecentlyOpenedPorject.json");
 		if (fileS.is_open())
@@ -113,13 +111,12 @@ namespace Porject
 			return;
 		file.close();
 
-
 		SelectHImGuiWindows = PorjectData["SelectWindow"];
 
 		LoadPorjectSetting(PorjectData["PorjectSetting"]);
 
 		RemoveAllHImGuiWindows();
-		
+
 		for (size_t i = 0; i < PorjectData["ImGuiWindows"].size(); i++)
 		{
 			ImGuiWindows.push_back(new HImGuiWindows);
@@ -128,52 +125,63 @@ namespace Porject
 		UpdataRecentlyOpenedPorject();
 	}
 
-	static void CreatePorjectCallBack(std::string path)
-	{
-		// Save Porject
-		PorjectPath = path.append("\\").append(PorjectName).append(".H_ImGui_PJ");
-
-		SavePorject();
-	}
+	//static void CreatePorjectCallBack(std::string path)
+	//{
+	//	// Save Porject
+	//	PorjectPath = path.append("\\").append(PorjectName).append(".H_ImGui_PJ");
+	//
+	//	SavePorject();
+	//}
 
 	static void CreatePorject()
 	{
-		ImGui::OpenPopup("CreatePorject");
+		//ImGui::OpenPopup("CreatePorject");
+		ifd::FileDialog::Instance().Save("CreatePorject", "CreatePorject", ".HImGuiPorject (*.H_ImGui_PJ){.H_ImGui_PJ}");
 	}
 
 	static void DrawCreatePorject(const char* id = "Porject")
 	{
-		if (ImGui::BeginPopupModal("CreatePorject",0))
-		{
-			ImGui::SetNextItemWidth(250);
-			if (ImGui::InputText("PorjectName", PorjectName, 50))
-			{
-				if (std::string(PorjectName).empty())
-				{
-					strcpy_s(PorjectName, "PorjectName");
-				}
+		if (ifd::FileDialog::Instance().IsDone("CreatePorject")) {
+			if (ifd::FileDialog::Instance().HasResult()) {
+				std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+				printf("SAVE[%s]\n", res.c_str());
+				PorjectPath = res;
+				SavePorject();
 			}
-			if (ImGui::Button(HT_Cancel))
-			{
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button(HT_Confirm))
-			{
-				NeedShowFileBrowser = true;
-
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
+			ifd::FileDialog::Instance().Close();
 		}
 
-		if (NeedShowFileBrowser)
-		{
-			FileBrowser::OpenBrowser(CreatePorjectCallBack,true,id);
-			NeedShowFileBrowser = false;
-		}
-
-		FileBrowser::DrawFileBrowser(id);
+		//if (ImGui::BeginPopupModal("CreatePorject",0))
+		//{
+		//	ImGui::SetNextItemWidth(250);
+		//	if (ImGui::InputText("PorjectName", PorjectName, 50))
+		//	{
+		//		if (std::string(PorjectName).empty())
+		//		{
+		//			strcpy_s(PorjectName, "PorjectName");
+		//		}
+		//	}
+		//	if (ImGui::Button(HT_Cancel))
+		//	{
+		//		ImGui::CloseCurrentPopup();
+		//	}
+		//	ImGui::SameLine();
+		//	if (ImGui::Button(HT_Confirm))
+		//	{
+		//		NeedShowFileBrowser = true;
+		//
+		//		ImGui::CloseCurrentPopup();
+		//	}
+		//	ImGui::EndPopup();
+		//}
+		//
+		//if (NeedShowFileBrowser)
+		//{
+		//	FileBrowser::OpenBrowser(CreatePorjectCallBack,true,id);
+		//	NeedShowFileBrowser = false;
+		//}
+		//
+		//FileBrowser::DrawFileBrowser(id);
 	}
 }
 

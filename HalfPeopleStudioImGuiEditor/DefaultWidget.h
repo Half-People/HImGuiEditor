@@ -449,9 +449,9 @@ public:
 		//static char _HV__InputTextBuff = { _HV_ };
 		SaveExportText.append("\n").append(Offset).append("static char ").append(RandTextSave).append("_InputTextBuff[260] = { \"").append(InputTextDefault).append("\" };");
 		//static ImGuiInputTextFlags _HV__InputTextFlag = _HV_;
-		SaveExportText.append("\n").append(Offset).append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string( InputTextFlag)).append(";");
+		SaveExportText.append("\n").append(Offset).append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string(InputTextFlag)).append(";");
 		//if(ImGui::InputText(_HV_,_HV__InputTextBuff,_HV_,))
-		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputText(\"").append( GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append( std::to_string(260)).append(",").append(RandTextSave).append("_InputTextFlag))");
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputText(\"").append(GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append(std::to_string(260)).append(",").append(RandTextSave).append("_InputTextFlag))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//}
@@ -462,7 +462,7 @@ public:
 	{
 		DrawPreLogic();
 		ImGui::SetNextItemWidth(WidgetSize.x);
-		ImGui::InputText(GetID().c_str(),InputTextBuff,IM_ARRAYSIZE(InputTextBuff), InputTextFlag);
+		ImGui::InputText(GetID().c_str(), InputTextBuff, IM_ARRAYSIZE(InputTextBuff), InputTextFlag);
 
 		DrawLogicTick();
 		return;
@@ -523,7 +523,7 @@ public:
 		ST = Data["TextBuff"];
 		strcpy_s(InputTextBuff, 260, ST.c_str());
 		ST = Data["TextDefault"];
-		strcpy_s(InputTextDefault,260, ST.c_str());
+		strcpy_s(InputTextDefault, 260, ST.c_str());
 
 		InputTextFlag = Data["Falgs"];
 		return;
@@ -532,7 +532,7 @@ private:
 	//std::string Text = "Button";
 	char TextData[200] = { "Text" };
 	char InputTextBuff[260];
-	char InputTextDefault[260] = {"InputText"};
+	char InputTextDefault[260] = { "InputText" };
 	ImGuiInputTextFlags InputTextFlag;
 };
 static std::string DefaultWidgetInputTextMultiline = "InputTextMultiline";
@@ -554,7 +554,7 @@ public:
 	virtual void DrawIconForControlPanel()override
 	{
 		char Buf[] = { "Text" };
-		ImGui::InputTextMultiline("###InputTextMultiline aaa", Buf, 5,ImVec2(0,40));
+		ImGui::InputTextMultiline("###InputTextMultiline aaa", Buf, 5, ImVec2(0, 40));
 		return;
 	}
 	virtual std::string Export(std::string Offset) override
@@ -577,14 +577,13 @@ public:
 	{
 		DrawPreLogic();
 		//ImGui::SetNextItemWidth(WidgetSize.x);
-		ImGui::InputTextMultiline(GetID().c_str(), InputTextBuff, IM_ARRAYSIZE(InputTextBuff), WidgetSize,InputTextFlag);
+		ImGui::InputTextMultiline(GetID().c_str(), InputTextBuff, IM_ARRAYSIZE(InputTextBuff), WidgetSize, InputTextFlag);
 
 		DrawLogicTick();
 		return;
 	}
 	virtual void DetailPanelWidget()override
 	{
-
 		ImGui::InputText("InputTextLable", TextData, IM_ARRAYSIZE(TextData));
 		ImGui::InputTextMultiline("TextDefault", InputTextDefault, IM_ARRAYSIZE(InputTextDefault));
 
@@ -651,8 +650,6 @@ private:
 	char InputTextDefault[260] = { "InputText" };
 	ImGuiInputTextFlags InputTextFlag;
 };
-
-
 static std::string DefaultWidgetDragFloat = "DragFloat";
 static std::string DefaultWidgetDragFloatID = "DragFloat";
 class DragFloat :public HWidget
@@ -669,7 +666,7 @@ public:
 	virtual void DrawIconForControlPanel()override
 	{
 		float F = 1.95;
-		ImGui::DragFloat("Text",&F);
+		ImGui::DragFloat("Text", &F);
 		return;
 	}
 	virtual std::string Export(std::string Offset) override
@@ -677,9 +674,9 @@ public:
 		std::string RandText = GetRandText((int)this);
 		std::string SaveExportText;
 		//static float DragFloat__HV_ = _THV_;
-		SaveExportText.append("\n").append(Offset).append("static float DragFloat_").append(RandText).append(" = ").append(std::to_string( 0)).append(";");
+		SaveExportText.append("\n").append(Offset).append("static float DragFloat_").append(RandText).append(" = ").append(std::to_string(0)).append(";");
 		//if(DragFloat(_HV_,DragFloat__HV_ ,_THV_,_THV_,_THV_,_HV_,_THV_))
-		SaveExportText.append("\n").append(Offset).append("if(DragFloat(").append(TextData).append(",&DragFloat_").append(RandText).append(" ,").append(std::to_string(Speed)).append(",").append(std::to_string(Mmin)).append(",").append(std::to_string( Mmax)).append(",\"").append(Mformat).append("\",").append(std::to_string(Mflage)).append("))");
+		SaveExportText.append("\n").append(Offset).append("if(DragFloat(").append(TextData).append(",&DragFloat_").append(RandText).append(" ,").append(std::to_string(Speed)).append(",").append(std::to_string(Mmin)).append(",").append(std::to_string(Mmax)).append(",\"").append(Mformat).append("\",").append(std::to_string(Mflage)).append("))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//}
@@ -690,7 +687,7 @@ public:
 	{
 		DrawPreLogic();
 		ImGui::SetNextItemWidth(WidgetSize.x);
-		ImGui::DragFloat(GetID().c_str(), &DragBuff, Speed,Mmin,Mmax,Mformat, Mflage);
+		ImGui::DragFloat(GetID().c_str(), &DragBuff, Speed, Mmin, Mmax, Mformat, Mflage);
 		DrawLogicTick();
 		return;
 	}
@@ -704,8 +701,6 @@ public:
 		ImGui::DragFloat("min", &Mmin, 0.1, 0, 100000);
 		ImGui::DragFloat("max", &Mmax, 0.1, 0, 100000);
 		ImGui::InputText("format", Mformat, sizeof(Mformat));
-
-
 
 		if (ImGui::TreeNode("Flags"))
 		{
@@ -757,19 +752,19 @@ private:
 	float Speed = 1;
 	float Mmin = 0;
 	float Mmax = 1;
-	char Mformat[200] = {"% .3f"};
+	char Mformat[200] = { "% .3f" };
 	ImGuiSliderFlags Mflage;
-	
 };
-static std::string DefaultWidgetColorEdit3 = "ColorEdit3";
-static std::string DefaultWidgetColorEdit3ID = "ColorEdit3";
-class ColorEdit3 :public HWidget
+static std::string DefaultWidgetColorEdit = "ColorEdit";
+static std::string DefaultWidgetColorEditID = "ColorEdit";
+class ColorEdit :public HWidget
 {
 public:
-	ColorEdit3()
+	ColorEdit()
 	{
-		WidgetName = &DefaultWidgetColorEdit3;
-		WidgetNameID = &DefaultWidgetColorEdit3ID;
+		HArrowFlag = HArrow_SizeFlag::HArrow_SizeFlag_OnlyX;
+		WidgetName = &DefaultWidgetColorEdit;
+		WidgetNameID = &DefaultWidgetColorEditID;
 		WidgetID = Text;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
@@ -800,18 +795,13 @@ public:
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::ColorEdit3(GetID().c_str(), (float*)&XColor,Cflags);
+		ImGui::ColorEdit3(GetID().c_str(), (float*)&XColor, Cflags);
 		DrawLogicTick();
 		return;
 	}
 	virtual void DetailPanelWidget()override
 	{
-		//char Save[200] = {};
-		//strncpy(Save, Text.c_str(), sizeof(Save));
-
 		ImGui::InputText("Button Text", Text, 200);
-		//ImGui::DragFloat2("Button Size", (float*)&WidgetSize, 0.2, 5);
-
 		ImGui::ColorEdit3("DFColor", (float*)&DFColor);
 
 		if (ImGui::TreeNode("Flags"))
@@ -850,20 +840,19 @@ public:
 		return;
 	}
 	virtual HWidget* CreateSelfClass()override {
-		return new ColorEdit3();
+		return new ColorEdit();
 	}
 
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["WidgetName"] = Text; 
+		J["WidgetName"] = Text;
 		json color;
 		color["r"] = XColor.x;
 		color["g"] = XColor.y;
 		color["b"] = XColor.z;
 		color["a"] = XColor.w;
 		J["Color"] = color;
-
 
 		color["r"] = DFColor.x;
 		color["g"] = DFColor.y;
@@ -891,7 +880,6 @@ public:
 		DFColor.z = color["b"];
 		DFColor.w = color["a"];
 
-
 		Cflags = Data["flags"];
 
 		//ImGuiColorEditFlags_
@@ -903,6 +891,133 @@ private:
 	char Text[200] = { "Button" };
 	ImGuiColorEditFlags Cflags;
 	ImVec4 XColor;
+	ImVec4 DFColor;
+	//ImVec2 Size = ImVec2(0, 0);
+};
+static std::string DefaultWidgetColorButton = "ColorButton";
+static std::string DefaultWidgetColorButtonID = "ColorButton";
+class ColorButton :public HWidget
+{
+public:
+	ColorButton()
+	{
+		WidgetName = &DefaultWidgetColorButton;
+		WidgetNameID = &DefaultWidgetColorButtonID;
+		WidgetID = Text;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+	}
+
+	virtual void DrawIconForControlPanel()override
+	{
+		static ImVec4 Color;
+		ImGui::ColorButton("ColorButton", Color);
+		//ImGui::Button("Button");
+		return;
+	}
+	virtual std::string Export(std::string Offset) override
+	{
+		std::string RandText = GetRandText((int)this);
+		std::string SaveExportText;
+		//static ImVec4 ColorEditor3__HV_ = ImVec4(_THV_,_THV_,_THV_,_THV_);
+		//if(ColorEdit3(_HV_,(float*)&ColorEditor3__HV_  ,_THV_))
+		SaveExportText.append("\n").append(Offset).append("if(ColorButton(\"").append(Text).append("###").append(GetID()).append("\",ImVec4(").append(std::to_string(DFColor.x)).append(",").append(std::to_string(DFColor.y)).append(",").append(std::to_string(DFColor.z)).append(",").append(std::to_string(DFColor.w)).append(")").append("  ,").append(std::to_string(Cflags)).append("))");
+		//{
+		SaveExportText.append("\n").append(Offset).append("{");
+		//}
+		SaveExportText.append("\n").append(Offset).append("}");
+		return SaveExportText;
+	}
+	virtual void Draw()override
+	{
+		DrawPreLogic();
+		ImGui::ColorButton(std::string(Text).append("###").append(WidgetID).c_str(), DFColor, Cflags, WidgetSize);
+		DrawLogicTick();
+		return;
+	}
+	virtual void DetailPanelWidget()override
+	{
+		ImGui::InputText("Button Text", Text, 200);
+		ImGui::ColorEdit3("DFColor", (float*)&DFColor);
+
+		if (ImGui::TreeNode("Flags"))
+		{
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_None           ", &Cflags, ImGuiColorEditFlags_None);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoAlpha        ", &Cflags, ImGuiColorEditFlags_NoAlpha);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoPicker       ", &Cflags, ImGuiColorEditFlags_NoPicker);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoOptions      ", &Cflags, ImGuiColorEditFlags_NoOptions);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoSmallPreview ", &Cflags, ImGuiColorEditFlags_NoSmallPreview);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoInputs       ", &Cflags, ImGuiColorEditFlags_NoInputs);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoTooltip      ", &Cflags, ImGuiColorEditFlags_NoTooltip);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoLabel        ", &Cflags, ImGuiColorEditFlags_NoLabel);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoSidePreview  ", &Cflags, ImGuiColorEditFlags_NoSidePreview);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoDragDrop     ", &Cflags, ImGuiColorEditFlags_NoDragDrop);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_NoBorder       ", &Cflags, ImGuiColorEditFlags_NoBorder);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_AlphaBar        ", &Cflags, ImGuiColorEditFlags_AlphaBar);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_AlphaPreview    ", &Cflags, ImGuiColorEditFlags_AlphaPreview);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_AlphaPreviewHalf", &Cflags, ImGuiColorEditFlags_AlphaPreviewHalf);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_HDR             ", &Cflags, ImGuiColorEditFlags_HDR);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_DisplayRGB      ", &Cflags, ImGuiColorEditFlags_DisplayRGB);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_DisplayHSV      ", &Cflags, ImGuiColorEditFlags_DisplayHSV);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_DisplayHex      ", &Cflags, ImGuiColorEditFlags_DisplayHex);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_Uint8           ", &Cflags, ImGuiColorEditFlags_Uint8);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_Float           ", &Cflags, ImGuiColorEditFlags_Float);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_PickerHueBar    ", &Cflags, ImGuiColorEditFlags_PickerHueBar);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_PickerHueWheel  ", &Cflags, ImGuiColorEditFlags_PickerHueWheel);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_InputRGB        ", &Cflags, ImGuiColorEditFlags_InputRGB);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_InputHSV        ", &Cflags, ImGuiColorEditFlags_InputHSV);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_DefaultOptions_", &Cflags, ImGuiColorEditFlags_DefaultOptions_);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_DisplayMask_ ", &Cflags, ImGuiColorEditFlags_DisplayMask_);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_DataTypeMask_", &Cflags, ImGuiColorEditFlags_DataTypeMask_);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_PickerMask_  ", &Cflags, ImGuiColorEditFlags_PickerMask_);
+			ImGui::CheckboxFlags("ImGuiColorEditFlags_InputMask_   ", &Cflags, ImGuiColorEditFlags_InputMask_);
+			ImGui::TreePop();
+		}
+		return;
+	}
+	virtual HWidget* CreateSelfClass()override {
+		return new ColorButton();
+	}
+
+	virtual json Copy()override {
+		json J;
+		PreCopy(J);
+		J["WidgetName"] = Text;
+		json color;
+
+		color["r"] = DFColor.x;
+		color["g"] = DFColor.y;
+		color["b"] = DFColor.z;
+		color["a"] = DFColor.w;
+		J["DFColor"] = color;
+
+		J["flags"] = Cflags;
+		return J;
+	}
+	virtual void Paste(json Data)override {
+		PrePaste(Data);
+
+		std::string Name = Data["WidgetName"];
+		strcpy_s(Text, Name.c_str());
+		json color;
+
+		color = Data["DFColor"];
+		DFColor.x = color["r"];
+		DFColor.y = color["g"];
+		DFColor.z = color["b"];
+		DFColor.w = color["a"];
+
+		Cflags = Data["flags"];
+
+		//ImGuiColorEditFlags_
+		return;
+	}
+
+private:
+	//std::string Text = "Button";
+	char Text[200] = { "Button" };
+	ImGuiColorEditFlags Cflags;
 	ImVec4 DFColor;
 	//ImVec2 Size = ImVec2(0, 0);
 };

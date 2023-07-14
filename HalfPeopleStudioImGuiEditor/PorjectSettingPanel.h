@@ -5,8 +5,8 @@
 #include "SettingPanel.h"
 #include "HWindows.h"
 #include "Porject.h"
-#include "HFileBrowser.h"
 
+//#include "HFileBrowser.h"
 
 namespace PorjectSettingTranslateList
 {
@@ -14,7 +14,24 @@ namespace PorjectSettingTranslateList
 	std::string MainWindow = "MainWindow";
 }
 
-static void InitPorjectSetting(){
+static void LoadFont(json J,HFont& font)
+{
+	font.font = J["FontData"].get<std::vector<int>>();
+	font.Fontfile_size = J["FontFileSize"];
+	font.font_size = J["FontSize"];
+	font.ApplayFont();
+}
+
+static json HFontToJson(HFont& font)
+{
+	json J;
+	J["FontData"] = font.font;
+	J["FontSize"] = font.font_size;
+	J["FontFileSize"] = font.Fontfile_size;
+	return J;
+}
+
+static void InitPorjectSetting() {
 	TranslateObject.push_back(&PorjectSettingTranslateList::PorjectSetting);
 	TranslateObject.push_back(&PorjectSettingTranslateList::MainWindow);
 }
@@ -23,66 +40,63 @@ static json SavePorjectSetting()
 {
 	json PorjectSettingSave;
 
-		json Style;
-		ImGuiStyle& style = GUIStyle;
-		ImVec4* colors = style.Colors;
+	json Style;
+	ImGuiStyle& style = GUIStyle;
+	ImVec4* colors = style.Colors;
 
-		json Color, Colors, Sizes;
+	json Color, Colors, Sizes;
 
-		for (size_t i = 0; i < 55; i++)
-		{
-			Color["R"] = colors[i].x;
-			Color["G"] = colors[i].y;
-			Color["B"] = colors[i].z;
-			Color["A"] = colors[i].w;
-			Colors[ImGui::GetStyleColorName(i)] = Color;
-		}
+	for (size_t i = 0; i < 55; i++)
+	{
+		Color["R"] = colors[i].x;
+		Color["G"] = colors[i].y;
+		Color["B"] = colors[i].z;
+		Color["A"] = colors[i].w;
+		Colors[ImGui::GetStyleColorName(i)] = Color;
+	}
 
-		Sizes["WindowPadding"] = PreferencesFun::ImVec2ToJson(style.WindowPadding);
-		Sizes["WindowRounding"] = style.WindowRounding;
-		Sizes["WindowBorderSize"] = style.WindowBorderSize;
-		Sizes["WindowMinSize"] = PreferencesFun::ImVec2ToJson(style.WindowMinSize);
-		Sizes["WindowTitleAlign"] = PreferencesFun::ImVec2ToJson(style.WindowTitleAlign);
-		Sizes["WindowMenuButtonPosition"] = style.WindowMenuButtonPosition;
-		Sizes["ChildRounding"] = style.ChildRounding;
-		Sizes["ChildBorderSize"] = style.ChildBorderSize;
-		Sizes["PopupRounding"] = style.PopupRounding;
-		Sizes["PopupBorderSize"] = style.PopupBorderSize;
-		Sizes["FramePadding"] = PreferencesFun::ImVec2ToJson(style.FramePadding);
-		Sizes["FrameRounding"] = style.FrameRounding;
-		Sizes["FrameBorderSize"] = style.FrameBorderSize;
-		Sizes["ItemSpacing"] = PreferencesFun::ImVec2ToJson(style.ItemSpacing);
-		Sizes["ItemInnerSpacing"] = PreferencesFun::ImVec2ToJson(style.ItemInnerSpacing);
-		Sizes["CellPadding"] = PreferencesFun::ImVec2ToJson(style.CellPadding);
-		Sizes["TouchExtraPadding"] = PreferencesFun::ImVec2ToJson(style.TouchExtraPadding);
-		Sizes["IndentSpacing"] = style.IndentSpacing;
-		Sizes["ColumnsMinSpacing"] = style.ColumnsMinSpacing;
-		Sizes["ScrollbarSize"] = style.ScrollbarSize;
-		Sizes["ScrollbarRounding"] = style.ScrollbarRounding;
-		Sizes["GrabMinSize"] = style.GrabMinSize;
-		Sizes["GrabRounding"] = style.GrabRounding;
-		Sizes["LogSliderDeadzone"] = style.LogSliderDeadzone;
-		Sizes["TabRounding"] = style.TabRounding;
-		Sizes["TabBorderSize"] = style.TabBorderSize;
-		Sizes["TabMinWidthForCloseButton"] = style.TabMinWidthForCloseButton;
-		Sizes["ColorButtonPosition"] = style.ColorButtonPosition;
-		Sizes["ButtonTextAlign"] = PreferencesFun::ImVec2ToJson(style.ButtonTextAlign);
-		Sizes["SelectableTextAlign"] = PreferencesFun::ImVec2ToJson(style.SelectableTextAlign);
-		Sizes["DisplayWindowPadding"] = PreferencesFun::ImVec2ToJson(style.DisplayWindowPadding);
-		Sizes["DisplaySafeAreaPadding"] = PreferencesFun::ImVec2ToJson(style.DisplaySafeAreaPadding);
-		//Sizes["CurveTessellationTol"]       =       style.CurveTessellationTol;
-		//Sizes["CircleTessellationMaxError"] =       style.CircleTessellationMaxError;
+	Sizes["WindowPadding"] = PreferencesFun::ImVec2ToJson(style.WindowPadding);
+	Sizes["WindowRounding"] = style.WindowRounding;
+	Sizes["WindowBorderSize"] = style.WindowBorderSize;
+	Sizes["WindowMinSize"] = PreferencesFun::ImVec2ToJson(style.WindowMinSize);
+	Sizes["WindowTitleAlign"] = PreferencesFun::ImVec2ToJson(style.WindowTitleAlign);
+	Sizes["WindowMenuButtonPosition"] = style.WindowMenuButtonPosition;
+	Sizes["ChildRounding"] = style.ChildRounding;
+	Sizes["ChildBorderSize"] = style.ChildBorderSize;
+	Sizes["PopupRounding"] = style.PopupRounding;
+	Sizes["PopupBorderSize"] = style.PopupBorderSize;
+	Sizes["FramePadding"] = PreferencesFun::ImVec2ToJson(style.FramePadding);
+	Sizes["FrameRounding"] = style.FrameRounding;
+	Sizes["FrameBorderSize"] = style.FrameBorderSize;
+	Sizes["ItemSpacing"] = PreferencesFun::ImVec2ToJson(style.ItemSpacing);
+	Sizes["ItemInnerSpacing"] = PreferencesFun::ImVec2ToJson(style.ItemInnerSpacing);
+	Sizes["CellPadding"] = PreferencesFun::ImVec2ToJson(style.CellPadding);
+	Sizes["TouchExtraPadding"] = PreferencesFun::ImVec2ToJson(style.TouchExtraPadding);
+	Sizes["IndentSpacing"] = style.IndentSpacing;
+	Sizes["ColumnsMinSpacing"] = style.ColumnsMinSpacing;
+	Sizes["ScrollbarSize"] = style.ScrollbarSize;
+	Sizes["ScrollbarRounding"] = style.ScrollbarRounding;
+	Sizes["GrabMinSize"] = style.GrabMinSize;
+	Sizes["GrabRounding"] = style.GrabRounding;
+	Sizes["LogSliderDeadzone"] = style.LogSliderDeadzone;
+	Sizes["TabRounding"] = style.TabRounding;
+	Sizes["TabBorderSize"] = style.TabBorderSize;
+	Sizes["TabMinWidthForCloseButton"] = style.TabMinWidthForCloseButton;
+	Sizes["ColorButtonPosition"] = style.ColorButtonPosition;
+	Sizes["ButtonTextAlign"] = PreferencesFun::ImVec2ToJson(style.ButtonTextAlign);
+	Sizes["SelectableTextAlign"] = PreferencesFun::ImVec2ToJson(style.SelectableTextAlign);
+	Sizes["DisplayWindowPadding"] = PreferencesFun::ImVec2ToJson(style.DisplayWindowPadding);
+	Sizes["DisplaySafeAreaPadding"] = PreferencesFun::ImVec2ToJson(style.DisplaySafeAreaPadding);
+	//Sizes["CurveTessellationTol"]       =       style.CurveTessellationTol;
+	//Sizes["CircleTessellationMaxError"] =       style.CircleTessellationMaxError;
 
-
-
-		Style["Style"] = Sizes;
-		Style["Colors"] = Colors;
-
-
-
+	Style["Style"] = Sizes;
+	Style["Colors"] = Colors;
 
 	PorjectSettingSave["Style"] = Style;
 	PorjectSettingSave["RootWindowSetting"] = RootWindows->DrawPorjectSettingSave();
+
+	PorjectSettingSave["Font"] = HFontToJson(FontBuff);
 
 	return PorjectSettingSave;
 }
@@ -94,6 +108,8 @@ static void LoadPorjectSetting(json PorjectSettingSave)
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	ImVec4* colors = style.Colors;
+
+	LoadFont(PorjectSettingSave["Font"], FontBuff);
 
 	Style = PorjectSettingSave["Style"];
 	RootWindows->DrawPorjectSettingLoad(PorjectSettingSave["RootWindowSetting"]);
@@ -108,9 +124,6 @@ static void LoadPorjectSetting(json PorjectSettingSave)
 		colors[i].z = Color["B"];
 		colors[i].w = Color["A"];
 	}
-
-
-
 
 	style.WindowPadding = PreferencesFun::JsonToImVec2(Sizes["WindowPadding"]);
 	style.WindowRounding = Sizes["WindowRounding"];
@@ -151,33 +164,33 @@ static void LoadPorjectSetting(json PorjectSettingSave)
 	GUIStyle = style;
 }
 
-static void ExportPorjectSettingCallback(std::string path)
-{
-	std::ofstream file(path.append("\\PorjectSetting.HEditorPorjectSetting.json"));
-	if (file.is_open())
-	{
-		file << SavePorjectSetting();
-	}
-	file.close();
-}
+//static void ExportPorjectSettingCallback(std::string path)
+//{
+//	std::ofstream file(path.append("\\PorjectSetting.HEditorPorjectSetting.json"));
+//	if (file.is_open())
+//	{
+//		file << SavePorjectSetting();
+//	}
+//	file.close();
+//}
 
-static void ImportPorjectSettingCallback(std::string path)
-{
-	std::ifstream file(path);
-	if (file.is_open())
-		LoadPorjectSetting (json::parse(file));
-	file.close();
-}
+//static void ImportPorjectSettingCallback(std::string path)
+//{
+//	std::ifstream file(path);
+//	if (file.is_open())
+//		LoadPorjectSetting(json::parse(file));
+//	file.close();
+//}
 
 static void DrawPorjectSetting()
 {
 	if (!ShowPorjectSettingPanel)
 		return;
 
-	if (ImGui::Begin(std::string(PorjectSettingTranslateList::PorjectSetting).append("###Porject Setting").c_str(),&ShowPorjectSettingPanel))
+	if (ImGui::Begin(std::string(PorjectSettingTranslateList::PorjectSetting).append("###Porject Setting").c_str(), &ShowPorjectSettingPanel))
 	{
 		ImGui::BeginChild("PorjectSettingSelect", ImVec2(150, 0), true);
-		if (ImGui::Selectable(PreferencesVar::TranslateText::TranslateData.at(5).c_str(), SettingSelectIndex ==0))
+		if (ImGui::Selectable(PreferencesVar::TranslateText::TranslateData.at(5).c_str(), SettingSelectIndex == 0))
 			SettingSelectIndex = 0;
 		if (ImGui::Selectable(std::string(PorjectSettingTranslateList::MainWindow).append("##Main Window").c_str(), SettingSelectIndex == 1))
 			SettingSelectIndex = 1;
@@ -187,18 +200,59 @@ static void DrawPorjectSetting()
 		ImGui::BeginGroup();
 		if (ImGui::Button(HT_Export))
 		{
-			FileBrowser::OpenBrowser(ExportPorjectSettingCallback,true);
+			//FileBrowser::OpenBrowser(ExportPorjectSettingCallback,true);
+			ifd::FileDialog::Instance().Save("Export_Porject_Setting", PorjectSettingTranslateList::PorjectSetting, "*.HEditorPorjectSetting {.HEditorPorjectSetting}");
 		}
 		ImGui::SameLine();
 		if (ImGui::Button(HT_Import))
 		{
 			//LoadPorjectSetting();
-			FileBrowser::OpenBrowser(ImportPorjectSettingCallback, false,".HEditorPorjectSetting.");
+			//FileBrowser::OpenBrowser(ImportPorjectSettingCallback, false, ".HEditorPorjectSetting.");
+			ifd::FileDialog::Instance().Open("Import_Porject_Setting", PorjectSettingTranslateList::PorjectSetting, "*.HEditorPorjectSetting {.HEditorPorjectSetting}");
 		}
-		FileBrowser::DrawFileBrowser();
+		//FileBrowser::DrawFileBrowser();
+		if (ifd::FileDialog::Instance().IsDone("Export_Porject_Setting")) {
+			if (ifd::FileDialog::Instance().HasResult()) {
+				std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+				std::ofstream file(res);
+				if (file.is_open())
+				{
+					file << SavePorjectSetting();
+				}
+				file.close();
+			}
+			ifd::FileDialog::Instance().Close();
+		}
+		if (ifd::FileDialog::Instance().IsDone("Import_Porject_Setting")) {
+			if (ifd::FileDialog::Instance().HasResult()) {
+				std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+				std::ifstream file(res);
+				if (file.is_open())
+					LoadPorjectSetting(json::parse(file));
+				file.close();
+			}
+			ifd::FileDialog::Instance().Close();
+		}
 		switch (SettingSelectIndex)
 		{
 		case 0:
+			if (ImGui::Button("Select font"))
+			{
+				ifd::FileDialog::Instance().Open("Select_Font", PorjectSettingTranslateList::PorjectSetting, "*.ttf {.ttf}");
+			}
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(120);
+			ImGui::DragFloat("Font Size (Select Font To Updata)", &FontBuff.font_size, 0.5, 1, 1000, "%.2f px");
+
+			if (ifd::FileDialog::Instance().IsDone("Select_Font")) {
+				if (ifd::FileDialog::Instance().HasResult()) {
+					std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+					FontBuff.LoadFontFile(res);
+					FontBuff.NeedUpdata = true;
+				}
+				ifd::FileDialog::Instance().Close();
+			}
+
 			if (ImGui::TreeNode(std::string(PreferencesVar::TranslateText::TranslateData.at(6)).append("###Main").c_str()))
 			{
 				//if (ImGui::Button(PreferencesVar::TranslateText::TranslateData.at(7).c_str()))
@@ -352,9 +406,9 @@ static void DrawPorjectSetting()
 				ImGui::TreePop();
 			}
 			break;
-			case 1:
-				RootWindows->DrawPorjectSetting();
-				break;
+		case 1:
+			RootWindows->DrawPorjectSetting();
+			break;
 		default:
 			break;
 		}

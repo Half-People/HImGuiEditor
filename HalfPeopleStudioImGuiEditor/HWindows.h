@@ -19,6 +19,7 @@ public:
 	virtual bool WhetherToEnableRenderingLoop() { return 0; }
 	virtual void FrameInit() { return; }
 	virtual void FrameEnd() { return; }
+	virtual void ReCreateObject() { return; }
 
 	virtual const char* GetCod_Inculd() { return ""; }
 	virtual const char* GetCod_InitWindows() { return ""; }
@@ -81,6 +82,7 @@ public:
 	virtual bool WhetherToEnableRenderingLoop()override;
 	virtual void FrameInit()override;
 	virtual void FrameEnd()override;
+	virtual void ReCreateObject()override;
 
 	virtual const char* GetCod_Inculd()override;
 	virtual const char* GetCod_InitWindows()override;
