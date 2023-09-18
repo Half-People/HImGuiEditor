@@ -40,6 +40,8 @@ The following are the APIs used
 
 [stb_image I use image loading](https://github.com/nothings/stb/blob/master/stb_image.h)
 
+[lz4 I use in Image compression when saving](https://github.com/lz4/lz4)
+
 There is also imgui API in the project
 --------------------------------------------------------------------------
 
