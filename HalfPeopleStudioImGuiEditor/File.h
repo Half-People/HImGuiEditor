@@ -2,15 +2,17 @@
 #include <io.h>
 #include <string>
 #include <vector>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
 #include <fstream>
 #include <GLFW/glfw3.h>
 #include <ctime>
 #include <direct.h>
 #include <filesystem>
 
-ImTextureID DefaultLogo;
+static ImTextureID DefaultLogo;
 
 static bool HHaveFile(std::string path)
 {
@@ -179,6 +181,7 @@ std::vector<std::string> getListOfDrives() {
 	return arrayOfDrives;
 }
 
+#define GLuintToImTextureID (void*)(intptr_t)
 static bool HLoadImage(const char* filename, ImTextureID& out_texture)
 {
 	int image_width = 0;
@@ -204,6 +207,51 @@ static bool HLoadImage(const char* filename, ImTextureID& out_texture)
 	stbi_image_free(image_data);
 
 	out_texture = (void*)(intptr_t)image_texture;
+
+	return true;
+}
+
+static bool HLoadImage1(const char* filename, ImVec2& ImageSize, std::vector<unsigned char>& ImageData)
+{
+	int image_width = 0;
+	int image_height = 0;
+	int image_channels = 0;
+
+	unsigned char* image_data = stbi_load(filename, &image_width, &image_height, &image_channels, 4);
+	if (image_data == NULL)
+		return false;
+	ImageData.clear();
+	ImageData.resize((image_width * image_height) * image_channels);
+	memcpy(ImageData.data(), image_data, ImageData.size());
+
+	ImageSize.x = image_width;
+	ImageSize.y = image_height;
+
+	//stbi_image_free(image_data);
+	return true;
+}
+
+static bool HLoadImage2(const unsigned char* imageData, ImVec2 ImageSize, GLuint& ImageBuffer)
+{
+	int image_width = ImageSize.x;
+	int image_height = ImageSize.y;
+
+	if (imageData == NULL)
+		return false;
+
+	glGenTextures(1, &ImageBuffer);
+	glBindTexture(GL_TEXTURE_2D, ImageBuffer);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // This is required on WebGL for non power-of-two textures
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // Same
+
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	//stbi_image_free(imageData);
 
 	return true;
 }

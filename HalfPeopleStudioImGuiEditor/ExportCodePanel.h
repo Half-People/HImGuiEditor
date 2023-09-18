@@ -11,7 +11,6 @@ static void InitexportCode()
 	ExportCode->SetHandleKeyboardInputs(false);
 }
 
-
 static void DrawExportCode()
 {
 	if (ImGui::Begin("ExportCodePanel"))
@@ -24,7 +23,7 @@ static void DrawExportCode()
 				HWidgetExport ExBuff = ImGuiWindows.at(SelectHImGuiWindows)->Export("		");
 
 				SaveCode = "// Inculde\n";
-				SaveCode.append( RootWindows->GetCod_Inculd());
+				SaveCode.append(RootWindows->GetCod_Inculd());
 
 				for (size_t i = 0; i < ExBuff.Inculd.size(); i++)
 				{
@@ -82,10 +81,6 @@ static void DrawExportCode()
 				SaveCode.append(ExBuff.ExportCode);
 			}
 
-
-
-
-
 			if (HaveExportHWindowCode)
 			{
 				SaveCode.append("\n		// FrameEnd");
@@ -98,7 +93,7 @@ static void DrawExportCode()
 		ImGui::SameLine();
 		ImGui::Checkbox("HaveExportWindowCode", &HaveExportHWindowCode);
 
-		ExportCode->Render("ExportCode",ImVec2(),true);
+		ExportCode->Render("ExportCode", ImVec2(), true);
 	}
 	ImGui::End();
 }

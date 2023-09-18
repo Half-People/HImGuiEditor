@@ -1,7 +1,8 @@
 #pragma once
 #include "HWidget.h"
+#include "FileToolCallBack.h"
 #include "HImGuiWidgetItem.h"
-
+#include "ImFileDialog/ImFileDialog.h"
 static std::string DefaultWidgetButton = "Button";
 static std::string DefaultWidgetButtonID = "Button";
 class Button :public HWidget
@@ -1019,6 +1020,211 @@ private:
 	char Text[200] = { "Button" };
 	ImGuiColorEditFlags Cflags;
 	ImVec4 DFColor;
+	//ImVec2 Size = ImVec2(0, 0);
+};
+static std::string DefaultWidgetImage = "Image";
+static std::string DefaultWidgetImageID = "Image";
+class Image :public HWidget
+{
+public:
+	Image()
+	{
+		WidgetName = &DefaultWidgetImage;
+		WidgetNameID = &DefaultWidgetImageID;
+		WidgetID = Text;
+		WidgetSize = ImVec2(100, 100);
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+	}
+
+	virtual void DrawIconForControlPanel()override
+	{
+		ImGui::Image(*FileCallBack::DefaultLogo, ImVec2(80, 80));
+		//ImGui::Button("Button");
+		return;
+	}
+	virtual std::string Export(std::string Offset) override
+	{
+		std::string RandText = GetRandText((int)this);
+		std::string SaveExportText;
+		SaveExportText.append("\n").append(Offset).append("static const unsigned char ").append(RandText).append("_imageData[] = {\n").append(Offset).append(EZ_Tool::VectorToString(ImageData, Offset)).append("\n};");
+		SaveExportText.append("\n").append(Offset).append("static bool ").append(RandText).append("_imageTextureNeedUpdata = true;");
+		SaveExportText.append("\n").append(Offset).append("static ImTextureID ").append(RandText).append("_imageTextureBuffer;");
+		SaveExportText.append("\n").append(Offset).append("ImGui::Image(HLoadImage(").append(RandText).append("_imageData,").append(RandText).append("_imageTextureBuffer, ImVec2(").append(std::to_string(ImageSizeBuffer.x)).append(", ").append(std::to_string(ImageSizeBuffer.y)).append("),").append(RandText).append("_imageTextureNeedUpdata").append("), ImVec2(").append(std::to_string(WidgetSize.x)).append(", ").append(std::to_string(WidgetSize.y)).append("), ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
+		return SaveExportText;
+	}
+	virtual void Draw()override
+	{
+		DrawPreLogic();
+		if (ImageBuffer)
+			ImGui::Image(GLuintToImTextureID ImageBuffer, WidgetSize, UV0, UV1, tini_color, border_color);
+		else
+			ImGui::Image(*FileCallBack::DefaultLogo, WidgetSize, UV0, UV1, tini_color, border_color);
+		DrawLogicTick();
+		return;
+	}
+	virtual void DetailPanelWidget()override
+	{
+		ImGui::InputText("ImageID", Text, 200);
+
+		if (ImGui::BeginChild("Image  aaa", ImVec2(-1, 210), true))
+		{
+			if (ImGui::Button("Select Image"))
+			{
+				ifd::FileDialog::Instance().Open("Select Image_Dialog", "Select Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*");
+			}
+
+			if (ifd::FileDialog::Instance().IsDone("Select Image_Dialog")) {
+				if (ifd::FileDialog::Instance().HasResult()) {
+					std::string res = ifd::FileDialog::Instance().GetResult().u8string();
+					printf("SAVE[%s]\n", res.c_str());
+					if (FileCallBack::HLoadImage2(res.c_str(), ImageSizeBuffer, ImageData))
+					{
+						FileCallBack::HLoadImage3(ImageData.data(), ImageSizeBuffer, ImageBuffer);
+					}
+				}
+				ifd::FileDialog::Instance().Close();
+			}
+
+			if (ImageBuffer)
+			{
+				ImGui::Image(GLuintToImTextureID ImageBuffer, ImVec2(100, 100));
+			}
+			ImGui::Text("ImageSize : x-%f   y-%f", ImageSizeBuffer.x, ImageSizeBuffer.y);
+			if (ImageSizeBuffer.x > 1024 || ImageSizeBuffer.y > 1024)
+			{
+				ImGui::TextColored(ImVec4(0.819608, 0.0666667, 0.0666667, 1), "The image is too large. It is recommended that the image size be below (1024, 1024).");
+			}
+			else
+			{
+				ImVec2 RecommendedSizes;
+				RecommendedSizes.x = EZ_Tool::GetRecommendedSizes(WidgetSize.x);
+				RecommendedSizes.y = EZ_Tool::GetRecommendedSizes(WidgetSize.y);
+				if (ImageSizeBuffer.x == RecommendedSizes.x && ImageSizeBuffer.y == RecommendedSizes.y)
+				{
+					ImGui::TextColored(ImVec4(0.160784, 0.878431, 0.0784314, 1), "Perfect picture size");
+				}
+				else
+				{
+					if (ImageSizeBuffer.x > RecommendedSizes.x && ImageSizeBuffer.y > RecommendedSizes.y)
+					{
+						ImGui::TextColored(ImVec4(0.960784, 0.713726, 0.258824, 1), "Recommended image size ( %f , %f )", RecommendedSizes.x, RecommendedSizes.y);
+					}
+					else
+					{
+						ImGui::TextColored(ImVec4(0.960784, 0.713726, 0.258824, 1), "The picture may be blurry  Recommended image size ( %f , %f )", RecommendedSizes.x, RecommendedSizes.y);
+					}
+				}
+			}
+			ImGui::EndChild();
+		}
+
+		ImGui::DragFloat2("uv0 :", (float*)&UV0, 0.1, 0, 1);
+		ImGui::DragFloat2("uv1 :", (float*)&UV1, 0.1, 0, 1);
+		ImGui::ColorEdit4("tint_col :", (float*)&tini_color, ImGuiColorEditFlags_AlphaBar);
+		ImGui::ColorEdit4("border_col :", (float*)&border_color, ImGuiColorEditFlags_AlphaBar);
+		return;
+	}
+	virtual HWidget* CreateSelfClass()override {
+		return new Image();
+	}
+
+	virtual json Copy()override {
+		json J;
+		PreCopy(J);
+		J["WidgetName"] = Text;
+
+		json tinicolor;
+
+		tinicolor["r"] = tini_color.x;
+		tinicolor["g"] = tini_color.y;
+		tinicolor["b"] = tini_color.z;
+		tinicolor["a"] = tini_color.w;
+		J["tini_color"] = tinicolor;
+
+		json bordercolor;
+
+		bordercolor["r"] = border_color.x;
+		bordercolor["g"] = border_color.y;
+		bordercolor["b"] = border_color.z;
+		bordercolor["a"] = border_color.w;
+		J["border_color"] = bordercolor;
+
+		json uv0;
+		uv0["x"] = UV0.x;
+		uv0["y"] = UV0.y;
+		J["uv0"] = uv0;
+
+		json uv1;
+		uv1["x"] = UV1.x;
+		uv1["y"] = UV1.y;
+		J["uv1"] = uv1;
+
+		json ImageSize;
+		ImageSize["x"] = ImageSizeBuffer.x;
+		ImageSize["y"] = ImageSizeBuffer.y;
+		J["ImageSizeBuffer"] = ImageSize;
+
+		try
+		{
+			J["Image_data_size"] = ImageData.size();
+			J["Image_data"] = EZ_Tool::compressLZ4(ImageData);
+		}
+		catch (const json::exception& e)
+		{
+			std::cout << "\nDefalutWidget->Image->Copy-> Json -> Error -> Error Message : " << e.what();
+		}
+
+		return J;
+	}
+	virtual void Paste(json Data)override {
+		PrePaste(Data);
+
+		std::string Name = Data["WidgetName"];
+		strcpy_s(Text, Name.c_str());
+
+		json tinicolor = Data["tini_color"];
+
+		tini_color.x = tinicolor["r"];
+		tini_color.y = tinicolor["g"];
+		tini_color.z = tinicolor["b"];
+		tini_color.w = tinicolor["a"];
+
+		json bordercolor = Data["border_color"];
+
+		border_color.x = bordercolor["r"];
+		border_color.y = bordercolor["g"];
+		border_color.z = bordercolor["b"];
+		border_color.w = bordercolor["a"];
+
+		json uv0 = Data["uv0"];
+		UV0.x = uv0["x"];
+		UV0.y = uv0["y"];
+
+		json uv1 = Data["uv1"];
+		uv1["x"] = UV1.x = uv1["x"];
+		uv1["y"] = UV1.y = uv1["y"];
+
+		json ImageSize = Data["ImageSizeBuffer"];
+		ImageSizeBuffer.x = ImageSize["x"];
+		ImageSizeBuffer.y = ImageSize["y"];
+
+		ImageData = EZ_Tool::decompressLZ4(Data["Image_data"].get<std::vector<long long>>(), Data["Image_data_size"]);
+
+		if (!ImageData.empty())
+			FileCallBack::HLoadImage3(ImageData.data(), ImageSizeBuffer, ImageBuffer);
+
+		return;
+	}
+private:
+	//std::string Text = "Button";
+	char Text[200] = { "Image" };
+	std::vector<unsigned char> ImageData = {};
+	ImVec2 UV0 = ImVec2(0, 0), UV1 = ImVec2(1, 1);
+	ImVec4 tini_color = ImVec4(1, 1, 1, 1), border_color = ImVec4(0, 0, 0, 0);
+	GLuint ImageBuffer;
+	ImVec2 ImageSizeBuffer;
 	//ImVec2 Size = ImVec2(0, 0);
 };
 //static ImVec4 Color;

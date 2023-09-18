@@ -22,6 +22,7 @@ void CreateDefaulWidget()
 	WidgetList.push_back(new DragFloat);
 	WidgetList.push_back(new ColorEdit);
 	WidgetList.push_back(new ColorButton);
+	WidgetList.push_back(new Image);
 }
 
 void VerifyHWidgetList()

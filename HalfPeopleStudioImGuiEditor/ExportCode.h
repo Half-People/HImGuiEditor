@@ -118,8 +118,48 @@ namespace ExportCodeNS
 		SaveCode.append(RootWindows->GetCod_Inculd());
 		SaveCode.append("\n// Inculd HImGuiWindow");
 		SaveCode.append("\n#include \"HImGuiWidget.h\"");
+		//
+		//LoadImageFunction
+		//
+		SaveCode.append("\n\nImTextureID HLoadImage_CB(const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize, bool& NeedUpdata)\n{");
+		SaveCode.append(R"(
+	if(NeedUpdata)
+	{
+		NeedUpdata = false;
+		int image_width = ImageSize.x;
+		int image_height = ImageSize.y;
+
+		if (imageData == NULL)
+			return ImageBuffer;
+
+		glGenTextures(1, reinterpret_cast<GLuint*>(&ImageBuffer));
+		glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(ImageBuffer));
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // This is required on WebGL for non power-of-two textures
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // Same
+
+	#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	#endif
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+		//stbi_image_free(imageData);
+
+		return ImageBuffer;
+	}
+	else
+	{
+		return ImageBuffer;
+	}
+
+)");
+		SaveCode.append("\n}");
+
 		SaveCode.append("\n\n// Main");
 		SaveCode.append("\nint main()\n{\n");
+		SaveCode.append("\n	// SetHLoadImage CallBack");
+		SaveCode.append("\n	HLoadImage = HLoadImage_CB;");
 		SaveCode.append("\n	// Init Window\n");
 		SaveCode.append(RootWindows->GetCod_InitWindows());
 		SaveCode.append("\n	// CreateWindow\n");
@@ -169,7 +209,10 @@ namespace ExportCodeNS
 	{
 		std::string SaveCode = "// Inculde Widget Inculd";
 
-		SaveCode.append("\n#include <imgui.h>\n");
+		SaveCode.append("\n#include <imgui.h>");
+		SaveCode.append("\n#include <vector>\n");
+		SaveCode.append("\n//HLoadImage CallBack");
+		SaveCode.append("\nImTextureID(*HLoadImage)(const unsigned char* imageData, ImTextureID& ImageBuffer,ImVec2 ImageSize,bool& NeedUpdata);\n");
 
 		for (size_t i = 0; i < CodeBuff.Inculd.size(); i++)
 		{
@@ -869,14 +912,14 @@ static void DrawExportMenu()
 		{
 			//ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportVS2019PorjectCallBack;
 			//ExportCodeNS::CanOpenBrowser = true;
-			ifd::FileDialog::Instance().Save("ExportVS2019PorjectDialog", ExportMenuT::ExportVisualStudioPorject.c_str(), "");
+			ifd::FileDialog::Instance().Open("ExportVS2019PorjectDialog", ExportMenuT::ExportVisualStudioPorject.c_str(), "");
 		}
 
 		if (ImGui::Selectable(ExportMenuT::OnlyExportSourceCode.c_str()))
 		{
 			//ExportCodeNS::NextBrowserCallBack = ExportCodeNS::ExportSourceCode;
 			//ExportCodeNS::CanOpenBrowser = true;
-			ifd::FileDialog::Instance().Save("OnlyExportSourceCode", ExportMenuT::OnlyExportSourceCode.c_str(), "");
+			ifd::FileDialog::Instance().Open("OnlyExportSourceCode", ExportMenuT::OnlyExportSourceCode.c_str(), "");
 		}
 
 		ImGui::EndMenu();
