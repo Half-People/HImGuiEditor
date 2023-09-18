@@ -2,9 +2,7 @@
 #include "HWindows.h"
 
 #include <iostream>
-
 #include "File.h"
-
 #include "MainMenuBar.h"
 #include "ControlPanel.h"
 #include "DetailsPanel.h"
@@ -21,8 +19,6 @@
 #include "Plugin.h"
 #include "KeyAndAutoSave.h"
 #include "ImFileDialogTool.h"
-
-
 
 int main()
 {
@@ -71,20 +67,24 @@ int main()
 	ImGui::StyleColorsDark();
 	GUIStyle = ImGui::GetStyle();
 
-	
 	io.Fonts->AddFontFromFileTTF("DependentFile\\kaiu.ttf", 20, NULL, io.Fonts->GetGlyphRangesChineseFull());
 	//GUIFont = io.Fonts->AddFontDefault();
 	FontBuff.Init();
 
-
 	std::cout << "\n InitializeBeforeRendering" << RootWindows->InitializeBeforeRendering();
+
+	//Init FileCallBack
+	FileCallBack::DefaultLogo = &DefaultLogo;
+	FileCallBack::HLoadImage1 = HLoadImage;
+	FileCallBack::HLoadImage2 = HLoadImage1;
+	FileCallBack::HLoadImage3 = HLoadImage2;
 
 	CreateDefaulWidget();
 	LoadWidgetPlugin();
 	VerifyHWidgetList();
 	InitImFileDialog
 
-	InitSettingPanel();
+		InitSettingPanel();
 	InitexportCode();
 	InitPorjectSetting();
 	SplashScreenInit
@@ -102,7 +102,6 @@ int main()
 		RightClickMenuInit
 		TranslateAllObject();
 	PostTranslationInit();
-	
 
 	EditorStyle = ImGui::GetStyle();
 	AutoSaveInit();
@@ -128,12 +127,10 @@ int main()
 		DrawWindowDetailsPanel();
 		DrawExportCode();
 
-
 		DrawPorjectSetting();
-		
-		
+
 		ImGuiWindows.at(SelectHImGuiWindows)->Draw(); //PopFont in HImGuiWindowDrawInit function
-		
+
 		RootWindows->FrameEnd();
 		//FontBuff.DelayedApplicationFontsInMainLoop(io);
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -143,7 +140,6 @@ int main()
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
-		
 	}
 	AutoSaveThread.detach();
 }

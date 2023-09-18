@@ -42,6 +42,9 @@
     <Filter Include="ImGui\HArrow">
       <UniqueIdentifier>{e523e62c-dccc-4897-9efa-c84a70092c5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGui\ImGuiFileDiaolog">
+      <UniqueIdentifier>{95683cfd-10f7-495f-abe1-8ef00878e763}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -134,9 +137,6 @@
     <ClInclude Include="Porject.h">
       <Filter>Porject</Filter>
     </ClInclude>
-    <ClInclude Include="HFileBrowser.h">
-      <Filter>Editor\Tool</Filter>
-    </ClInclude>
     <ClInclude Include="HArrow\HArrow.h">
       <Filter>ImGui\HArrow</Filter>
     </ClInclude>
@@ -157,6 +157,18 @@
     </ClInclude>
     <ClInclude Include="FlagsList.h">
       <Filter>Editor\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ImFileDialog\ImFileDialog.h">
+      <Filter>ImGui\ImGuiFileDiaolog</Filter>
+    </ClInclude>
+    <ClInclude Include="ImFileDialogTool.h">
+      <Filter>Editor\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="HFont.h">
+      <Filter>Editor\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="FileToolCallBack.h">
+      <Filter>Editor\Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="ImGuiColorTextEdit\TextEditor.cpp">
       <Filter>ImGui\ImGuiColorTextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="ImFileDialog\ImFileDialog.cpp">
+      <Filter>ImGui\ImGuiFileDiaolog</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

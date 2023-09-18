@@ -97,8 +97,6 @@ namespace PreferencesVar
 			"NavWindowDimBackground",
 			"ModalWindowDimBackground",//55
 
-
-
 			"WindowPadding",
 			"Frame Padding",
 			"CellPadding",
@@ -143,13 +141,20 @@ namespace AutoSave {
 }
 static void LoadSettingData()
 {
-	std::ifstream file("DependentFile\\configuration file\\Preferences.json");
-	if(file.is_open())
-		SettingSave = json::parse(file);
-	file.close();
-	TranslateTargetLang = SettingSave["TranslateTargetLang"];
-	AutoSave::Interval = SettingSave["AutoSaveInterval"];
-	AutoSave::AutoSave = SettingSave["AutoSave"];
+	try
+	{
+		std::ifstream file("DependentFile\\configuration file\\Preferences.json");
+		if (file.is_open())
+			SettingSave = json::parse(file);
+		file.close();
+		TranslateTargetLang = SettingSave["TranslateTargetLang"];
+		AutoSave::Interval = SettingSave["AutoSaveInterval"];
+		AutoSave::AutoSave = SettingSave["AutoSave"];
+	}
+	catch (const json::exception& e)
+	{
+		std::cout << "\nSetting Panel -> LoadSettingData -> Json -> Error -> Error Message : " << e.what();
+	}
 }
 static void PostTranslationInit()
 {
@@ -166,7 +171,6 @@ static void SaveSettingData()
 	}
 	file.close();
 }
-
 
 namespace PreferencesFun
 {
@@ -193,63 +197,69 @@ namespace PreferencesFun
 
 	static void LoadThemeMainStyle()
 	{
-		json Style,Color,Colors,Sizes;
-		std::ifstream file("DependentFile\\configuration file\\UseStyle.json");
-		if (file.is_open())
-			Style = json::parse(file);
-		else
-			return;
-		file.close();
-		ImGuiStyle& style = ImGui::GetStyle();
-		ImVec4* colors = style.Colors;
-		Colors = Style["Colors"];
-		Sizes = Style["Style"];
-		for (size_t i = 0; i < Colors.size(); i++)
+		try
 		{
-			Color= Colors[ImGui::GetStyleColorName(i)];
-			colors[i].x = Color["R"];
-			colors[i].y = Color["G"];
-			colors[i].z = Color["B"];
-			colors[i].w = Color["A"];
+			json Style, Color, Colors, Sizes;
+			std::ifstream file("DependentFile\\configuration file\\UseStyle.json");
+			if (file.is_open())
+				Style = json::parse(file);
+			else
+				return;
+			file.close();
+			ImGuiStyle& style = ImGui::GetStyle();
+			ImVec4* colors = style.Colors;
+			Colors = Style["Colors"];
+			Sizes = Style["Style"];
+			for (size_t i = 0; i < Colors.size(); i++)
+			{
+				Color = Colors[ImGui::GetStyleColorName(i)];
+				colors[i].x = Color["R"];
+				colors[i].y = Color["G"];
+				colors[i].z = Color["B"];
+				colors[i].w = Color["A"];
+			}
+
+			style.WindowPadding = JsonToImVec2(Sizes["WindowPadding"]);
+			style.WindowRounding = Sizes["WindowRounding"];
+			style.WindowBorderSize = Sizes["WindowBorderSize"];
+			style.WindowMinSize = JsonToImVec2(Sizes["WindowMinSize"]);
+			style.WindowTitleAlign = JsonToImVec2(Sizes["WindowTitleAlign"]);
+			style.WindowMenuButtonPosition = Sizes["WindowMenuButtonPosition"];
+			style.ChildRounding = Sizes["ChildRounding"];
+			style.ChildBorderSize = Sizes["ChildBorderSize"];
+			style.PopupRounding = Sizes["PopupRounding"];
+			style.PopupBorderSize = Sizes["PopupBorderSize"];
+			style.FramePadding = JsonToImVec2(Sizes["FramePadding"]);
+			style.FrameRounding = Sizes["FrameRounding"];
+			style.FrameBorderSize = Sizes["FrameBorderSize"];
+			style.ItemSpacing = JsonToImVec2(Sizes["ItemSpacing"]);
+			style.ItemInnerSpacing = JsonToImVec2(Sizes["ItemInnerSpacing"]);
+			style.CellPadding = JsonToImVec2(Sizes["CellPadding"]);
+			style.TouchExtraPadding = JsonToImVec2(Sizes["TouchExtraPadding"]);
+			style.IndentSpacing = Sizes["IndentSpacing"];
+			style.ColumnsMinSpacing = Sizes["ColumnsMinSpacing"];
+			style.ScrollbarSize = Sizes["ScrollbarSize"];
+			style.ScrollbarRounding = Sizes["ScrollbarRounding"];
+			style.GrabMinSize = Sizes["GrabMinSize"];
+			style.GrabRounding = Sizes["GrabRounding"];
+			style.LogSliderDeadzone = Sizes["LogSliderDeadzone"];
+			style.TabRounding = Sizes["TabRounding"];
+			style.TabBorderSize = Sizes["TabBorderSize"];
+			style.TabMinWidthForCloseButton = Sizes["TabMinWidthForCloseButton"];
+			style.ColorButtonPosition = Sizes["ColorButtonPosition"];
+			style.ButtonTextAlign = JsonToImVec2(Sizes["ButtonTextAlign"]);
+			style.SelectableTextAlign = JsonToImVec2(Sizes["SelectableTextAlign"]);
+			style.DisplayWindowPadding = JsonToImVec2(Sizes["DisplayWindowPadding"]);
+			style.DisplaySafeAreaPadding = JsonToImVec2(Sizes["DisplaySafeAreaPadding"]);
+			//style.CurveTessellationTol						      =              Sizes["CurveTessellationTol"]       		  ;
+			//style.CircleTessellationMaxError					  =              Sizes["CircleTessellationMaxError"] 		  ;
+
+			EditorStyle = style;
 		}
-
-
-		 style.WindowPadding                                  = JsonToImVec2(Sizes["WindowPadding"])                      ;
-		 style.WindowRounding								  =              Sizes["WindowRounding"]             		  ;
-		 style.WindowBorderSize						          =              Sizes["WindowBorderSize"]           		  ;
-		 style.WindowMinSize  			                      = JsonToImVec2(Sizes["WindowMinSize"])             		  ;
-		 style.WindowTitleAlign		                          = JsonToImVec2(Sizes["WindowTitleAlign"])           		  ;
-		 style.WindowMenuButtonPosition				          =              Sizes["WindowMenuButtonPosition"]   		  ;
-		 style.ChildRounding								  =              Sizes["ChildRounding"]              		  ;
-		 style.ChildBorderSize								  =              Sizes["ChildBorderSize"]            		  ;
-		 style.PopupRounding								  =              Sizes["PopupRounding"]              		  ;
-		 style.PopupBorderSize								  =              Sizes["PopupBorderSize"]            		  ;
-		 style.FramePadding					                  = JsonToImVec2(Sizes["FramePadding"])              		  ;
-		 style.FrameRounding								  =              Sizes["FrameRounding"]              		  ;
-		 style.FrameBorderSize								  =              Sizes["FrameBorderSize"]            		  ;
-		 style.ItemSpacing					                  = JsonToImVec2(Sizes["ItemSpacing"])                		  ;
-		 style.ItemInnerSpacing				                  = JsonToImVec2(Sizes["ItemInnerSpacing"])           		  ;
-		 style.CellPadding					                  = JsonToImVec2(Sizes["CellPadding"])               		  ;
-		 style.TouchExtraPadding				              = JsonToImVec2(Sizes["TouchExtraPadding"])          		  ;
-		 style.IndentSpacing								  =              Sizes["IndentSpacing"]              		  ;
-		 style.ColumnsMinSpacing							  =              Sizes["ColumnsMinSpacing"]          		  ;
-		 style.ScrollbarSize								  =              Sizes["ScrollbarSize"]              		  ;
-		 style.ScrollbarRounding							  =              Sizes["ScrollbarRounding"]          		  ;
-		 style.GrabMinSize								      =              Sizes["GrabMinSize"]                		  ;
-		 style.GrabRounding								      =              Sizes["GrabRounding"]               		  ;
-		 style.LogSliderDeadzone							  =              Sizes["LogSliderDeadzone"]          		  ;
-		 style.TabRounding									  =              Sizes["TabRounding"]                		  ;
-		 style.TabBorderSize								  =              Sizes["TabBorderSize"]              		  ;
-		 style.TabMinWidthForCloseButton					  =              Sizes["TabMinWidthForCloseButton"]  		  ;
-		 style.ColorButtonPosition							  =              Sizes["ColorButtonPosition"]        		  ;
-		 style.ButtonTextAlign				                  = JsonToImVec2(Sizes["ButtonTextAlign"])            		  ;
-		 style.SelectableTextAlign			                  = JsonToImVec2(Sizes["SelectableTextAlign"])        		  ;
-		 style.DisplayWindowPadding			                  = JsonToImVec2(Sizes["DisplayWindowPadding"])       		  ;
-		 style.DisplaySafeAreaPadding		                  = JsonToImVec2(Sizes["DisplaySafeAreaPadding"])     		  ;
-		 //style.CurveTessellationTol						      =              Sizes["CurveTessellationTol"]       		  ;
-		 //style.CircleTessellationMaxError					  =              Sizes["CircleTessellationMaxError"] 		  ;
-
-		 EditorStyle = style;
+		catch (const json::exception& e)
+		{
+			std::cout << "\nSetting Panel -> LoadThemeMainStyle -> Json -> Error -> Error Message : " << e.what();
+		}
 	}
 
 	static void SaveThemeMainStyle()
@@ -258,7 +268,7 @@ namespace PreferencesFun
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec4* colors = style.Colors;
 
-		json Color,Colors,Sizes;
+		json Color, Colors, Sizes;
 
 		for (size_t i = 0; i < 55; i++)
 		{
@@ -269,42 +279,40 @@ namespace PreferencesFun
 			Colors[ImGui::GetStyleColorName(i)] = Color;
 		}
 
-		Sizes["WindowPadding"]              =       PreferencesFun::ImVec2ToJson(style.WindowPadding);
-		Sizes["WindowRounding"]             =       style.WindowRounding;
-		Sizes["WindowBorderSize"]           =       style.WindowBorderSize;
-		Sizes["WindowMinSize"]              =       PreferencesFun::ImVec2ToJson(style.WindowMinSize);
-		Sizes["WindowTitleAlign"]           =       PreferencesFun::ImVec2ToJson(style.WindowTitleAlign);
-		Sizes["WindowMenuButtonPosition"]   =       style.WindowMenuButtonPosition;
-		Sizes["ChildRounding"]              =       style.ChildRounding;
-		Sizes["ChildBorderSize"]            =       style.ChildBorderSize;
-		Sizes["PopupRounding"]              =       style.PopupRounding;
-		Sizes["PopupBorderSize"]            =       style.PopupBorderSize;
-		Sizes["FramePadding"]               =       PreferencesFun::ImVec2ToJson(style.FramePadding);
-		Sizes["FrameRounding"]              =       style.FrameRounding;
-		Sizes["FrameBorderSize"]            =       style.FrameBorderSize;
-		Sizes["ItemSpacing"]                =       PreferencesFun::ImVec2ToJson(style.ItemSpacing);
-		Sizes["ItemInnerSpacing"]           =       PreferencesFun::ImVec2ToJson(style.ItemInnerSpacing);
-		Sizes["CellPadding"]                =       PreferencesFun::ImVec2ToJson(style.CellPadding);
-		Sizes["TouchExtraPadding"]          =       PreferencesFun::ImVec2ToJson(style.TouchExtraPadding);
-		Sizes["IndentSpacing"]              =       style.IndentSpacing;
-		Sizes["ColumnsMinSpacing"]          =       style.ColumnsMinSpacing;
-		Sizes["ScrollbarSize"]              =       style.ScrollbarSize;
-		Sizes["ScrollbarRounding"]          =       style.ScrollbarRounding;
-		Sizes["GrabMinSize"]                =       style.GrabMinSize;
-		Sizes["GrabRounding"]               =       style.GrabRounding;
-		Sizes["LogSliderDeadzone"]          =       style.LogSliderDeadzone;
-		Sizes["TabRounding"]                =       style.TabRounding;
-		Sizes["TabBorderSize"]              =       style.TabBorderSize;
-		Sizes["TabMinWidthForCloseButton"]  =       style.TabMinWidthForCloseButton;
-		Sizes["ColorButtonPosition"]        =       style.ColorButtonPosition;
-		Sizes["ButtonTextAlign"]            =       PreferencesFun::ImVec2ToJson(style.ButtonTextAlign);
-		Sizes["SelectableTextAlign"]        =       PreferencesFun::ImVec2ToJson(style.SelectableTextAlign);
-		Sizes["DisplayWindowPadding"]       =       PreferencesFun::ImVec2ToJson(style.DisplayWindowPadding);
-		Sizes["DisplaySafeAreaPadding"]     =       PreferencesFun::ImVec2ToJson(style.DisplaySafeAreaPadding);
+		Sizes["WindowPadding"] = PreferencesFun::ImVec2ToJson(style.WindowPadding);
+		Sizes["WindowRounding"] = style.WindowRounding;
+		Sizes["WindowBorderSize"] = style.WindowBorderSize;
+		Sizes["WindowMinSize"] = PreferencesFun::ImVec2ToJson(style.WindowMinSize);
+		Sizes["WindowTitleAlign"] = PreferencesFun::ImVec2ToJson(style.WindowTitleAlign);
+		Sizes["WindowMenuButtonPosition"] = style.WindowMenuButtonPosition;
+		Sizes["ChildRounding"] = style.ChildRounding;
+		Sizes["ChildBorderSize"] = style.ChildBorderSize;
+		Sizes["PopupRounding"] = style.PopupRounding;
+		Sizes["PopupBorderSize"] = style.PopupBorderSize;
+		Sizes["FramePadding"] = PreferencesFun::ImVec2ToJson(style.FramePadding);
+		Sizes["FrameRounding"] = style.FrameRounding;
+		Sizes["FrameBorderSize"] = style.FrameBorderSize;
+		Sizes["ItemSpacing"] = PreferencesFun::ImVec2ToJson(style.ItemSpacing);
+		Sizes["ItemInnerSpacing"] = PreferencesFun::ImVec2ToJson(style.ItemInnerSpacing);
+		Sizes["CellPadding"] = PreferencesFun::ImVec2ToJson(style.CellPadding);
+		Sizes["TouchExtraPadding"] = PreferencesFun::ImVec2ToJson(style.TouchExtraPadding);
+		Sizes["IndentSpacing"] = style.IndentSpacing;
+		Sizes["ColumnsMinSpacing"] = style.ColumnsMinSpacing;
+		Sizes["ScrollbarSize"] = style.ScrollbarSize;
+		Sizes["ScrollbarRounding"] = style.ScrollbarRounding;
+		Sizes["GrabMinSize"] = style.GrabMinSize;
+		Sizes["GrabRounding"] = style.GrabRounding;
+		Sizes["LogSliderDeadzone"] = style.LogSliderDeadzone;
+		Sizes["TabRounding"] = style.TabRounding;
+		Sizes["TabBorderSize"] = style.TabBorderSize;
+		Sizes["TabMinWidthForCloseButton"] = style.TabMinWidthForCloseButton;
+		Sizes["ColorButtonPosition"] = style.ColorButtonPosition;
+		Sizes["ButtonTextAlign"] = PreferencesFun::ImVec2ToJson(style.ButtonTextAlign);
+		Sizes["SelectableTextAlign"] = PreferencesFun::ImVec2ToJson(style.SelectableTextAlign);
+		Sizes["DisplayWindowPadding"] = PreferencesFun::ImVec2ToJson(style.DisplayWindowPadding);
+		Sizes["DisplaySafeAreaPadding"] = PreferencesFun::ImVec2ToJson(style.DisplaySafeAreaPadding);
 		//Sizes["CurveTessellationTol"]       =       style.CurveTessellationTol;
 		//Sizes["CircleTessellationMaxError"] =       style.CircleTessellationMaxError;
-
-
 
 		Style["Style"] = Sizes;
 		Style["Colors"] = Colors;
@@ -320,13 +328,11 @@ namespace PreferencesFun
 
 	static void ThemeMain()
 	{
-		
 		ImVec4* colors = ImGui::GetStyle().Colors;
-
 
 		for (size_t i = 0; i < 54; i++)
 		{
-			ImGui::ColorEdit4(PreferencesVar::TranslateText::ThemeTranslateData.at(i).c_str(), (float*)&colors[i],ImGuiColorEditFlags_NoInputs);
+			ImGui::ColorEdit4(PreferencesVar::TranslateText::ThemeTranslateData.at(i).c_str(), (float*)&colors[i], ImGuiColorEditFlags_NoInputs);
 		}
 	}
 }
@@ -352,7 +358,7 @@ static void DrawSettingPanel()
 		return;
 	if (ImGui::Begin(std::string(PreferencesVar::TranslateText::TranslateData.at(0)).append("###Preferences").c_str(), &ShowSettingPanel))
 	{
-		ImGui::BeginChild("SettingSelect",ImVec2(150,0),true);
+		ImGui::BeginChild("SettingSelect", ImVec2(150, 0), true);
 		if (ImGui::Selectable(PreferencesVar::TranslateText::TranslateData.at(1).c_str(), SettingSelectIndex == 0))
 			SettingSelectIndex = 0;
 		if (ImGui::Selectable(PreferencesVar::TranslateText::TranslateData.at(5).c_str(), SettingSelectIndex == 1))
@@ -392,7 +398,7 @@ static void DrawSettingPanel()
 					SaveSettingData();
 				}
 				ImGui::Text(PreferencesVar::TranslateText::TranslateData.at(4).c_str());
-				ImGui::BufferingBar("TranslateBar", Schedule,ImVec2(250,5),ImColor(0,100,210),ImColor(0,210,200));
+				ImGui::BufferingBar("TranslateBar", Schedule, ImVec2(250, 5), ImColor(0, 100, 210), ImColor(0, 210, 200));
 				ImGui::TreePop();
 			}
 			if (ImGui::TreeNode(std::string(PreferencesVar::TranslateText::TranslateData.at(13)).append("###Optimization").c_str()))
@@ -406,8 +412,6 @@ static void DrawSettingPanel()
 					SaveSettingData();
 				}
 				ImGui::Text(PreferencesVar::TranslateText::TranslateData.at(14).c_str());
-
-
 
 				ImGui::TreePop();
 			}
@@ -469,7 +473,7 @@ static void DrawSettingPanel()
 					ImGui::OpenPopup(PreferencesVar::TranslateText::TranslateData.at(7).c_str());
 					//SaveThemeMainStyle();
 				}
-				if (ImGui::BeginPopupModal(PreferencesVar::TranslateText::TranslateData.at(7).c_str(), 0,  ImGuiWindowFlags_NoResize))
+				if (ImGui::BeginPopupModal(PreferencesVar::TranslateText::TranslateData.at(7).c_str(), 0, ImGuiWindowFlags_NoResize))
 				{
 					//ImGui::CloseCurrentPopup();
 					ImGui::Text(PreferencesVar::TranslateText::TranslateData.at(9).c_str());
@@ -496,7 +500,7 @@ static void DrawSettingPanel()
 					getFileNames("DependentFile\\configuration file\\Style", StyleFilePath);
 					for (size_t i = 0; i < StyleFilePath.size(); i++)
 					{
-						if (ImGui::Selectable(StyleFilePath.at(i).substr(39,60).c_str()))
+						if (ImGui::Selectable(StyleFilePath.at(i).substr(39, 60).c_str()))
 						{
 							if (SelectStyleFile)
 								delete SelectStyleFile;
@@ -504,14 +508,12 @@ static void DrawSettingPanel()
 							//ImGui::OpenPopup("Test");//std::string(PreferencesVar::TranslateText::TranslateData.at(8)).append("###Popup").c_str());
 							std::cout << "\n Down";
 						}
-
-
 					}
 					ImGui::EndCombo();
-					if(SelectStyleFile)
+					if (SelectStyleFile)
 						ImGui::OpenPopup(std::string(PreferencesVar::TranslateText::TranslateData.at(8)).append("###Popup").c_str());
 				}
-				if (ImGui::BeginPopupModal(std::string(PreferencesVar::TranslateText::TranslateData.at(8)).append("###Popup").c_str(), 0,   ImGuiWindowFlags_NoResize))
+				if (ImGui::BeginPopupModal(std::string(PreferencesVar::TranslateText::TranslateData.at(8)).append("###Popup").c_str(), 0, ImGuiWindowFlags_NoResize))
 				{
 					//ImGui::CloseCurrentPopup();
 					ImGui::Text(PreferencesVar::TranslateText::TranslateData.at(9).c_str());
@@ -533,84 +535,82 @@ static void DrawSettingPanel()
 						ImGui::CloseCurrentPopup();
 					}
 
-
 					ImGui::EndPopup();
 				}
 				if (ImGui::TreeNode(std::string(PreferencesVar::TranslateText::TranslateData.at(11)).append("###Color").c_str()))
 				{
-
 					PreferencesFun::ThemeMain();
 
 					ImGui::TreePop();
 				}
 				if (ImGui::TreeNode(std::string(PreferencesVar::TranslateText::TranslateData.at(12)).append("###Sizes").c_str()))
 				{
-						ImGuiStyle& style = ImGui::GetStyle();
+					ImGuiStyle& style = ImGui::GetStyle();
 
-						ImGui::Text(PreferencesVar::TranslateText::TranslateData.at(6).c_str());
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(55).c_str()/*"WindowPadding",      */, (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(56).c_str()/*"FramePadding",       */, (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(57).c_str()/*"CellPadding",        */, (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(58).c_str()/*"ItemSpacing",        */, (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(59).c_str()/*"ItemInnerSpacing",   */, (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(60).c_str()/*"TouchExtraPadding",  */, (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(61).c_str()/*"IndentSpacing",      */, &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(62).c_str()/*"ScrollbarSize",      */, &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(63).c_str()/*"GrabMinSize",        */, &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
-						ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(64).c_str()/*"Borders"             */);
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(65).c_str()/*"WindowBorderSize",   */, &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(66).c_str()/*"ChildBorderSize",    */, &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(67).c_str()/*"PopupBorderSize",    */, &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(68).c_str()/*"FrameBorderSize",    */, &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(69).c_str()/*"TabBorderSize",      */, &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
-						ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(70).c_str()/*"Rounding"            */);
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(71).c_str()/*"WindowRounding",     */, &style.WindowRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(72).c_str()/*"ChildRounding",      */, &style.ChildRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(73).c_str()/*"FrameRounding",      */, &style.FrameRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(74).c_str()/*"PopupRounding",      */, &style.PopupRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(75).c_str()/*"ScrollbarRounding",  */, &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(76).c_str()/*"GrabRounding",       */, &style.GrabRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(77).c_str()/*"LogSliderDeadzone",  */, &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(78).c_str()/*"TabRounding",        */, &style.TabRounding, 0.0f, 12.0f, "%.0f");
-						ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(79).c_str()/*"Alignment"           */);
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(80).c_str()/*"WindowTitleAlign",   */, (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
-						int window_menu_button_position = style.WindowMenuButtonPosition + 1;
-						ImGui::SetNextItemWidth(250);
-						if (ImGui::Combo(PreferencesVar::TranslateText::ThemeTranslateData.at(81).c_str()/*"WindowMenuButtonPosition",*/, (int*)&window_menu_button_position, "None\0Left\0Right\0"))
-							style.WindowMenuButtonPosition = window_menu_button_position - 1;
-						ImGui::SetNextItemWidth(250);
-						ImGui::Combo(PreferencesVar::TranslateText::ThemeTranslateData.at(82).c_str()/*"ColorButtonPosition",   */, (int*)&style.ColorButtonPosition, "Left\0Right\0");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(83).c_str()/*"ButtonTextAlign",       */, (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(84).c_str()/*"SelectableTextAlign",   */, (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
-						//ImGui::SameLine();
-						ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(85).c_str()/*"Safe Area Padding"      */);
-						ImGui::SetNextItemWidth(250);
-						ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(86).c_str()/*"DisplaySafeAreaPadding",*/, (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
+					ImGui::Text(PreferencesVar::TranslateText::TranslateData.at(6).c_str());
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(55).c_str()/*"WindowPadding",      */, (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(56).c_str()/*"FramePadding",       */, (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(57).c_str()/*"CellPadding",        */, (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(58).c_str()/*"ItemSpacing",        */, (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(59).c_str()/*"ItemInnerSpacing",   */, (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(60).c_str()/*"TouchExtraPadding",  */, (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(61).c_str()/*"IndentSpacing",      */, &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(62).c_str()/*"ScrollbarSize",      */, &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(63).c_str()/*"GrabMinSize",        */, &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
+					ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(64).c_str()/*"Borders"             */);
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(65).c_str()/*"WindowBorderSize",   */, &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(66).c_str()/*"ChildBorderSize",    */, &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(67).c_str()/*"PopupBorderSize",    */, &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(68).c_str()/*"FrameBorderSize",    */, &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(69).c_str()/*"TabBorderSize",      */, &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
+					ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(70).c_str()/*"Rounding"            */);
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(71).c_str()/*"WindowRounding",     */, &style.WindowRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(72).c_str()/*"ChildRounding",      */, &style.ChildRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(73).c_str()/*"FrameRounding",      */, &style.FrameRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(74).c_str()/*"PopupRounding",      */, &style.PopupRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(75).c_str()/*"ScrollbarRounding",  */, &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(76).c_str()/*"GrabRounding",       */, &style.GrabRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(77).c_str()/*"LogSliderDeadzone",  */, &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat(PreferencesVar::TranslateText::ThemeTranslateData.at(78).c_str()/*"TabRounding",        */, &style.TabRounding, 0.0f, 12.0f, "%.0f");
+					ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(79).c_str()/*"Alignment"           */);
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(80).c_str()/*"WindowTitleAlign",   */, (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
+					int window_menu_button_position = style.WindowMenuButtonPosition + 1;
+					ImGui::SetNextItemWidth(250);
+					if (ImGui::Combo(PreferencesVar::TranslateText::ThemeTranslateData.at(81).c_str()/*"WindowMenuButtonPosition",*/, (int*)&window_menu_button_position, "None\0Left\0Right\0"))
+						style.WindowMenuButtonPosition = window_menu_button_position - 1;
+					ImGui::SetNextItemWidth(250);
+					ImGui::Combo(PreferencesVar::TranslateText::ThemeTranslateData.at(82).c_str()/*"ColorButtonPosition",   */, (int*)&style.ColorButtonPosition, "Left\0Right\0");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(83).c_str()/*"ButtonTextAlign",       */, (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(84).c_str()/*"SelectableTextAlign",   */, (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
+					//ImGui::SameLine();
+					ImGui::Text(PreferencesVar::TranslateText::ThemeTranslateData.at(85).c_str()/*"Safe Area Padding"      */);
+					ImGui::SetNextItemWidth(250);
+					ImGui::SliderFloat2(PreferencesVar::TranslateText::ThemeTranslateData.at(86).c_str()/*"DisplaySafeAreaPadding",*/, (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
 
 					ImGui::TreePop();
 				}
@@ -618,7 +618,6 @@ static void DrawSettingPanel()
 				EditorStyle = ImGui::GetStyle();
 				ImGui::TreePop();
 			}
-
 
 			break;
 		default:

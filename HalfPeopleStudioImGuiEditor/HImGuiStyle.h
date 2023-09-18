@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef HImGuiStyle
 #define HImGuiStyle
 #include <sstream>
@@ -12,13 +11,15 @@
 struct HFont
 {
 	std::vector<int> font;
+	std::vector<int> font_Buff;
 	float font_size = 20.f;
-	size_t Fontfile_size;
+	size_t Fontfile_size = 0;
 	ImFont* FontBuff;
 	ImFontAtlas* font_atlas;
 	// will auto applay
 	bool LoadFontFile(std::string font_path)
 	{
+		font.clear();
 		std::ifstream font_file(font_path, std::ios::binary);
 		if (!font_file)
 			return false;
@@ -28,24 +29,34 @@ struct HFont
 		font_file.seekg(0, std::ios::beg);
 
 		// 创建std::vector<int>对象，并分配足够的内存来保存文件数据
-		font.resize(Fontfile_size /sizeof(int));
+		font.resize(Fontfile_size / sizeof(int));
 
 		// 读取文件数据到std::vector<int>对象中
 		font_file.read(reinterpret_cast<char*>(font.data()), Fontfile_size);
 		return true;
 	}
 	bool NeedUpdata = false;
-	void WiteDrawEnd(BaceHWindows * RootWindow)
+	void WiteDrawEnd(BaceHWindows* RootWindow)
 	{
 		if (!NeedUpdata)
 			return;
 
-		NeedUpdata = false;	
+		NeedUpdata = false;
 		font_atlas->Clear();
 		font_atlas->AddFontFromFileTTF("DependentFile\\kaiu.ttf", 20, NULL);
-		FontBuff = font_atlas->AddFontFromMemoryTTF(font.data(), Fontfile_size, font_size);// &config);
+
+		if (font.empty())
+		{
+			ImFontConfig cfg;
+			cfg.SizePixels = font_size;
+			FontBuff = font_atlas->AddFontDefault(&cfg);
+		}
+		else
+		{
+			FontBuff = font_atlas->AddFontFromMemoryTTF(font_Buff.data(), Fontfile_size, font_size);// &config);
+		}
 		font_atlas->Build();
-		
+
 		RootWindow->ReCreateObject();
 	}
 	void Init()
@@ -80,7 +91,5 @@ static ImGuiStyle GUIStyle;
 //static ImFont *GUIFont;
 //static float GuiFontSize = 20.f;
 static bool NeedDocking = true;
-
-
 
 #endif // !1

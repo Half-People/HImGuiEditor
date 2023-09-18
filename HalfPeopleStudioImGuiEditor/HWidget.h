@@ -1095,7 +1095,7 @@ private:
 
 	bool BeginDragDropTargetForHWidget()
 	{
-			ImGuiContext& g = *GImGui;
+		ImGuiContext& g = *GImGui;
 		if (!g.DragDropActive)
 			return false;
 

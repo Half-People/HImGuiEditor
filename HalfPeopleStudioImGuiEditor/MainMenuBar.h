@@ -209,6 +209,9 @@ void DrawMainMenuBar()
 			if (ImGui::Button("ImFileDialog "))
 				OsOpenInShell("https://github.com/dfranx/ImFileDialog");
 
+			if (ImGui::Button("lz4 "))
+				OsOpenInShell("https://github.com/lz4/lz4");
+
 			ImGui::Separator();
 			if (ImGui::Button(std::string(MainMenuBarT::AbouData6).c_str()))
 			{

@@ -99,30 +99,37 @@ namespace Porject
 
 	static void LoadPorject()
 	{
-		if (PorjectPath.empty())
-			return;
-		json PorjectData;
-		std::ifstream file(PorjectPath);
-		if (file.is_open())
-			PorjectData = json::parse(file);
-		else
-			return;
-		if (PorjectData.is_null())
-			return;
-		file.close();
-
-		SelectHImGuiWindows = PorjectData["SelectWindow"];
-
-		LoadPorjectSetting(PorjectData["PorjectSetting"]);
-
-		RemoveAllHImGuiWindows();
-
-		for (size_t i = 0; i < PorjectData["ImGuiWindows"].size(); i++)
+		try
 		{
-			ImGuiWindows.push_back(new HImGuiWindows);
-			ImGuiWindows.back()->Load(PorjectData["ImGuiWindows"].at(i));
+			if (PorjectPath.empty())
+				return;
+			json PorjectData;
+			std::ifstream file(PorjectPath);
+			if (file.is_open())
+				PorjectData = json::parse(file);
+			else
+				return;
+			if (PorjectData.is_null())
+				return;
+			file.close();
+
+			SelectHImGuiWindows = PorjectData["SelectWindow"];
+
+			LoadPorjectSetting(PorjectData["PorjectSetting"]);
+
+			RemoveAllHImGuiWindows();
+
+			for (size_t i = 0; i < PorjectData["ImGuiWindows"].size(); i++)
+			{
+				ImGuiWindows.push_back(new HImGuiWindows);
+				ImGuiWindows.back()->Load(PorjectData["ImGuiWindows"].at(i));
+			}
+			UpdataRecentlyOpenedPorject();
 		}
-		UpdataRecentlyOpenedPorject();
+		catch (const json::exception& e)
+		{
+			std::cout << "\nPorject->LoadPorject -> Json -> Error -> Error Message : " << e.what();
+		}
 	}
 
 	//static void CreatePorjectCallBack(std::string path)

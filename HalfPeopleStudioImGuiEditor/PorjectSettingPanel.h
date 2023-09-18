@@ -14,12 +14,19 @@ namespace PorjectSettingTranslateList
 	std::string MainWindow = "MainWindow";
 }
 
-static void LoadFont(json J,HFont& font)
+static void LoadFont(json J, HFont& font)
 {
-	font.font = J["FontData"].get<std::vector<int>>();
-	font.Fontfile_size = J["FontFileSize"];
-	font.font_size = J["FontSize"];
-	font.ApplayFont();
+	try
+	{
+		font.font = J["FontData"].get<std::vector<int>>();
+		font.Fontfile_size = J["FontFileSize"];
+		font.font_size = J["FontSize"];
+		font.ApplayFont();
+	}
+	catch (const json::exception& e)
+	{
+		std::cout << "\nPorjectSettingPanel -> LoadFont ->Json->Error -> ErrorMessage : " << e.what();
+	}
 }
 
 static json HFontToJson(HFont& font)
@@ -102,66 +109,73 @@ static json SavePorjectSetting()
 }
 static void LoadPorjectSetting(json PorjectSettingSave)
 {
-	if (PorjectSettingSave.is_null())
-		return;
-	json Style, Color, Colors, Sizes;
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	ImVec4* colors = style.Colors;
-
-	LoadFont(PorjectSettingSave["Font"], FontBuff);
-
-	Style = PorjectSettingSave["Style"];
-	RootWindows->DrawPorjectSettingLoad(PorjectSettingSave["RootWindowSetting"]);
-
-	Colors = Style["Colors"];
-	Sizes = Style["Style"];
-	for (size_t i = 0; i < Colors.size(); i++)
+	try
 	{
-		Color = Colors[ImGui::GetStyleColorName(i)];
-		colors[i].x = Color["R"];
-		colors[i].y = Color["G"];
-		colors[i].z = Color["B"];
-		colors[i].w = Color["A"];
+		if (PorjectSettingSave.is_null())
+			return;
+		json Style, Color, Colors, Sizes;
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		ImVec4* colors = style.Colors;
+
+		LoadFont(PorjectSettingSave["Font"], FontBuff);
+
+		Style = PorjectSettingSave["Style"];
+		RootWindows->DrawPorjectSettingLoad(PorjectSettingSave["RootWindowSetting"]);
+
+		Colors = Style["Colors"];
+		Sizes = Style["Style"];
+		for (size_t i = 0; i < Colors.size(); i++)
+		{
+			Color = Colors[ImGui::GetStyleColorName(i)];
+			colors[i].x = Color["R"];
+			colors[i].y = Color["G"];
+			colors[i].z = Color["B"];
+			colors[i].w = Color["A"];
+		}
+
+		style.WindowPadding = PreferencesFun::JsonToImVec2(Sizes["WindowPadding"]);
+		style.WindowRounding = Sizes["WindowRounding"];
+		style.WindowBorderSize = Sizes["WindowBorderSize"];
+		style.WindowMinSize = PreferencesFun::JsonToImVec2(Sizes["WindowMinSize"]);
+		style.WindowTitleAlign = PreferencesFun::JsonToImVec2(Sizes["WindowTitleAlign"]);
+		style.WindowMenuButtonPosition = Sizes["WindowMenuButtonPosition"];
+		style.ChildRounding = Sizes["ChildRounding"];
+		style.ChildBorderSize = Sizes["ChildBorderSize"];
+		style.PopupRounding = Sizes["PopupRounding"];
+		style.PopupBorderSize = Sizes["PopupBorderSize"];
+		style.FramePadding = PreferencesFun::JsonToImVec2(Sizes["FramePadding"]);
+		style.FrameRounding = Sizes["FrameRounding"];
+		style.FrameBorderSize = Sizes["FrameBorderSize"];
+		style.ItemSpacing = PreferencesFun::JsonToImVec2(Sizes["ItemSpacing"]);
+		style.ItemInnerSpacing = PreferencesFun::JsonToImVec2(Sizes["ItemInnerSpacing"]);
+		style.CellPadding = PreferencesFun::JsonToImVec2(Sizes["CellPadding"]);
+		style.TouchExtraPadding = PreferencesFun::JsonToImVec2(Sizes["TouchExtraPadding"]);
+		style.IndentSpacing = Sizes["IndentSpacing"];
+		style.ColumnsMinSpacing = Sizes["ColumnsMinSpacing"];
+		style.ScrollbarSize = Sizes["ScrollbarSize"];
+		style.ScrollbarRounding = Sizes["ScrollbarRounding"];
+		style.GrabMinSize = Sizes["GrabMinSize"];
+		style.GrabRounding = Sizes["GrabRounding"];
+		style.LogSliderDeadzone = Sizes["LogSliderDeadzone"];
+		style.TabRounding = Sizes["TabRounding"];
+		style.TabBorderSize = Sizes["TabBorderSize"];
+		style.TabMinWidthForCloseButton = Sizes["TabMinWidthForCloseButton"];
+		style.ColorButtonPosition = Sizes["ColorButtonPosition"];
+		style.ButtonTextAlign = PreferencesFun::JsonToImVec2(Sizes["ButtonTextAlign"]);
+		style.SelectableTextAlign = PreferencesFun::JsonToImVec2(Sizes["SelectableTextAlign"]);
+		style.DisplayWindowPadding = PreferencesFun::JsonToImVec2(Sizes["DisplayWindowPadding"]);
+		style.DisplaySafeAreaPadding = PreferencesFun::JsonToImVec2(Sizes["DisplaySafeAreaPadding"]);
+
+		//style.CurveTessellationTol						      =              Sizes["CurveTessellationTol"]       		  ;
+		//style.CircleTessellationMaxError					  =              Sizes["CircleTessellationMaxError"] 		  ;
+
+		GUIStyle = style;
 	}
-
-	style.WindowPadding = PreferencesFun::JsonToImVec2(Sizes["WindowPadding"]);
-	style.WindowRounding = Sizes["WindowRounding"];
-	style.WindowBorderSize = Sizes["WindowBorderSize"];
-	style.WindowMinSize = PreferencesFun::JsonToImVec2(Sizes["WindowMinSize"]);
-	style.WindowTitleAlign = PreferencesFun::JsonToImVec2(Sizes["WindowTitleAlign"]);
-	style.WindowMenuButtonPosition = Sizes["WindowMenuButtonPosition"];
-	style.ChildRounding = Sizes["ChildRounding"];
-	style.ChildBorderSize = Sizes["ChildBorderSize"];
-	style.PopupRounding = Sizes["PopupRounding"];
-	style.PopupBorderSize = Sizes["PopupBorderSize"];
-	style.FramePadding = PreferencesFun::JsonToImVec2(Sizes["FramePadding"]);
-	style.FrameRounding = Sizes["FrameRounding"];
-	style.FrameBorderSize = Sizes["FrameBorderSize"];
-	style.ItemSpacing = PreferencesFun::JsonToImVec2(Sizes["ItemSpacing"]);
-	style.ItemInnerSpacing = PreferencesFun::JsonToImVec2(Sizes["ItemInnerSpacing"]);
-	style.CellPadding = PreferencesFun::JsonToImVec2(Sizes["CellPadding"]);
-	style.TouchExtraPadding = PreferencesFun::JsonToImVec2(Sizes["TouchExtraPadding"]);
-	style.IndentSpacing = Sizes["IndentSpacing"];
-	style.ColumnsMinSpacing = Sizes["ColumnsMinSpacing"];
-	style.ScrollbarSize = Sizes["ScrollbarSize"];
-	style.ScrollbarRounding = Sizes["ScrollbarRounding"];
-	style.GrabMinSize = Sizes["GrabMinSize"];
-	style.GrabRounding = Sizes["GrabRounding"];
-	style.LogSliderDeadzone = Sizes["LogSliderDeadzone"];
-	style.TabRounding = Sizes["TabRounding"];
-	style.TabBorderSize = Sizes["TabBorderSize"];
-	style.TabMinWidthForCloseButton = Sizes["TabMinWidthForCloseButton"];
-	style.ColorButtonPosition = Sizes["ColorButtonPosition"];
-	style.ButtonTextAlign = PreferencesFun::JsonToImVec2(Sizes["ButtonTextAlign"]);
-	style.SelectableTextAlign = PreferencesFun::JsonToImVec2(Sizes["SelectableTextAlign"]);
-	style.DisplayWindowPadding = PreferencesFun::JsonToImVec2(Sizes["DisplayWindowPadding"]);
-	style.DisplaySafeAreaPadding = PreferencesFun::JsonToImVec2(Sizes["DisplaySafeAreaPadding"]);
-
-	//style.CurveTessellationTol						      =              Sizes["CurveTessellationTol"]       		  ;
-	//style.CircleTessellationMaxError					  =              Sizes["CircleTessellationMaxError"] 		  ;
-
-	GUIStyle = style;
+	catch (const json::exception& e)
+	{
+		std::cout << "\n PorjectSettingPanel->LoadPorjectSetting->Json->Error->Error Message : " << e.what();
+	}
 }
 
 //static void ExportPorjectSettingCallback(std::string path)
@@ -243,6 +257,18 @@ static void DrawPorjectSetting()
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(120);
 			ImGui::DragFloat("Font Size (Select Font To Updata)", &FontBuff.font_size, 0.5, 1, 1000, "%.2f px");
+			ImGui::SameLine();
+			if (ImGui::Button("Updata Font Size"))
+			{
+				if (FontBuff.font.empty())
+				{
+					FontBuff.NeedUpdata = true;
+				}
+				else
+				{
+					ifd::FileDialog::Instance().Open("Select_Font", PorjectSettingTranslateList::PorjectSetting, "*.ttf {.ttf}");
+				}
+			}
 
 			if (ifd::FileDialog::Instance().IsDone("Select_Font")) {
 				if (ifd::FileDialog::Instance().HasResult()) {

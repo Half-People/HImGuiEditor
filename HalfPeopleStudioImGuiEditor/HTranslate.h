@@ -396,56 +396,42 @@ namespace HTranslate
 		return translate_url;
 	}
 
-	static std::string TranslateTargetObject(std::string& In)
-	{
+	static std::string TranslateTargetObject(const std::string& In) {
 		if (TranslateTargetLang == -1)
 			return In;
-		std::string buffer;
-		CURL* curl;
-		CURLcode res;
-		curl_global_init(CURL_GLOBAL_DEFAULT);
-		curl = curl_easy_init();
-		if (curl)
-		{
-			curl_easy_setopt(curl, CURLOPT_URL, HTranslate::BuildURL(In).c_str());
 
+		std::string buffer;
+		CURL* curl = curl_easy_init();
+		if (curl) {
+			curl_easy_setopt(curl, CURLOPT_URL, HTranslate::BuildURL(In).c_str());
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, HTranslate::writer);
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
-			res = curl_easy_perform(curl);
+			CURLcode res = curl_easy_perform(curl);
 			curl_easy_cleanup(curl);
-			if (CURLE_OK != res)
-			{
+			if (res != CURLE_OK) {
 				std::cerr << "\nHTranslate->ERROR :  CURL ERROR ID  --  " << res;
 				return In;
 			}
 		}
-		curl_global_cleanup();
 
-		if (HTranslate::UTF8_To_string(buffer).find("¡°") < 100000)
-		{
-			//buffer = HTranslate::UTF8_To_string(buffer);
+		if (buffer.find("¡°") != std::string::npos) {
 			std::string cn = buffer.substr(7, buffer.find("\",\"") - 10);
-
 			if (HTranslate::is_valid_utf8(cn.c_str()))
 				buffer = cn;
 			else
 				buffer = In;
 		}
-		else
-		{
-			if (langs.at(TranslateTargetLang) == "ja")
-			{
-				buffer = HTranslate::UTF8_To_string(buffer);
+		else {
+			if (langs.at(TranslateTargetLang) == "ja") {
 				std::string qt = buffer.substr(6, buffer.find("\",\"") - 8);
-
 				buffer = HTranslate::UTF8_To_string(HTranslate::string_To_UTF8(qt));
 			}
-			else
-			{
+			else {
 				std::string qt = buffer.substr(6, buffer.find("\",\"") - 8);
 				buffer = qt;
 			}
 		}
+
 		return buffer;
 	}
 
@@ -461,82 +447,82 @@ namespace HTranslate
 		// return Cache;
 	}
 
-	static void TranslateAllObjectThread()
-	{
-		for (size_t i = 0; i < CommonTranslationData.size(); i++)
-		{
-			TranslateObject.push_back(&CommonTranslationData.at(i));
-		}
-
-		json TranslateSave;
-		std::ifstream Lfile("DependentFile\\configuration file\\TranslateCache.json");
-		if (Lfile.good() && Lfile.seekg(0, std::ios_base::end).tellg() > 5) {
-			Lfile.seekg(0, std::ios_base::beg);
-			TranslateSave = json::parse(Lfile);
-		}
-		Lfile.close();
-
-		//std::cout << "\nTranslateBuff Size   :" << TranslateSave["TranslateBuff"].size();
-		//std::cout << "\nTranslateObject Size :" << TranslateObject.size();
-		//std::cout << "\nTranslateSave IsNull :" << TranslateSave.is_null();
-
-		if (TranslateSave["TranslateBuff"].size() != TranslateObject.size() || TranslateSave.is_null())
-		{
-			//std::cout << "\n Translate The Object";
-			//TranslateSave["BaceTranslateTarget"] = ConvertVectorTranslateTarget();
-			ConvertVectorTranslateTarget(TranslateSave, "BaceTranslateTarget");
-			for (size_t i = 0; i < TranslateObject.size(); i++)
-			{
-				Schedule = i / (float)(TranslateObject.size() - 1);
-				*TranslateObject.at(i) = TranslateTargetObject(*TranslateObject.at(i));
-				std::cout << "\n TranslateAllObjectThread -> HTranslate-> INFO -> Translate Buffer : " << HTranslate::UTF8_To_string(*TranslateObject.at(i)) << "\n	UTF8_Buffer :" << std::hex << *TranslateObject.at(i);
-				//TranslateSave["TranslateBuff"][i] = json::string_t(*TranslateObject.at(i));
-				TranslateSave["TranslateBuff"][i] = (*TranslateObject.at(i));
+	static void TranslateAllObjectThread() {
+		try {
+			std::vector<std::string*> TranslateObject;
+			for (size_t i = 0; i < CommonTranslationData.size(); i++) {
+				TranslateObject.push_back(&CommonTranslationData.at(i));
 			}
-		}
-		else
-		{
-			// std::cout << "\n Load Translate";
-			json TG = TranslateSave["TranslateBuff"];
-			for (size_t i = 0; i < TG.size(); i++)
-			{
-				*TranslateObject.at(i) = TG.at(i);
-			}
-		}
 
-		std::ofstream file("DependentFile\\configuration file\\TranslateCache.json");
-		if (file.is_open())
-		{
-			file << TranslateSave;
+			json TranslateSave;
+			std::ifstream Lfile("DependentFile\\configuration file\\TranslateCache.json");
+			if (Lfile.good() && Lfile.seekg(0, std::ios_base::end).tellg() > 5) {
+				Lfile.seekg(0, std::ios_base::beg);
+				TranslateSave = json::parse(Lfile);
+			}
+			Lfile.close();
+
+			if (TranslateSave["TranslateBuff"].size() != TranslateObject.size() || TranslateSave.is_null()) {
+				ConvertVectorTranslateTarget(TranslateSave, "BaceTranslateTarget");
+				for (size_t i = 0; i < TranslateObject.size(); i++) {
+					Schedule = i / static_cast<float>(TranslateObject.size() - 1);
+					*TranslateObject.at(i) = TranslateTargetObject(*TranslateObject.at(i));
+					std::cout << "\n TranslateAllObjectThread -> HTranslate-> INFO -> Translate Buffer : " <<
+						HTranslate::UTF8_To_string(*TranslateObject.at(i)) << "\n	UTF8_Buffer :" << std::hex <<
+						*TranslateObject.at(i);
+					TranslateSave["TranslateBuff"][i] = (*TranslateObject.at(i));
+				}
+			}
+			else {
+				json TG = TranslateSave["TranslateBuff"];
+				for (size_t i = 0; i < TG.size(); i++) {
+					*TranslateObject.at(i) = TG.at(i);
+				}
+			}
+
+			std::ofstream file("DependentFile\\configuration file\\TranslateCache.json");
+			if (file.is_open()) {
+				file << TranslateSave;
+			}
+			file.close();
 		}
-		file.close();
+		catch (const json::exception& e) {
+			std::cout << "\nHTranslate -> TranslateAllObjectThread -> Json -> Error -> Error Message : " << e.what();
+		}
 	}
 
 	static void UpdataTranslateObjectThread()
 	{
-		json TranslateSave;
-		std::ifstream Lfile("DependentFile\\configuration file\\TranslateCache.json");
-		if (Lfile.is_open())
-			TranslateSave = json::parse(Lfile);
-		Lfile.close();
-
-		json TG = TranslateSave["BaceTranslateTarget"];
-		for (size_t i = 0; i < TranslateObject.size(); i++)
+		try
 		{
-			Schedule = i / (float)(TranslateObject.size() - 1);
-			std::string SData = TG.at(i);
-			*TranslateObject.at(i) = TranslateTargetObject(SData);
-			std::cout << "\nUpdataTranslateObjectThread -> HTranslate-> INFO -> Translate Buffer : " << HTranslate::UTF8_To_string(*TranslateObject.at(i));
-		}
-		//TranslateSave["TranslateBuff"] = ConvertVectorTranslateTarget();
-		ConvertVectorTranslateTarget(TranslateSave, "TranslateBuff");
+			json TranslateSave;
+			std::ifstream Lfile("DependentFile\\configuration file\\TranslateCache.json");
+			if (Lfile.is_open())
+				TranslateSave = json::parse(Lfile);
+			Lfile.close();
 
-		std::ofstream file("DependentFile\\configuration file\\TranslateCache.json");
-		if (file.is_open())
-		{
-			file << TranslateSave;
+			json TG = TranslateSave["BaceTranslateTarget"];
+			for (size_t i = 0; i < TranslateObject.size(); i++)
+			{
+				Schedule = i / (float)(TranslateObject.size() - 1);
+				std::string SData = TG.at(i);
+				*TranslateObject.at(i) = TranslateTargetObject(SData);
+				std::cout << "\nUpdataTranslateObjectThread -> HTranslate-> INFO -> Translate Buffer : " << HTranslate::UTF8_To_string(*TranslateObject.at(i));
+			}
+			//TranslateSave["TranslateBuff"] = ConvertVectorTranslateTarget();
+			ConvertVectorTranslateTarget(TranslateSave, "TranslateBuff");
+
+			std::ofstream file("DependentFile\\configuration file\\TranslateCache.json");
+			if (file.is_open())
+			{
+				file << TranslateSave;
+			}
+			file.close();
 		}
-		file.close();
+		catch (const json::exception& e)
+		{
+			std::cout << "\nHTranslate -> UpdataTranslateObjectThread -> Json -> Error -> Error Message : " << e.what();
+		}
 	}
 }
 
