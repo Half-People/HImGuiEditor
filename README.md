@@ -1,4 +1,6 @@
 # HImGuiEditor
+[Discord](https://discord.gg/U322zUJH)
+
 Wiki
 ---------------------------------------
 [Wiki](https://github.com/Half-People/HImGuiEditor/wiki)
