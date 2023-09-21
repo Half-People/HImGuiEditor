@@ -22,8 +22,12 @@ Contents
 
 Future Ideas
 ----------------------------------------
-1.  []
-
+1.Add other underlying rendering methods (OpenGL - SDL) - [ ]
+2.Add other underlying rendering methods (Vulkan - GLFW) - [ ]
+3.Add other underlying rendering methods (Vulkan - SDL) - [ ]
+4.Add `Widget` creation tools (Use low-level methods) - [ ]
+5.Organize and optimize the output project file structure - [ ]
+6.Add `Nod Editor` to interact with `Widget` - [ ]
 
 # Why we develop this product.
 
