@@ -20,6 +20,11 @@ Contents
 
  ![image](https://user-images.githubusercontent.com/56476339/218198311-d9673fe5-d839-4fdb-8487-0bb8fa448c91.gif)
 
+Future Ideas
+----------------------------------------
+1.  []
+
+
 # Why we develop this product.
 
  The purpose is to make editing
