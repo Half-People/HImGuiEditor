@@ -1,4 +1,4 @@
-![image](https://github.com/Half-People/HImGuiEditor/assets/56476339/a6e6bd5d-eefe-4c03-9a8b-42555941ee51)# HImGuiEditor
+
 [Discord](https://discord.gg/U322zUJH)
 
 Wiki
