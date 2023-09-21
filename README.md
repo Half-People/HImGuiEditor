@@ -28,7 +28,8 @@ Future Ideas
 - Add `Widget` creation tools (Use low-level methods) - [ ]
 - Organize and optimize the output project file structure - [ ]
 - Add `Nod Editor` to interact with `Widget` - [ ]
-
+- Add animation system -[]
+- 
 # Why we develop this product.
 
  The purpose is to make editing
