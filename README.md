@@ -1,4 +1,4 @@
-# HImGuiEditor
+![image](https://github.com/Half-People/HImGuiEditor/assets/56476339/a6e6bd5d-eefe-4c03-9a8b-42555941ee51)# HImGuiEditor
 [Discord](https://discord.gg/U322zUJH)
 
 Wiki
@@ -22,8 +22,11 @@ Contents
 
 Future Ideas
 ----------------------------------------
-> [!Future Ideas Development premise]
-> The number of users increases (maybe 60Star) or I have nothing to do
+
+
+> - Future Ideas Development premise :
+> - The number of users increases (maybe 60Star) or I have nothing to do
+
 - [ ] Add other underlying rendering methods (OpenGL - SDL)
 - [ ] Add other underlying rendering methods (Vulkan - GLFW)
 - [ ] Add other underlying rendering methods (Vulkan - SDL)
