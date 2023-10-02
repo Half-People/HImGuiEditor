@@ -13,8 +13,9 @@ namespace FileCallBack
 {
 	static ImTextureID* DefaultLogo;
 	static bool (*HLoadImage1)(const char* filename, ImTextureID& out_texture);
-	static bool (*HLoadImage2)(const char* filename, ImVec2& ImageSize, std::vector<unsigned char>& ImageData);
-	static bool (*HLoadImage3)(const unsigned char* imageData, ImVec2 ImageSize, GLuint& ImageBuffer);
+	static bool (*HLoadImage2)(const char* filename, ImVec2& ImageSize, std::vector<unsigned char>& ImageData, bool& alpha);
+	static bool (*HLoadImage3)(const unsigned char* imageData, ImVec2 ImageSize, GLuint& ImageBuffer, bool alpha);
+	static void (*OsOpenInShell)(const char* path);
 }
 
 namespace EZ_Tool

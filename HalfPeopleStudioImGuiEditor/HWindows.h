@@ -37,13 +37,13 @@ public:
 	int WindowSize_Y = 900;
 
 	char WindowTitle[150] = { "HWindow Title" };
+	char PorjectName[150] = { "HImEditor" };
 
 	std::string InculdPathList;
 	std::string LibPath;
 	std::string Lib;
 	std::vector<std::string> CompileFiles;
 private:
-
 };
 static BaceHWindows* RootWindows;
 
@@ -52,7 +52,7 @@ static class HOpenGLWindow :public BaceHWindows
 public:
 	HOpenGLWindow()
 	{
-		InculdPathList  = "API\\ImGui;API\\ImGui\\backends;API\\GLFW\\include;";
+		InculdPathList = "API\\ImGui;API\\ImGui\\backends;API\\GLFW\\include;";
 		LibPath = "API\\GLFW;";
 		Lib = "glfw3.lib;%(AdditionalDependencies)";
 		CompileFiles = {

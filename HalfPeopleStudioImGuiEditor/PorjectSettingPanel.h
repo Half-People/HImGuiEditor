@@ -18,7 +18,7 @@ static void LoadFont(json J, HFont& font)
 {
 	try
 	{
-		font.font = J["FontData"].get<std::vector<int>>();
+		font.font = J["FontData"].get<std::vector<unsigned int>>();
 		font.Fontfile_size = J["FontFileSize"];
 		font.font_size = J["FontSize"];
 		font.ApplayFont();
@@ -254,19 +254,30 @@ static void DrawPorjectSetting()
 			{
 				ifd::FileDialog::Instance().Open("Select_Font", PorjectSettingTranslateList::PorjectSetting, "*.ttf {.ttf}");
 			}
+
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(120);
 			ImGui::DragFloat("Font Size (Select Font To Updata)", &FontBuff.font_size, 0.5, 1, 1000, "%.2f px");
 			ImGui::SameLine();
-			if (ImGui::Button("Updata Font Size"))
+			if (FontBuff.font.empty())
 			{
-				if (FontBuff.font.empty())
+				if (ImGui::Button("Updata Font Size"))
 				{
 					FontBuff.NeedUpdata = true;
 				}
-				else
+			}
+			else
+			{
+				if (ImGui::Button("Updata Font Size"))
 				{
-					ifd::FileDialog::Instance().Open("Select_Font", PorjectSettingTranslateList::PorjectSetting, "*.ttf {.ttf}");
+					if (std::filesystem::exists(FontBuff.LoadFontPath))
+					{
+						FontBuff.NeedUpdata = true;
+					}
+					else
+					{
+						ifd::FileDialog::Instance().Open("Select_Font", PorjectSettingTranslateList::PorjectSetting, "*.ttf {.ttf}");
+					}
 				}
 			}
 
@@ -274,6 +285,7 @@ static void DrawPorjectSetting()
 				if (ifd::FileDialog::Instance().HasResult()) {
 					std::string res = ifd::FileDialog::Instance().GetResult().u8string();
 					FontBuff.LoadFontFile(res);
+					FontBuff.LoadFontPath = res;
 					FontBuff.NeedUpdata = true;
 				}
 				ifd::FileDialog::Instance().Close();

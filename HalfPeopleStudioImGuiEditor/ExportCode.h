@@ -121,7 +121,7 @@ namespace ExportCodeNS
 		//
 		//LoadImageFunction
 		//
-		SaveCode.append("\n\nImTextureID HLoadImage_CB(const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize, bool& NeedUpdata)\n{");
+		SaveCode.append("\n\nImTextureID HLoadImage_CB(bool HaveAlpha ,const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize, bool& NeedUpdata)\n{");
 		SaveCode.append(R"(
 	if(NeedUpdata)
 	{
@@ -143,7 +143,13 @@ namespace ExportCodeNS
 	#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	#endif
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+		if(HaveAlpha){
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+		}
+		else
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+		}
 		//stbi_image_free(imageData);
 
 		return ImageBuffer;
@@ -212,7 +218,7 @@ namespace ExportCodeNS
 		SaveCode.append("\n#include <imgui.h>");
 		SaveCode.append("\n#include <vector>\n");
 		SaveCode.append("\n//HLoadImage CallBack");
-		SaveCode.append("\nImTextureID(*HLoadImage)(const unsigned char* imageData, ImTextureID& ImageBuffer,ImVec2 ImageSize,bool& NeedUpdata);\n");
+		SaveCode.append("\nImTextureID(*HLoadImage)(bool HaveAlpha ,const unsigned char* imageData, ImTextureID& ImageBuffer,ImVec2 ImageSize,bool& NeedUpdata);\n");
 
 		for (size_t i = 0; i < CodeBuff.Inculd.size(); i++)
 		{
@@ -325,7 +331,7 @@ namespace ExportCodeNS
 			//</Project>
 			SaveExportText.append("\n").append("</Project>");
 
-			std::ofstream file(Path.append("\\HImGui.vcxproj.filters"));
+			std::ofstream file(Path.append("\\").append(RootWindows->PorjectName).append(".vcxproj.filters"));
 			file << SaveExportText;
 			file.close();
 		}
@@ -366,7 +372,7 @@ namespace ExportCodeNS
 			//    <ProjectGuid>{1a116941-cc13-48a9-8a96-5d6fcdfb93bd}</ProjectGuid>
 			SaveExportText.append("\n").append("    <ProjectGuid>{1a116941-cc13-48a9-8a96-5d6fcdfb93bd}</ProjectGuid>");
 			//    <RootNamespace>MSNUILDTEST</RootNamespace>
-			SaveExportText.append("\n").append("    <RootNamespace>HImGui</RootNamespace>");
+			SaveExportText.append("\n").append("    <RootNamespace>").append(RootWindows->PorjectName).append("</RootNamespace>");
 			//    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
 			SaveExportText.append("\n").append("    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>");
 			//  </PropertyGroup>
@@ -555,7 +561,7 @@ namespace ExportCodeNS
 			//MinimumVisualStudioVersion = 10.0.40219.1
 			SaveExportText.append("\n").append("MinimumVisualStudioVersion = 10.0.40219.1");
 			//Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HImGui", "ExportPorject\HImGui.vcxproj", "{1A116941-CC13-48A9-8A96-5D6FCDFB93BD}"
-			SaveExportText.append("\n").append("Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"HImGui\", \"ExportPorject\\HImGui.vcxproj\", \"{1A116941-CC13-48A9-8A96-5D6FCDFB93BD}\"");
+			SaveExportText.append("\n").append("Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"").append(RootWindows->PorjectName).append("\", \"ExportPorject\\").append(RootWindows->PorjectName).append(".vcxproj\", \"{1A116941-CC13-48A9-8A96-5D6FCDFB93BD}\"");
 			//EndProject
 			SaveExportText.append("\n").append("EndProject");
 			//Global
@@ -595,7 +601,7 @@ namespace ExportCodeNS
 			//EndGlobal
 			SaveExportText.append("\n").append("EndGlobal");
 
-			std::ofstream file(Path.append("\\HImGui.sln"));
+			std::ofstream file(Path.append("\\").append(RootWindows->PorjectName).append(".sln"));
 			file << SaveExportText;
 			file.close();
 		}
@@ -710,7 +716,7 @@ namespace ExportCodeNS
 
 		std::string SaveExportText = SpawnVSPorjectTool::SpawnVCXPROJ_File(InculdPathSave, LibPath, LibFile, Files);
 		SpawnVSPorjectTool::SpawnFilters(path, Files);
-		std::ofstream file(path.append("\\HImGui.vcxproj"));
+		std::ofstream file(path.append("\\").append(RootWindows->PorjectName).append(".vcxproj"));
 		file << SaveExportText;
 		file.close();
 	}

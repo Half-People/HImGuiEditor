@@ -923,7 +923,7 @@ public:
 		std::string SaveExportText;
 		//static ImVec4 ColorEditor3__HV_ = ImVec4(_THV_,_THV_,_THV_,_THV_);
 		//if(ColorEdit3(_HV_,(float*)&ColorEditor3__HV_  ,_THV_))
-		SaveExportText.append("\n").append(Offset).append("if(ColorButton(\"").append(Text).append("###").append(GetID()).append("\",ImVec4(").append(std::to_string(DFColor.x)).append(",").append(std::to_string(DFColor.y)).append(",").append(std::to_string(DFColor.z)).append(",").append(std::to_string(DFColor.w)).append(")").append("  ,").append(std::to_string(Cflags)).append("))");
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::ColorButton(\"").append(Text).append("###").append(GetID()).append("\",ImVec4(").append(std::to_string(DFColor.x)).append(",").append(std::to_string(DFColor.y)).append(",").append(std::to_string(DFColor.z)).append(",").append(std::to_string(DFColor.w)).append(")").append("  ,").append(std::to_string(Cflags)).append(",(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append(")))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//}
@@ -1041,7 +1041,6 @@ public:
 	virtual void DrawIconForControlPanel()override
 	{
 		ImGui::Image(*FileCallBack::DefaultLogo, ImVec2(80, 80));
-		//ImGui::Button("Button");
 		return;
 	}
 	virtual std::string Export(std::string Offset) override
@@ -1050,8 +1049,9 @@ public:
 		std::string SaveExportText;
 		SaveExportText.append("\n").append(Offset).append("static const unsigned char ").append(RandText).append("_imageData[] = {\n").append(Offset).append(EZ_Tool::VectorToString(ImageData, Offset)).append("\n};");
 		SaveExportText.append("\n").append(Offset).append("static bool ").append(RandText).append("_imageTextureNeedUpdata = true;");
+		SaveExportText.append("\n").append(Offset).append("const bool ").append(RandText).append("_HaveAlpha = ").append(BoolToString(HaveAlpha)).append(";");
 		SaveExportText.append("\n").append(Offset).append("static ImTextureID ").append(RandText).append("_imageTextureBuffer;");
-		SaveExportText.append("\n").append(Offset).append("ImGui::Image(HLoadImage(").append(RandText).append("_imageData,").append(RandText).append("_imageTextureBuffer, ImVec2(").append(std::to_string(ImageSizeBuffer.x)).append(", ").append(std::to_string(ImageSizeBuffer.y)).append("),").append(RandText).append("_imageTextureNeedUpdata").append("), ImVec2(").append(std::to_string(WidgetSize.x)).append(", ").append(std::to_string(WidgetSize.y)).append("), ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
+		SaveExportText.append("\n").append(Offset).append("ImGui::Image(HLoadImage(").append(RandText).append("_HaveAlpha").append(",").append(RandText).append("_imageData,").append(RandText).append("_imageTextureBuffer, ImVec2(").append(std::to_string(ImageSizeBuffer.x)).append(", ").append(std::to_string(ImageSizeBuffer.y)).append("),").append(RandText).append("_imageTextureNeedUpdata").append("), ImVec2(").append(std::to_string(WidgetSize.x)).append(", ").append(std::to_string(WidgetSize.y)).append("), ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
 		return SaveExportText;
 	}
 	virtual void Draw()override
@@ -1079,9 +1079,13 @@ public:
 				if (ifd::FileDialog::Instance().HasResult()) {
 					std::string res = ifd::FileDialog::Instance().GetResult().u8string();
 					printf("SAVE[%s]\n", res.c_str());
-					if (FileCallBack::HLoadImage2(res.c_str(), ImageSizeBuffer, ImageData))
+					if (FileCallBack::HLoadImage2(res.c_str(), ImageSizeBuffer, ImageData, HaveAlpha))
 					{
-						FileCallBack::HLoadImage3(ImageData.data(), ImageSizeBuffer, ImageBuffer);
+						FileCallBack::HLoadImage3(ImageData.data(), ImageSizeBuffer, ImageBuffer, HaveAlpha);
+					}
+					else
+					{
+						std::cout << "\n DefaultWidget -> Image - > DetailPanelWidget -> FileCallBack::HLoadImage2 -> HLoadImage1-> Error -> ErrorMessage : The image format is incorrect or the image file is damaged ! ";
 					}
 				}
 				ifd::FileDialog::Instance().Close();
@@ -1166,6 +1170,8 @@ public:
 		ImageSize["y"] = ImageSizeBuffer.y;
 		J["ImageSizeBuffer"] = ImageSize;
 
+		J["HaveAlpha"] = HaveAlpha;
+
 		try
 		{
 			J["Image_data_size"] = ImageData.size();
@@ -1212,8 +1218,10 @@ public:
 
 		ImageData = EZ_Tool::decompressLZ4(Data["Image_data"].get<std::vector<long long>>(), Data["Image_data_size"]);
 
+		HaveAlpha = Data["HaveAlpha"];
+
 		if (!ImageData.empty())
-			FileCallBack::HLoadImage3(ImageData.data(), ImageSizeBuffer, ImageBuffer);
+			FileCallBack::HLoadImage3(ImageData.data(), ImageSizeBuffer, ImageBuffer, HaveAlpha);
 
 		return;
 	}
@@ -1224,8 +1232,382 @@ private:
 	ImVec2 UV0 = ImVec2(0, 0), UV1 = ImVec2(1, 1);
 	ImVec4 tini_color = ImVec4(1, 1, 1, 1), border_color = ImVec4(0, 0, 0, 0);
 	GLuint ImageBuffer;
+	bool HaveAlpha = true;
 	ImVec2 ImageSizeBuffer;
 	//ImVec2 Size = ImVec2(0, 0);
 };
-//static ImVec4 Color;
-//ImGui::ColorEdit3("ColorEdit", (float*)&Color);
+//ImGui::SeparatorText("ABOUT THIS DEMO:");
+static std::string DefaultWidgetSeparatorText = "SeparatorText";
+static std::string DefaultWidgetSeparatorTextID = "SeparatorText";
+class SeparatorText :public HWidget
+{
+public:
+	SeparatorText()
+	{
+		WidgetName = &DefaultWidgetSeparatorText;
+		WidgetNameID = &DefaultWidgetSeparatorTextID;
+		WidgetID = TextData;
+		HArrowFlag = HArrow_SizeFlag_NotResize;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+	}
+
+	virtual void DrawIconForControlPanel()override
+	{
+		ImGui::SeparatorText("Text :)");
+		return;
+	}
+	virtual std::string Export(std::string Offset) override
+	{
+		return std::string("\n").append(Offset).append("ImGui::SeparatorText(\"").append(TextData).append("\"); ");
+	}
+	virtual void Draw()override
+	{
+		DrawPreLogic();
+		ImGui::SeparatorText(TextData);
+		DrawLogicTick();
+		return;
+	}
+	virtual void DetailPanelWidget()override
+	{
+		//char Save[200] = {};
+		//strncpy(Save, Text.c_str(), sizeof(Save));
+
+		ImGui::InputText("TextData", TextData, sizeof(TextData));
+
+		return;
+	}
+	virtual HWidget* CreateSelfClass()override { return new SeparatorText(); }
+
+	virtual json Copy()override {
+		json J;
+		PreCopy(J);
+		J["WidgetText"] = TextData;
+		return J;
+	}
+	virtual void Paste(json Data)override {
+		PrePaste(Data);
+		std::string ST = Data["WidgetText"];
+
+		strcpy_s(TextData, 200, ST.c_str());
+
+		return;
+	}
+private:
+	//std::string Text = "Button";
+	char TextData[200] = { "Text" };
+};
+static std::string DefaultWidgetSeparator = "Separator";
+static std::string DefaultWidgetSeparatorID = "Separator";
+class Separator :public HWidget
+{
+public:
+	Separator()
+	{
+		WidgetName = &DefaultWidgetSeparator;
+		WidgetNameID = &DefaultWidgetSeparatorID;
+		HArrowFlag = HArrow_SizeFlag_NotResize;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+	}
+
+	virtual void DrawIconForControlPanel()override
+	{
+		ImGui::Separator();
+		return;
+	}
+	virtual std::string Export(std::string Offset) override
+	{
+		return std::string("\n").append(Offset).append("ImGui::Separator(); ");
+	}
+	virtual void Draw()override
+	{
+		DrawPreLogic();
+		ImGui::Separator();
+		DrawLogicTick();
+		return;
+	}
+	virtual void DetailPanelWidget()override
+	{
+		ImGui::Text("nothing :)");
+
+		return;
+	}
+	virtual HWidget* CreateSelfClass()override { return new Separator(); }
+
+	virtual json Copy()override {
+		json J;
+		PreCopy(J);
+		return J;
+	}
+	virtual void Paste(json Data)override {
+		PrePaste(Data);
+		return;
+	}
+private:
+};
+static std::string DefaultWidgetCheckbox = "Checkbox";
+static std::string DefaultWidgetCheckboxID = "Checkbox";
+class Checkbox :public HWidget
+{
+public:
+	Checkbox()
+	{
+		WidgetName = &DefaultWidgetCheckbox;
+		WidgetNameID = &DefaultWidgetCheckboxID;
+		WidgetID = TextData;
+		HArrowFlag = HArrow_SizeFlag_NotResize;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+	}
+
+	virtual void DrawIconForControlPanel()override
+	{
+		bool a = 0;
+		ImGui::Checkbox("CheckBox :)", &a);
+		return;
+	}
+	virtual std::string Export(std::string Offset) override
+	{
+		std::string RandText = GetRandText((int)this);
+		std::string ExportBuffer = std::string("\n").append(Offset).append("static bool ").append(RandText).append("_IsCheck = ").append(BoolToString(IsCheck));
+		ExportBuffer.append("\n").append(Offset).append("ImGui::Checkbox(\"").append(TextData).append("\",&").append(RandText).append("_IsCheck").append("); ");
+		return ExportBuffer;
+	}
+	virtual void Draw()override
+	{
+		DrawPreLogic();
+		ImGui::Checkbox(TextData, &IsCheck);
+		DrawLogicTick();
+		return;
+	}
+	virtual void DetailPanelWidget()override
+	{
+		//char Save[200] = {};
+		//strncpy(Save, Text.c_str(), sizeof(Save));
+
+		ImGui::InputText("TextData", TextData, sizeof(TextData));
+		ImGui::Checkbox("IsCheck", &IsCheck);
+		return;
+	}
+	virtual HWidget* CreateSelfClass()override { return new Checkbox(); }
+
+	virtual json Copy()override {
+		json J;
+		PreCopy(J);
+		J["WidgetText"] = TextData;
+		J["IsCheck"] = IsCheck;
+		return J;
+	}
+	virtual void Paste(json Data)override {
+		PrePaste(Data);
+		std::string ST = Data["WidgetText"];
+		IsCheck = Data["IsCheck"];
+		strcpy_s(TextData, 200, ST.c_str());
+
+		return;
+	}
+private:
+	//std::string Text = "Button";
+	bool IsCheck = false;
+	char TextData[200] = { "Text" };
+};
+static std::string DefaultWidgetMyKnob = "MyKnob";
+static std::string DefaultWidgetMyKnobID = "MyKnob";
+namespace Function
+{
+	static std::string DefaultWidgetMyKnobFunction =
+		R"(
+namespace ImGui
+{
+	// Implementing a simple custom widget using the public API.
+	// You may also use the <imgui_internal.h> API to get raw access to more data/helpers, however the internal API isn't guaranteed to be forward compatible.
+	// FIXME: Need at least proper label centering + clipping (internal functions RenderTextClipped provides both but api is flaky/temporary)
+	static bool MyKnob(const float radius_outer,const char* label, float* p_value, float v_min, float v_max)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImVec2 center = ImVec2(pos.x + radius_outer, pos.y + radius_outer);
+		float line_height = ImGui::GetTextLineHeight();
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+		float ANGLE_MIN = 3.141592f * 0.75f;
+		float ANGLE_MAX = 3.141592f * 2.25f;
+
+		ImGui::InvisibleButton(label, ImVec2(radius_outer * 2, radius_outer * 2 + line_height + style.ItemInnerSpacing.y));
+		bool value_changed = false;
+		bool is_active = ImGui::IsItemActive();
+		bool is_hovered = ImGui::IsItemActive();
+		if (is_active && io.MouseDelta.x != 0.0f)
+		{
+			float step = (v_max - v_min) / 200.0f;
+			*p_value += io.MouseDelta.x * step;
+			if (*p_value < v_min) *p_value = v_min;
+			if (*p_value > v_max) *p_value = v_max;
+			value_changed = true;
+		}
+
+		float t = (*p_value - v_min) / (v_max - v_min);
+		float angle = ANGLE_MIN + (ANGLE_MAX - ANGLE_MIN) * t;
+		float angle_cos = cosf(angle), angle_sin = sinf(angle);
+		float radius_inner = radius_outer * 0.40f;
+		draw_list->AddCircleFilled(center, radius_outer, ImGui::GetColorU32(ImGuiCol_FrameBg), 16);
+		draw_list->AddLine(ImVec2(center.x + angle_cos * radius_inner, center.y + angle_sin * radius_inner), ImVec2(center.x + angle_cos * (radius_outer - 2), center.y + angle_sin * (radius_outer - 2)), ImGui::GetColorU32(ImGuiCol_SliderGrabActive), 2.0f);
+		draw_list->AddCircleFilled(center, radius_inner, ImGui::GetColorU32(is_active ? ImGuiCol_FrameBgActive : is_hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), 16);
+		draw_list->AddText(ImVec2(pos.x, pos.y + radius_outer * 2 + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_Text), label);
+
+		if (is_active || is_hovered)
+		{
+			ImGui::SetNextWindowPos(ImVec2(pos.x - style.WindowPadding.x, pos.y - line_height - style.ItemInnerSpacing.y - style.WindowPadding.y));
+			ImGui::BeginTooltip();
+			ImGui::Text("%.3f", *p_value);
+			ImGui::EndTooltip();
+		}
+
+		return value_changed;
+	}
+}
+
+)";
+}
+
+namespace ImGui
+{
+	// Implementing a simple custom widget using the public API.
+	// You may also use the <imgui_internal.h> API to get raw access to more data/helpers, however the internal API isn't guaranteed to be forward compatible.
+	// FIXME: Need at least proper label centering + clipping (internal functions RenderTextClipped provides both but api is flaky/temporary)
+	static bool MyKnob(const float radius_outer, const char* label, float* p_value, float v_min, float v_max)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+
+		ImVec2 pos = ImGui::GetCursorScreenPos();
+		ImVec2 center = ImVec2(pos.x + radius_outer, pos.y + radius_outer);
+		float line_height = ImGui::GetTextLineHeight();
+		ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+		float ANGLE_MIN = 3.141592f * 0.75f;
+		float ANGLE_MAX = 3.141592f * 2.25f;
+
+		ImGui::InvisibleButton(label, ImVec2(radius_outer * 2, radius_outer * 2 + line_height + style.ItemInnerSpacing.y));
+		bool value_changed = false;
+		bool is_active = ImGui::IsItemActive();
+		bool is_hovered = ImGui::IsItemActive();
+		if (is_active && io.MouseDelta.x != 0.0f)
+		{
+			float step = (v_max - v_min) / 200.0f;
+			*p_value += io.MouseDelta.x * step;
+			if (*p_value < v_min) *p_value = v_min;
+			if (*p_value > v_max) *p_value = v_max;
+			value_changed = true;
+		}
+
+		float t = (*p_value - v_min) / (v_max - v_min);
+		float angle = ANGLE_MIN + (ANGLE_MAX - ANGLE_MIN) * t;
+		float angle_cos = cosf(angle), angle_sin = sinf(angle);
+		float radius_inner = radius_outer * 0.40f;
+		draw_list->AddCircleFilled(center, radius_outer, ImGui::GetColorU32(ImGuiCol_FrameBg), 16);
+		draw_list->AddLine(ImVec2(center.x + angle_cos * radius_inner, center.y + angle_sin * radius_inner), ImVec2(center.x + angle_cos * (radius_outer - 2), center.y + angle_sin * (radius_outer - 2)), ImGui::GetColorU32(ImGuiCol_SliderGrabActive), 2.0f);
+		draw_list->AddCircleFilled(center, radius_inner, ImGui::GetColorU32(is_active ? ImGuiCol_FrameBgActive : is_hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg), 16);
+		draw_list->AddText(ImVec2(pos.x, pos.y + radius_outer * 2 + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_Text), label);
+
+		if (is_active || is_hovered)
+		{
+			ImGui::SetNextWindowPos(ImVec2(pos.x - style.WindowPadding.x, pos.y - line_height - style.ItemInnerSpacing.y - style.WindowPadding.y));
+			ImGui::BeginTooltip();
+			ImGui::Text("%.3f", *p_value);
+			ImGui::EndTooltip();
+		}
+
+		return value_changed;
+	}
+}
+
+class MyKnob :public HWidget
+{
+public:
+	MyKnob()
+	{
+		Function = &Function::DefaultWidgetMyKnobFunction;
+		WidgetName = &DefaultWidgetMyKnob;
+		WidgetNameID = &DefaultWidgetMyKnobID;
+		WidgetID = TextData;
+		HArrowFlag = HArrow_SizeFlag_NotResize;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
+		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+	}
+
+	virtual void DrawIconForControlPanel()override
+	{
+		float a = 0;
+		ImGui::MyKnob(20, "MyKnob :)", &a, 0, 1);
+		return;
+	}
+	virtual std::string Export(std::string Offset) override
+	{
+		std::string RandText = GetRandText((int)this);
+		std::string ExportBuffer = std::string("\n").append(Offset).append("static float ").append(RandText).append("_value = ").append(std::to_string(value));
+		ExportBuffer.append("\n").append(Offset).append("ImGui::MyKnob(").append(std::to_string(size)).append(",\"").append(TextData).append("\",&").append(RandText).append("_value,").append(std::to_string(min_value)).append(",").append(std::to_string(max_value)).append("); ");
+		return ExportBuffer;
+	}
+	virtual void Draw()override
+	{
+		DrawPreLogic();
+		ImGui::MyKnob(size, TextData, &value, min_value, max_value);
+		DrawLogicTick();
+		return;
+	}
+	virtual void DetailPanelWidget()override
+	{
+		//char Save[200] = {};
+		//strncpy(Save, Text.c_str(), sizeof(Save));
+
+		ImGui::InputText("label", TextData, sizeof(TextData));
+		ImGui::DragFloat("WidgetSize", &size, 5);
+		ImGui::DragFloat("Bace value", &value);
+		ImGui::DragFloat("min value", &min_value, 1, -100000, max_value - 0.0001);
+		ImGui::DragFloat("max value", &max_value, 1, min_value);
+
+		if (ImGui::Button("source"))
+		{
+			FileCallBack::OsOpenInShell("https://github.com/ocornut/imgui/issues/942#issuecomment-268369298");
+		}
+		return;
+	}
+	virtual HWidget* CreateSelfClass()override { return new MyKnob(); }
+
+	virtual json Copy()override {
+		json J;
+		PreCopy(J);
+		J["WidgetText"] = TextData;
+		J["value"] = value;
+		J["size"] = size;
+		J["min_value"] = min_value;
+		J["max_value"] = max_value;
+		return J;
+	}
+	virtual void Paste(json Data)override {
+		PrePaste(Data);
+		std::string ST = Data["WidgetText"];
+		value = Data["value"];
+		min_value = Data["min_value"];
+		max_value = Data["max_value"];
+		size = Data["size"];
+		strcpy_s(TextData, 200, ST.c_str());
+
+		return;
+	}
+private:
+	//std::string Text = "Button";
+	float min_value = 0;
+	float max_value = 1;
+	float value = 0;
+	float size = 20;
+	char TextData[200] = { "Text" };
+};

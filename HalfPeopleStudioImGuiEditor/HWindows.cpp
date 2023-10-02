@@ -14,10 +14,9 @@ void HOpenGLWindow::CreateWindows(const char* title, int x, int y)
 {
 	Windows = glfwCreateWindow(900, 800, "HImGuiEditor (By HalfPeopleStudio ,this is open source tool)", NULL, NULL);
 	GLFWimage icons[1];
-	icons[0].pixels =  stbi_load("DependentFile\\DFL.HLogo", &icons[0].width, &icons[0].height, 0, 4);
+	icons[0].pixels = stbi_load("DependentFile\\DFL.HLogo", &icons[0].width, &icons[0].height, 0, 4);
 	glfwSetWindowIcon(Windows, 1, icons);
 	stbi_image_free(icons[0].pixels);
-
 
 	glfwMakeContextCurrent(Windows);
 	//glfwSwapInterval(0);
@@ -43,7 +42,7 @@ void HOpenGLWindow::FrameInit()
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
-	
+
 	ImGui::NewFrame();
 }
 
@@ -107,12 +106,15 @@ void HOpenGLWindow::DrawPorjectSetting()
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(125);
 	ImGui::DragInt("Y", &WindowSize_Y, 1, 1);
+	ImGui::InputText("Export Porject Name", PorjectName, 150);
 }
 
 void HOpenGLWindow::DrawPorjectSettingLoad(json Data)
 {
 	std::string Save = Data["WindowTitle"];
 	strcpy_s(WindowTitle, Save.c_str());
+	Save = Data["PorjectName"];
+	strcpy_s(PorjectName, Save.c_str());
 	WindowSize_X = Data["WindowSize_X"];
 	WindowSize_Y = Data["WindowSize_Y"];
 }
@@ -121,6 +123,7 @@ json HOpenGLWindow::DrawPorjectSettingSave()
 {
 	json S;
 	S["WindowTitle"] = WindowTitle;
+	S["PorjectName"] = PorjectName;
 	S["WindowSize_X"] = WindowSize_X;
 	S["WindowSize_Y"] = WindowSize_Y;
 	return S;

@@ -23,6 +23,10 @@ void CreateDefaulWidget()
 	WidgetList.push_back(new ColorEdit);
 	WidgetList.push_back(new ColorButton);
 	WidgetList.push_back(new Image);
+	WidgetList.push_back(new Separator);
+	WidgetList.push_back(new SeparatorText);
+	WidgetList.push_back(new Checkbox);
+	WidgetList.push_back(new MyKnob);
 }
 
 void VerifyHWidgetList()

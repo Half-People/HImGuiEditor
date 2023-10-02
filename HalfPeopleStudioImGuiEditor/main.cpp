@@ -78,6 +78,7 @@ int main()
 	FileCallBack::HLoadImage1 = HLoadImage;
 	FileCallBack::HLoadImage2 = HLoadImage1;
 	FileCallBack::HLoadImage3 = HLoadImage2;
+	FileCallBack::OsOpenInShell = OsOpenInShell;
 
 	CreateDefaulWidget();
 	LoadWidgetPlugin();
@@ -127,9 +128,8 @@ int main()
 		DrawWindowDetailsPanel();
 		DrawExportCode();
 
-		DrawPorjectSetting();
-
 		ImGuiWindows.at(SelectHImGuiWindows)->Draw(); //PopFont in HImGuiWindowDrawInit function
+		DrawPorjectSetting();
 
 		RootWindows->FrameEnd();
 		//FontBuff.DelayedApplicationFontsInMainLoop(io);

@@ -211,14 +211,14 @@ static bool HLoadImage(const char* filename, ImTextureID& out_texture)
 	return true;
 }
 
-static bool HLoadImage1(const char* filename, ImVec2& ImageSize, std::vector<unsigned char>& ImageData)
+static bool HLoadImage1(const char* filename, ImVec2& ImageSize, std::vector<unsigned char>& ImageData, bool& Alpha)
 {
 	int image_width = 0;
 	int image_height = 0;
 	int image_channels = 0;
 
 	unsigned char* image_data = stbi_load(filename, &image_width, &image_height, &image_channels, 4);
-	if (image_data == NULL)
+	if (image_data == NULL || sizeof(image_data) / sizeof(unsigned char) < (image_width * image_height * image_channels))
 		return false;
 	ImageData.clear();
 	ImageData.resize((image_width * image_height) * image_channels);
@@ -226,17 +226,18 @@ static bool HLoadImage1(const char* filename, ImVec2& ImageSize, std::vector<uns
 
 	ImageSize.x = image_width;
 	ImageSize.y = image_height;
-
+	if (image_channels > 3)
+		Alpha = true;
 	//stbi_image_free(image_data);
 	return true;
 }
 
-static bool HLoadImage2(const unsigned char* imageData, ImVec2 ImageSize, GLuint& ImageBuffer)
+static bool HLoadImage2(const unsigned char* imageData, ImVec2 ImageSize, GLuint& ImageBuffer, bool Alpha)
 {
-	int image_width = ImageSize.x;
-	int image_height = ImageSize.y;
+	int image_width = static_cast<int>(ImageSize.x);
+	int image_height = static_cast<int>(ImageSize.y);
 
-	if (imageData == NULL)
+	if (imageData == nullptr || image_width <= 0 || image_height <= 0)
 		return false;
 
 	glGenTextures(1, &ImageBuffer);
@@ -244,14 +245,17 @@ static bool HLoadImage2(const unsigned char* imageData, ImVec2 ImageSize, GLuint
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // This is required on WebGL for non power-of-two textures
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // Same
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F/*GL_CLAMP_TO_EDGE*/);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F/*GL_CLAMP_TO_EDGE*/);
 
 #if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 #endif
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-	//stbi_image_free(imageData);
+
+	if (Alpha)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	else
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
 
 	return true;
 }
