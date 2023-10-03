@@ -31,7 +31,7 @@ Future Ideas
 - [ ] Add other underlying rendering methods (Vulkan - GLFW)
 - [ ] Add other underlying rendering methods (Vulkan - SDL)
 - [ ] Add `Widget` creation tools (Use low-level methods)
-- [ ] Organize and optimize the output project file structure
+- [ ] Organize and optimize the output project file structure   ---90%
 - [ ] Add `Nod Editor` to interact with `Widget`
 - [ ] Add animation system
 
