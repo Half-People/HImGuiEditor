@@ -1,5 +1,5 @@
 
-[Discord](https://discord.gg/U322zUJH)
+[Discord](https://discord.gg/JpkSc6EJQ7)
 
 Wiki
 ---------------------------------------
