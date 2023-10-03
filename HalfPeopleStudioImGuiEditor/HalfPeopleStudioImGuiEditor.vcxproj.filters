@@ -74,9 +74,6 @@
     <ClInclude Include="ImGui\backends\imgui_impl_opengl3_loader.h">
       <Filter>ImGui\ImGui\backends</Filter>
     </ClInclude>
-    <ClInclude Include="HWindows.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
     <ClInclude Include="ControlPanel.h">
       <Filter>Editor\EditorWidget</Filter>
     </ClInclude>
@@ -169,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="FileToolCallBack.h">
       <Filter>Editor\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="H_stb.h">
+      <Filter>Editor\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="HWindows.h">
+      <Filter>EditorRoot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

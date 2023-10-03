@@ -61,37 +61,40 @@ void HOpenGLWindow::ReCreateObject()
 	ImGui_ImplOpenGL3_CreateDeviceObjects();
 }
 
-const char* HOpenGLWindow::GetCod_Inculd()
+std::string HOpenGLWindow::GetCod_Inculd()
 {
 	return "\n#pragma comment(lib,\"Opengl32.lib\")\n#include <GLFW/glfw3.h>\n#include <imgui_impl_glfw.h>\n#include <imgui_impl_opengl3.h>";
 }
 
-const char* HOpenGLWindow::GetCod_InitWindows()
+std::string HOpenGLWindow::GetCod_InitWindows()
 {
 	return "	\n	glfwInit();\n	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);\n	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);\n	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); ";
 }
 
-const char* HOpenGLWindow::GetCod_CreateWindows()
+std::string HOpenGLWindow::GetCod_CreateWindows()
 {
-	return std::string("\n	GLFWwindow* Windows;\n	Windows = glfwCreateWindow(").append(std::to_string(WindowSize_X)).append(",").append(std::to_string(WindowSize_Y)).append(",\"").append(WindowTitle).append("\", NULL, NULL); \n	glfwMakeContextCurrent(Windows); \n	glfwSwapInterval(0); ").c_str();
+	std::string Buffer("\n	 GLFWwindow* Windows;\n	Windows = glfwCreateWindow(");
+	Buffer.append(std::to_string(WindowSize_X)).append(",").append(std::to_string(WindowSize_Y)).append(",\"").append(WindowTitle).append("\", NULL, NULL); \n	glfwMakeContextCurrent(Windows); \n	glfwSwapInterval(0); ");
+	//printf("\n\n\n Test : %s", Buffer.c_str());
+	return Buffer;
 }
 
-const char* HOpenGLWindow::GetCod_InitializeBeforeRendering()
+std::string HOpenGLWindow::GetCod_InitializeBeforeRendering()
 {
 	return "\n	ImGui_ImplGlfw_InitForOpenGL(Windows, true);\n	ImGui_ImplOpenGL3_Init(\"#version 330\"); ";
 }
 
-const char* HOpenGLWindow::GetCod_WhetherToEnableRenderingLoop()
+std::string HOpenGLWindow::GetCod_WhetherToEnableRenderingLoop()
 {
 	return "!glfwWindowShouldClose(Windows)";
 }
 
-const char* HOpenGLWindow::GetCod_FrameInit()
+std::string HOpenGLWindow::GetCod_FrameInit()
 {
 	return "\n		glClear(GL_COLOR_BUFFER_BIT);\n		ImGui_ImplOpenGL3_NewFrame();\n		ImGui_ImplGlfw_NewFrame();\n		ImGui::NewFrame(); ";
 }
 
-const char* HOpenGLWindow::GetCod_FrameEnd()
+std::string HOpenGLWindow::GetCod_FrameEnd()
 {
 	return "\n		ImGui::Render();\n		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());\n\n		glfwSwapBuffers(Windows);\n		glfwPollEvents(); ";
 }

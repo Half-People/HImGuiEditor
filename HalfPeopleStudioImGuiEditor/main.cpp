@@ -49,6 +49,7 @@ int main()
 	HLoadImage("DependentFile\\Image\\Delete.png", DeleteIcon);
 	HLoadImage("DependentFile\\Image\\Plugin.png", PluginImage);
 	HLoadImage("DependentFile\\Image\\Setting.png", PorjectSettingImage);
+	HLoadImage("DependentFile\\Image\\Discord.png", DiscordImage);
 	HLoadImage("DependentFile\\Image\\Save.png", SaveImage);
 	HLoadImage("DependentFile\\Image\\EditViewBg.HBG", EditViewBg);
 	HLoadImage("DependentFile\\Image\\Mouse.png", MouseModeImg);

@@ -105,6 +105,8 @@ static json SavePorjectSetting()
 
 	PorjectSettingSave["Font"] = HFontToJson(FontBuff);
 
+	PorjectSettingSave["OutputUsingSeparateFontFiles"] = FontBuff.OutputUsingSeparateFontFiles;
+	PorjectSettingSave["FoontFileName"] = FontBuff.FontFileName;
 	return PorjectSettingSave;
 }
 static void LoadPorjectSetting(json PorjectSettingSave)
@@ -167,6 +169,8 @@ static void LoadPorjectSetting(json PorjectSettingSave)
 		style.DisplayWindowPadding = PreferencesFun::JsonToImVec2(Sizes["DisplayWindowPadding"]);
 		style.DisplaySafeAreaPadding = PreferencesFun::JsonToImVec2(Sizes["DisplaySafeAreaPadding"]);
 
+		FontBuff.OutputUsingSeparateFontFiles = PorjectSettingSave["OutputUsingSeparateFontFiles"];
+		FontBuff.FontFileName = PorjectSettingSave["FoontFileName"];
 		//style.CurveTessellationTol						      =              Sizes["CurveTessellationTol"]       		  ;
 		//style.CircleTessellationMaxError					  =              Sizes["CircleTessellationMaxError"] 		  ;
 
@@ -257,29 +261,31 @@ static void DrawPorjectSetting()
 
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(120);
-			ImGui::DragFloat("Font Size (Select Font To Updata)", &FontBuff.font_size, 0.5, 1, 1000, "%.2f px");
-			ImGui::SameLine();
-			if (FontBuff.font.empty())
+			ImGui::DragFloat("Font Size", &FontBuff.font_size, 0.5, 1, 1000, "%.2f px");
+
+			if (FontBuff.FontBuff->FontSize != FontBuff.font_size)
 			{
-				if (ImGui::Button("Updata Font Size"))
+				ImGui::SameLine();
+				if (FontBuff.font.empty())
 				{
-					FontBuff.NeedUpdata = true;
-				}
-			}
-			else
-			{
-				if (ImGui::Button("Updata Font Size"))
-				{
-					if (std::filesystem::exists(FontBuff.LoadFontPath))
+					if (ImGui::Button("Updata Font Size"))
 					{
 						FontBuff.NeedUpdata = true;
 					}
-					else
+				}
+				else
+				{
+					if (ImGui::Button("Updata Font Size"))
 					{
-						ifd::FileDialog::Instance().Open("Select_Font", PorjectSettingTranslateList::PorjectSetting, "*.ttf {.ttf}");
+						if (std::filesystem::exists(FontBuff.LoadFontPath))
+						{
+							FontBuff.NeedUpdata = true;
+						}
 					}
 				}
 			}
+
+			ImGui::Checkbox("Output using separate font files", &FontBuff.OutputUsingSeparateFontFiles);
 
 			if (ifd::FileDialog::Instance().IsDone("Select_Font")) {
 				if (ifd::FileDialog::Instance().HasResult()) {

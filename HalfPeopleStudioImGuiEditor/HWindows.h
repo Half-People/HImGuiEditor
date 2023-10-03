@@ -8,6 +8,7 @@
 #include <imgui_impl_opengl3.h>
 #pragma comment(lib,"Opengl32.lib")
 #include <vector>
+#include <string>
 
 static class BaceHWindows
 {
@@ -21,13 +22,13 @@ public:
 	virtual void FrameEnd() { return; }
 	virtual void ReCreateObject() { return; }
 
-	virtual const char* GetCod_Inculd() { return ""; }
-	virtual const char* GetCod_InitWindows() { return ""; }
-	virtual const char* GetCod_CreateWindows() { return ""; }
-	virtual const char* GetCod_InitializeBeforeRendering() { return ""; }
-	virtual const char* GetCod_WhetherToEnableRenderingLoop() { return ""; }
-	virtual const char* GetCod_FrameInit() { return ""; }
-	virtual const char* GetCod_FrameEnd() { return ""; }
+	virtual std::string GetCod_Inculd() { return ""; }
+	virtual std::string GetCod_InitWindows() { return ""; }
+	virtual std::string GetCod_CreateWindows() { return "FQ"; }
+	virtual std::string GetCod_InitializeBeforeRendering() { return ""; }
+	virtual std::string GetCod_WhetherToEnableRenderingLoop() { return ""; }
+	virtual std::string GetCod_FrameInit() { return ""; }
+	virtual std::string GetCod_FrameEnd() { return ""; }
 
 	virtual void DrawPorjectSetting() { return; }
 	virtual void DrawPorjectSettingLoad(json Data) { return; }
@@ -84,13 +85,13 @@ public:
 	virtual void FrameEnd()override;
 	virtual void ReCreateObject()override;
 
-	virtual const char* GetCod_Inculd()override;
-	virtual const char* GetCod_InitWindows()override;
-	virtual const char* GetCod_CreateWindows()override;
-	virtual const char* GetCod_InitializeBeforeRendering()override;
-	virtual const char* GetCod_WhetherToEnableRenderingLoop()override;
-	virtual const char* GetCod_FrameInit()override;
-	virtual const char* GetCod_FrameEnd()override;
+	virtual std::string GetCod_Inculd()override;
+	virtual std::string GetCod_InitWindows()override;
+	virtual std::string GetCod_CreateWindows()override;
+	virtual std::string GetCod_InitializeBeforeRendering()override;
+	virtual std::string GetCod_WhetherToEnableRenderingLoop()override;
+	virtual std::string GetCod_FrameInit()override;
+	virtual std::string GetCod_FrameEnd()override;
 
 	virtual void DrawPorjectSetting()override;
 	virtual void DrawPorjectSettingLoad(json Data)override;

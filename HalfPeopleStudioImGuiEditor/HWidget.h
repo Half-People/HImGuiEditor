@@ -17,7 +17,14 @@
 //bool HaveWidgetFocused = false;
 class HWidget;
 //HWidget* (*GetWidgetData)(int Index);
-
+struct HVariableExport
+{
+	std::string VariableCode;
+	std::string Comment;
+};
+static std::vector<HVariableExport> EVariable;
+static std::vector<HVariableExport> ECacheVariable;
+static std::vector<std::string> InitializationCodes;
 static HWidget* SelectWidget;
 static std::vector<HWidget*> WidgetList;
 static std::vector<HWidget*>* HImGuiWidnowsWidgetList;
@@ -460,34 +467,9 @@ public:
 		Flag = J["Flag"];
 	}
 
-	//std::vector<HWidget*> GetAllContent()
-	//{
-	//	std::vector<HWidget*> SaveList;
-	//	HWidget* SaveWidget;
-	//	do
-	//	{
-	//		SaveWidget = Subclass;
-	//		if (SaveWidget)
-	//		{
-	//			SaveList.push_back(SaveWidget);
-	//		}
-	//	} while (SaveWidget);
-	//}
-
-	//struct ContentItems
-	//{
-	//	//std::string ID;
-	//	json Data;
-	//	//HWidgetFlag Flag;
-	//	//ImVec2 Pos;
-	//	std::vector<ContentItems> SubclassItems;
-	//};
-
-	//std::vector<ContentItems> CopyContent()
 	json CopyContent()
 	{
 		HWidget* SaveContent = Content;
-		//std::vector <ContentItems> OutData;
 		json OutData;
 		while (SaveContent)
 		{
@@ -507,7 +489,6 @@ public:
 		return OutData;
 	}
 
-	//void PasteContent(std::vector<ContentItems> In)
 	void PasteContent(json In)
 	{
 		HWidget* SaveWidget = NULL;// = Content;

@@ -5,7 +5,7 @@
 #include "Porject.h"
 #include "MainMenuBarVar.h"
 
-static ImTextureID PluginImage,PorjectSettingImage,SaveImage;
+static ImTextureID PluginImage, PorjectSettingImage, SaveImage, DiscordImage;
 static std::string PagingPanelWindowTitle = "Paging Panel";
 
 namespace PagingPanelRemoveWindow
@@ -24,7 +24,7 @@ static void SelectFolderCallBack(std::string Path)
 
 static void DrawPagingPanel()
 {
-	if (ImGui::Begin(std::string(PagingPanelWindowTitle).append("###PagingPanel").c_str(), 0,ImGuiWindowFlags_NoMove))// ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar))
+	if (ImGui::Begin(std::string(PagingPanelWindowTitle).append("###PagingPanel").c_str(), 0, ImGuiWindowFlags_NoMove))// ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar))
 	{
 		ImVec2 WindowSizeSave = ImGui::GetWindowSize();
 		WindowSizeSave.y -= 60;//50
@@ -36,17 +36,17 @@ static void DrawPagingPanel()
 			WindowSizeSave.y = WindowSizeSave.x;
 
 		ImGui::BeginGroup();
-		if(ImGui::ImageButton(PluginImage, WindowSizeSave,ImVec2(0,0),ImVec2(1,1),-1,ImVec4(0.1,0.1,0.1,0.5)))
+		if (ImGui::ImageButton(PluginImage, WindowSizeSave, ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0.1, 0.1, 0.1, 0.5)))
 		{
 			ShowPluginPanel = !ShowPluginPanel;
 		}
 		ImGui::SameLine();
-		if (ImGui::ImageButton(PorjectSettingImage,WindowSizeSave))
+		if (ImGui::ImageButton(PorjectSettingImage, WindowSizeSave))
 		{
 			ShowPorjectSettingPanel = !ShowPorjectSettingPanel;
 		}
 		ImGui::SameLine();
-		if (ImGui::ImageButton(SaveImage,WindowSizeSave))
+		if (ImGui::ImageButton(SaveImage, WindowSizeSave))
 		{
 			//FileBrowser::OpenBrowser(SelectFolderCallBack,true);
 			if (Porject::PorjectPath.empty())
@@ -58,11 +58,16 @@ static void DrawPagingPanel()
 				Porject::SavePorject();
 			}
 		}
+		ImGui::SameLine();
+		if (ImGui::ImageButton(DiscordImage, WindowSizeSave))
+		{
+			OsOpenInShell("https://discord.gg/JpkSc6EJQ7");
+		}
 		Porject::DrawCreatePorject();
 		ImGui::EndGroup();
 		//FileBrowser::DrawFileBrowser();
 
-		if (ImGui::BeginTabBar("WindowList",ImGuiTabBarFlags_::ImGuiTabBarFlags_FittingPolicyScroll))
+		if (ImGui::BeginTabBar("WindowList", ImGuiTabBarFlags_::ImGuiTabBarFlags_FittingPolicyScroll))
 		{
 			if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
 			{
@@ -88,8 +93,8 @@ static void DrawPagingPanel()
 					{
 						ImGui::Text(PagingPanelRemoveWindow::Text.c_str());
 						ImGui::Separator();
-						float WindowHalfSizeX = ImGui::GetWindowSize().x/2;
-						if (ImGui::Button(HT_Cancel,ImVec2(WindowHalfSizeX,0)))
+						float WindowHalfSizeX = ImGui::GetWindowSize().x / 2;
+						if (ImGui::Button(HT_Cancel, ImVec2(WindowHalfSizeX, 0)))
 						{
 							ImGui::CloseCurrentPopup();
 						}
@@ -106,7 +111,7 @@ static void DrawPagingPanel()
 				}
 				else
 				{
-					if (ImGui::BeginTabItem(ImGuiWindows.at(i)->Title,0, ImGuiTabItemFlags_None))
+					if (ImGui::BeginTabItem(ImGuiWindows.at(i)->Title, 0, ImGuiTabItemFlags_None))
 					{
 						SelectHImGuiWindows = i;
 						ImGui::EndTabItem();
@@ -116,8 +121,6 @@ static void DrawPagingPanel()
 
 			ImGui::EndTabBar();
 		}
-
-
 	}
 	ImGui::End();
 }

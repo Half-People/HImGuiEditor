@@ -19,7 +19,23 @@ namespace ExportCodeNS
 		SaveExportText.append("\n").append("	ImGui::CreateContext(NULL);");
 		//	ImGuiIO& io = ImGui::GetIO(); (void)io;
 		SaveExportText.append("\n").append("	ImGuiIO& io = ImGui::GetIO(); (void)io;");
-		SaveExportText.append("\n").append("	io.Fonts->AddFontFromFileTTF(\"kaiu.ttf\", 20, NULL, io.Fonts->GetGlyphRangesChineseFull());");
+		if (!FontBuff.OutputUsingSeparateFontFiles && !FontBuff.font.empty())
+		{
+			SaveExportText.append("\n	io.Fonts->AddFontFromMemoryCompressedTTF(Font_data, Font_size, ").append(std::to_string(FontBuff.font_size)).append(", 0, io.Fonts->GetGlyphRangesChineseFull());");
+		}
+		else
+		{
+			if (FontBuff.font.empty())
+			{
+				SaveExportText.append("\n	ImFontConfig FontConfig;");
+				SaveExportText.append("\n	FontConfig.SizePixels = ").append(std::to_string(FontBuff.font_size)).append(";");
+				SaveExportText.append("\n	FontBuff = io.Fonts->AddFontDefault(&FontConfig);");
+			}
+			else if (FontBuff.OutputUsingSeparateFontFiles)
+			{
+				SaveExportText.append("\n").append("	io.Fonts->AddFontFromFileTTF(\"").append(FontBuff.FontFileName).append("\", ").append(std::to_string(FontBuff.font_size)).append(", NULL, io.Fonts->GetGlyphRangesChineseFull()); ");
+			}
+		}
 
 		if (NeedDocking)
 		{
@@ -121,44 +137,27 @@ namespace ExportCodeNS
 		//
 		//LoadImageFunction
 		//
-		SaveCode.append("\n\nImTextureID HLoadImage_CB(bool HaveAlpha ,const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize, bool& NeedUpdata)\n{");
+		SaveCode.append("\n\nbool HLoadImage_CB(const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize)\n{");
 		SaveCode.append(R"(
-	if(NeedUpdata)
-	{
-		NeedUpdata = false;
-		int image_width = ImageSize.x;
-		int image_height = ImageSize.y;
+	int image_width = ImageSize.x;
+	int image_height = ImageSize.y;
 
-		if (imageData == NULL)
-			return ImageBuffer;
+	if (imageData == NULL)
+		return false;
 
-		glGenTextures(1, reinterpret_cast<GLuint*>(&ImageBuffer));
-		glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(ImageBuffer));
+	glGenTextures(1, reinterpret_cast<GLuint*>(&ImageBuffer));
+	glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(ImageBuffer));
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // This is required on WebGL for non power-of-two textures
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // Same
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F); // This is required on WebGL for non power-of-two textures
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F); // Same
 
-	#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	#endif
-		if(HaveAlpha){
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-		}
-		else
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image_width, image_height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-		}
-		//stbi_image_free(imageData);
-
-		return ImageBuffer;
-	}
-	else
-	{
-		return ImageBuffer;
-	}
-
+#if defined(GL_UNPACK_ROW_LENGTH) && !defined(__EMSCRIPTEN__)
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+#endif
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	return true;
 )");
 		SaveCode.append("\n}");
 
@@ -170,12 +169,17 @@ namespace ExportCodeNS
 		SaveCode.append(RootWindows->GetCod_InitWindows());
 		SaveCode.append("\n	// CreateWindow\n");
 		SaveCode.append(RootWindows->GetCod_CreateWindows());
+		std::cout << "\n Test Export Create Window Function : " << RootWindows->GetCod_CreateWindows();
 		//
 		// Add Style
 		SaveCode.append(GetExportStyle());
 		//
 		SaveCode.append("\n	// InitializeBeforeRendering");
 		SaveCode.append(RootWindows->GetCod_InitializeBeforeRendering());
+
+		SaveCode.append("\n	//Initialize ImGui Widget");
+		SaveCode.append("\n	HImGui_Initialization();");
+
 		SaveCode.append("\n	// Draw Loop\n");
 		SaveCode.append("\n	while(").append(RootWindows->GetCod_WhetherToEnableRenderingLoop()).append(")\n	{\n	");
 		SaveCode.append("\n		// FrameInit\n");
@@ -218,7 +222,7 @@ namespace ExportCodeNS
 		SaveCode.append("\n#include <imgui.h>");
 		SaveCode.append("\n#include <vector>\n");
 		SaveCode.append("\n//HLoadImage CallBack");
-		SaveCode.append("\nImTextureID(*HLoadImage)(bool HaveAlpha ,const unsigned char* imageData, ImTextureID& ImageBuffer,ImVec2 ImageSize,bool& NeedUpdata);\n");
+		SaveCode.append("\nbool(*HLoadImage)(const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize);\n");
 
 		for (size_t i = 0; i < CodeBuff.Inculd.size(); i++)
 		{
@@ -237,6 +241,32 @@ namespace ExportCodeNS
 		}
 
 		std::ofstream file(Path.append("\\HImGui_Widget_includeAndFunction.h"));
+		file << SaveCode;
+		file.close();
+	}
+
+	void SpawnImGuiH_VariableH(std::string Path)
+	{
+		std::string SaveCode = "\n#include \"HImGui_Widget_includeAndFunction.h\"";
+		for (size_t i = 0; i < EVariable.size(); i++)
+		{
+			SaveCode.append("\n\n//").append(EVariable.at(i).Comment);
+			SaveCode.append("\n").append(EVariable.at(i).VariableCode);
+		}
+		SaveCode.append("\n\n\n\n//--------------CacheVariable---------------------------------\n");
+		for (size_t i = 0; i < ECacheVariable.size(); i++)
+		{
+			SaveCode.append("\n\n//").append(ECacheVariable.at(i).Comment);
+			SaveCode.append("\n").append(ECacheVariable.at(i).VariableCode);
+		}
+
+		if (!FontBuff.OutputUsingSeparateFontFiles && !FontBuff.font.empty())
+		{
+			SaveCode.append("\n\n\n\n//--------------Font -  ").append(FontBuff.FontFileName);
+			SaveCode.append("\n").append(FontBuff.binary_to_compressed_c());
+		}
+
+		std::ofstream file(Path.append("\\HImGui_Widget_Variable.h"));
 		file << SaveCode;
 		file.close();
 	}
@@ -310,6 +340,10 @@ namespace ExportCodeNS
 			SaveExportText.append("\n").append("  <ItemGroup>");
 
 			SaveExportText.append("\n").append("    <ClInclude Include=\"").append("HImGui_Widget_includeAndFunction.h").append("\">");
+			SaveExportText.append("\n").append("      <Filter>Main</Filter>");
+			SaveExportText.append("\n").append("    </ClInclude>");
+
+			SaveExportText.append("\n").append("    <ClInclude Include=\"").append("HImGui_Widget_Variable.h").append("\">");
 			SaveExportText.append("\n").append("      <Filter>Main</Filter>");
 			SaveExportText.append("\n").append("    </ClInclude>");
 
@@ -527,6 +561,7 @@ namespace ExportCodeNS
 			SaveExportText.append("\n").append("  </ItemGroup>");
 			SaveExportText.append("\n").append("  <ItemGroup>");
 			SaveExportText.append("\n").append("    <ClInclude Include=\"").append("HImGui_Widget_includeAndFunction.h").append("\" />");
+			SaveExportText.append("\n").append("    <ClInclude Include=\"").append("HImGui_Widget_Variable.h").append("\" />");
 			SaveExportText.append("\n").append("    <ClInclude Include=\"").append("HImGuiWidget.h").append("\" />");
 
 			for (size_t i = 0; i < FileList.size(); i++)
@@ -723,13 +758,9 @@ namespace ExportCodeNS
 
 	HWidgetExport SpawnImGuiH(std::string Path)
 	{
-		std::string SaveCode;
-
-		SaveCode.append("// Inculd  HImGui Widget Inculde And Function");
-		SaveCode.append("\n#include \"HImGui_Widget_includeAndFunction.h\"");
+		std::string SaveCode, FunctionCodeBuffer;
 
 		SaveCode.append("\n\n\n");
-
 		SaveCode.append("// Draw ImGui Window And Widget");
 		SaveCode.append("\nvoid HImGui_GuiDraw()\n{\n");
 		HWidgetExport OutBuff;
@@ -851,11 +882,24 @@ namespace ExportCodeNS
 		}
 
 		SpawnImGuiH_FunctionH(OutBuff, Path);
-
+		SpawnImGuiH_VariableH(Path);
 		SaveCode.append("\n}");
 
+		FunctionCodeBuffer.append("// Inculd  HImGui Widget Inculde And Function");
+		FunctionCodeBuffer.append("\n#include \"HImGui_Widget_Variable.h\"");
+
+		FunctionCodeBuffer.append("\n\n\n");
+		FunctionCodeBuffer.append("// Initialization Widget");
+		FunctionCodeBuffer.append("\nvoid HImGui_Initialization(){\n");
+		for (size_t i = 0; i < InitializationCodes.size(); i++)
+		{
+			FunctionCodeBuffer.append("\n\n");
+			FunctionCodeBuffer.append(InitializationCodes.at(i));
+		}
+		FunctionCodeBuffer.append("\n}");
+
 		std::ofstream file(Path.append("\\HImGuiWidget.h"));
-		file << SaveCode;
+		file << FunctionCodeBuffer << SaveCode;
 		file.close();
 		return OutBuff;
 	}

@@ -322,8 +322,11 @@ public:
 	{
 		std::string SaveRandText = GetRandText((int)this, 15);
 		std::string SaveExportText;
-		//ImGuiWindowFlags _HV__ChildFlag = _THV_
+		HVariableExport HV;
 		SaveExportText.append("\n").append(Offset).append("ImGuiWindowFlags ").append(SaveRandText).append("_ChildFlag = ").append(std::to_string(ChildFlag)).append(";");
+		HV.VariableCode = SaveExportText;
+		SaveExportText.clear();
+		EVariable.push_back(HV);
 		//if(ImGui::BeginChild(_HV_,ImVec2(_THV_,_THV_),_HV_,))
 		SaveExportText.append("\n").append(Offset).append("if(ImGui::BeginChild(\"").append(GetID()).append("\",ImVec2(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append("),").append(BoolToString(border)).append(",").append(SaveRandText).append("_ChildFlag ))");
 		//{
@@ -344,15 +347,6 @@ public:
 		if (ImGui::BeginChild(GetID().c_str(), WidgetSize, border, ChildFlag))
 		{
 			HWidgetDragSpace(Content);
-			//if (!Content)
-			//{
-			//	ImGui::Text("DragSpace");
-			//	Content = HWidgetDragSpace();
-			//}
-			//else
-			//{
-			//	Content->Draw();
-			//}
 		}
 		ImGui::EndChild();
 		DrawLogicTick();
@@ -447,11 +441,18 @@ public:
 	{
 		std::string RandTextSave = GetRandText((int)this);
 		std::string SaveExportText;
+		HVariableExport HV;
 		//static char _HV__InputTextBuff = { _HV_ };
-		SaveExportText.append("\n").append(Offset).append("static char ").append(RandTextSave).append("_InputTextBuff[260] = { \"").append(InputTextDefault).append("\" };");
+		SaveExportText.append("\n").append("static char ").append(RandTextSave).append("_InputTextBuff[260] = { \"").append(InputTextDefault).append("\" };");
+		HV.VariableCode = SaveExportText;
+		SaveExportText.clear();
+		EVariable.push_back(HV);
+
 		//static ImGuiInputTextFlags _HV__InputTextFlag = _HV_;
-		SaveExportText.append("\n").append(Offset).append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string(InputTextFlag)).append(";");
-		//if(ImGui::InputText(_HV_,_HV__InputTextBuff,_HV_,))
+		SaveExportText.append("\n").append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string(InputTextFlag)).append(";");
+		HV.VariableCode = SaveExportText;
+		SaveExportText.clear();
+		EVariable.push_back(HV);
 		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputText(\"").append(GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append(std::to_string(260)).append(",").append(RandTextSave).append("_InputTextFlag))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
@@ -563,9 +564,16 @@ public:
 		std::string RandTextSave = GetRandText((int)this);
 		std::string SaveExportText;
 		//static char _HV__InputTextBuff = { _HV_ };
-		SaveExportText.append("\n").append(Offset).append("static char ").append(RandTextSave).append("_InputTextMultilineBuff[260] = { \"").append(InputTextDefault).append("\" };");
+		HVariableExport HV;
+		SaveExportText.append("\n").append("static char ").append(RandTextSave).append("_InputTextMultilineBuff[260] = { \"").append(InputTextDefault).append("\" };");
+		HV.VariableCode = SaveExportText;
+		SaveExportText.clear();
+		EVariable.push_back(HV);
 		//static ImGuiInputTextFlags _HV__InputTextFlag = _HV_;
-		SaveExportText.append("\n").append(Offset).append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string(InputTextFlag)).append(";");
+		SaveExportText.append("\n").append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string(InputTextFlag)).append(";");
+		HV.VariableCode = SaveExportText;
+		SaveExportText.clear();
+		EVariable.push_back(HV);
 		//if(ImGui::InputText(_HV_,_HV__InputTextBuff,_HV_,))
 		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputTextMultiline(\"").append(GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append(std::to_string(260)).append(",").append("ImVec2(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append(")").append(",").append(RandTextSave).append("_InputTextFlag))");
 		//{
@@ -674,13 +682,13 @@ public:
 	{
 		std::string RandText = GetRandText((int)this);
 		std::string SaveExportText;
-		//static float DragFloat__HV_ = _THV_;
-		SaveExportText.append("\n").append(Offset).append("static float DragFloat_").append(RandText).append(" = ").append(std::to_string(0)).append(";");
-		//if(DragFloat(_HV_,DragFloat__HV_ ,_THV_,_THV_,_THV_,_HV_,_THV_))
+		HVariableExport HV;
+		SaveExportText.append("\n").append("static float DragFloat_").append(RandText).append(" = ").append(std::to_string(DragBuff)).append(";");
+		HV.VariableCode = SaveExportText;
+		EVariable.push_back(HV);
+		SaveExportText.clear();
 		SaveExportText.append("\n").append(Offset).append("if(DragFloat(").append(TextData).append(",&DragFloat_").append(RandText).append(" ,").append(std::to_string(Speed)).append(",").append(std::to_string(Mmin)).append(",").append(std::to_string(Mmax)).append(",\"").append(Mformat).append("\",").append(std::to_string(Mflage)).append("))");
-		//{
 		SaveExportText.append("\n").append(Offset).append("{");
-		//}
 		SaveExportText.append("\n").append(Offset).append("}");
 		return SaveExportText;
 	}
@@ -784,7 +792,11 @@ public:
 		std::string RandText = GetRandText((int)this);
 		std::string SaveExportText;
 		//static ImVec4 ColorEditor3__HV_ = ImVec4(_THV_,_THV_,_THV_,_THV_);
+		HVariableExport HV;
 		SaveExportText.append("\n").append(Offset).append("static ImVec4 ColorEditor3_").append(RandText).append(" = ImVec4(").append(std::to_string(DFColor.x)).append(",").append(std::to_string(DFColor.y)).append(",").append(std::to_string(DFColor.z)).append(",").append(std::to_string(DFColor.w)).append(");");
+		HV.VariableCode = SaveExportText;
+		SaveExportText.clear();
+		EVariable.push_back(HV);
 		//if(ColorEdit3(_HV_,(float*)&ColorEditor3__HV_  ,_THV_))
 		SaveExportText.append("\n").append(Offset).append("if(ColorEdit3(\"").append(GetID()).append("\",(float*)&ColorEditor3_").append(RandText).append("  ,").append(std::to_string(Cflags)).append("))");
 		//{
@@ -1033,9 +1045,6 @@ public:
 		WidgetNameID = &DefaultWidgetImageID;
 		WidgetID = Text;
 		WidgetSize = ImVec2(100, 100);
-		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
-		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
-		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -1047,11 +1056,16 @@ public:
 	{
 		std::string RandText = GetRandText((int)this);
 		std::string SaveExportText;
-		SaveExportText.append("\n").append(Offset).append("static const unsigned char ").append(RandText).append("_imageData[] = {\n").append(Offset).append(EZ_Tool::VectorToString(ImageData, Offset)).append("\n};");
-		SaveExportText.append("\n").append(Offset).append("static bool ").append(RandText).append("_imageTextureNeedUpdata = true;");
-		SaveExportText.append("\n").append(Offset).append("const bool ").append(RandText).append("_HaveAlpha = ").append(BoolToString(HaveAlpha)).append(";");
-		SaveExportText.append("\n").append(Offset).append("static ImTextureID ").append(RandText).append("_imageTextureBuffer;");
-		SaveExportText.append("\n").append(Offset).append("ImGui::Image(HLoadImage(").append(RandText).append("_HaveAlpha").append(",").append(RandText).append("_imageData,").append(RandText).append("_imageTextureBuffer, ImVec2(").append(std::to_string(ImageSizeBuffer.x)).append(", ").append(std::to_string(ImageSizeBuffer.y)).append("),").append(RandText).append("_imageTextureNeedUpdata").append("), ImVec2(").append(std::to_string(WidgetSize.x)).append(", ").append(std::to_string(WidgetSize.y)).append("), ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
+		HVariableExport HV;
+		HV.Comment = "Image image Data";
+		HV.VariableCode = std::string("\n").append(Offset).append("static const unsigned char ").append(RandText).append("_imageData[] = {\n").append(Offset).append(EZ_Tool::VectorToString(ImageData, Offset)).append("\n};");
+		ECacheVariable.push_back(HV);
+		HV.Comment = "Image ImTextureID";
+		HV.VariableCode = std::string("\nstatic ImTextureID ").append(RandText).append("_ImageTexture;");
+		EVariable.push_back(HV);
+		InitializationCodes.push_back(std::string("\nif(!HLoadImage(").append(RandText).append("_imageData,").append(RandText).append("_ImageTexture,ImVec2(").append(std::to_string(ImageSizeBuffer.x)).append(",").append(std::to_string(ImageSizeBuffer.y)).append(")").append("))\n{\nprintf(\"\\nLoadImage : false\");\n}"));
+
+		SaveExportText.append("\n").append(Offset).append("ImGui::Image( ").append(RandText).append("_ImageTexture , ").append("ImVec2(").append(std::to_string(WidgetSize.x)).append(", ").append(std::to_string(WidgetSize.y)).append("), ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
 		return SaveExportText;
 	}
 	virtual void Draw()override
@@ -1074,7 +1088,8 @@ public:
 			{
 				ifd::FileDialog::Instance().Open("Select Image_Dialog", "Select Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*");
 			}
-
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Please save the project before selecting the image.\n Currently loading images cannot support non-standard images.");
 			if (ifd::FileDialog::Instance().IsDone("Select Image_Dialog")) {
 				if (ifd::FileDialog::Instance().HasResult()) {
 					std::string res = ifd::FileDialog::Instance().GetResult().u8string();
@@ -1373,9 +1388,11 @@ public:
 	virtual std::string Export(std::string Offset) override
 	{
 		std::string RandText = GetRandText((int)this);
-		std::string ExportBuffer = std::string("\n").append(Offset).append("static bool ").append(RandText).append("_IsCheck = ").append(BoolToString(IsCheck));
-		ExportBuffer.append("\n").append(Offset).append("ImGui::Checkbox(\"").append(TextData).append("\",&").append(RandText).append("_IsCheck").append("); ");
-		return ExportBuffer;
+		HVariableExport HV;
+		HV.Comment = "Checkbox Value Buffer";
+		HV.VariableCode = std::string("\n").append(Offset).append("static bool ").append(RandText).append("_IsCheck = ").append(BoolToString(IsCheck)).append(";");
+		EVariable.push_back(HV);
+		return std::string("\n").append(Offset).append("ImGui::Checkbox(\"").append(TextData).append("\",&").append(RandText).append("_IsCheck").append("); ");
 	}
 	virtual void Draw()override
 	{
@@ -1552,9 +1569,12 @@ public:
 	virtual std::string Export(std::string Offset) override
 	{
 		std::string RandText = GetRandText((int)this);
-		std::string ExportBuffer = std::string("\n").append(Offset).append("static float ").append(RandText).append("_value = ").append(std::to_string(value));
-		ExportBuffer.append("\n").append(Offset).append("ImGui::MyKnob(").append(std::to_string(size)).append(",\"").append(TextData).append("\",&").append(RandText).append("_value,").append(std::to_string(min_value)).append(",").append(std::to_string(max_value)).append("); ");
-		return ExportBuffer;
+		HVariableExport HV;
+		HV.Comment = "MyKnob ValueBuffer";
+		HV.VariableCode = std::string("\n").append(Offset).append("static float ").append(RandText).append("_value = ").append(std::to_string(value)).append(";");
+		EVariable.push_back(HV);
+
+		return std::string("\n").append(Offset).append("ImGui::MyKnob(").append(std::to_string(size)).append(",\"").append(TextData).append("\",&").append(RandText).append("_value,").append(std::to_string(min_value)).append(",").append(std::to_string(max_value)).append("); ");
 	}
 	virtual void Draw()override
 	{
