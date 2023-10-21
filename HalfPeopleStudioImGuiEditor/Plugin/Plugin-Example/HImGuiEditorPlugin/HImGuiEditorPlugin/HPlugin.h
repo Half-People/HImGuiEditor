@@ -51,13 +51,6 @@ namespace ToggleButtonV
 		"\n}\0";
 }
 
-std::string BoolToString(bool B)
-{
-	if (B)
-		return "true";
-	return"false";
-}
-
 bool DemoToggleButton(const char* str_id, bool* v, float ANIM_SPEED = 0.08f)
 {
 	bool Updata = false;
@@ -183,7 +176,7 @@ namespace TextEditorV
 	static std::string DefaultWidgetTextEditor = "ImGui Color TextEdit";
 	static std::string DefaultWidgetTextEditorID = "ImGui Color TextEdit";
 	static std::vector<std::string> HInculd = { "#include <TextEditor.h>" ,"#include <imgui.h>" };
-	static std::vector<std::string> HRequestCompileFile = { "Content\\ImGuiColorTextEdit-master\\TextEditor.h","Content\\ImGuiColorTextEdit-master\\TextEditor.cpp"};
+	static std::vector<std::string> HRequestCompileFile = { "Content\\ImGuiColorTextEdit-master\\TextEditor.h","Content\\ImGuiColorTextEdit-master\\TextEditor.cpp" };
 	static std::string HInculdPath = "Content\\ImGuiColorTextEdit-master";
 	static std::vector<std::string> LanguageDefinitionList = { "CPlusPlus",
 																"HLSL",
@@ -202,13 +195,21 @@ public:
 	{
 		WidgetName = &TextEditorV::DefaultWidgetTextEditor;
 		WidgetNameID = &TextEditorV::DefaultWidgetTextEditorID;
-		WidgetID = TextEditorTitleID;
+
 		HArrowFlag = HArrow_SizeFlag_Default;
 		InculdPath = &TextEditorV::HInculdPath;
 		this->RequestCompileFile = &TextEditorV::HRequestCompileFile;
 		Inculd = &TextEditorV::HInculd;
 		Ed = new TextEditor();
 		Ed->SetText("#include <iostream>\n\nint main()\n{\n\n	std::cout << \"\\n Hello World\" ;\n\n}");
+
+		TextEditorTitleID = new HVString("TextEditorTitleID", "TextEditor", 0, true, false);
+		Border = new HVBool("Border");
+
+		HValues.AddHValue(TextEditorTitleID);
+		HValues.AddHValue(Border);
+
+		WidgetID = TextEditorTitleID->Get().data();
 	}
 	~HTextEditor()
 	{
@@ -226,41 +227,37 @@ public:
 		std::string SaveExportText;
 		std::string SaveRandText = GetRandText((int)this);
 		//static TextEditor* _HV_;
-		SaveExportText.append("\n").append(Offset).append("static TextEditor* ").append(SaveRandText).append("_TEdit;");
-		//static bool _HV_ = true;
-		SaveExportText.append("\n").append(Offset).append("static bool ").append(SaveRandText).append("_B = true;");
-		//if(_HV_)
-		SaveExportText.append("\n").append(Offset).append("if(").append(SaveRandText).append("_B)");
-		//{
-		SaveExportText.append("\n").append(Offset).append("{");
-		//	_HV_ = false;
-		SaveExportText.append("\n").append(Offset).append("	").append(SaveRandText).append("_B = false;");
-		//	_HV_ = new TextEditor;
-		SaveExportText.append("\n").append(Offset).append("	").append(SaveRandText).append("_TEdit = new TextEditor;");
-		//	_HV_->SetShowWhitespaces(_HV_);
-		SaveExportText.append("\n").append(Offset).append("	").append(SaveRandText).append("_TEdit->SetShowWhitespaces(").append(BoolToString(ShowWhitespaces)).append(");");
-		//	_HV_->SetLanguageDefinition(_HV_);
-		SaveExportText.append("\n").append(Offset).append("	").append(SaveRandText).append("_TEdit->SetLanguageDefinition(").append(LanguageDefinitionListToString(LanguageDefinitionListIndex)).append(");");
-		//	_HV_->SetText(_HV_);
-		//SaveExportText.append("\n").append(Offset).append("	").append(SaveRandText).append("_TEdit->SetText(").append(Ed->GetText()).append(");");
-		//}
-		SaveExportText.append("\n").append(Offset).append("}");
-		//_HV_->Render(_HV_,ImVec2(std::to_string(_HV_),std::to_string(_HV_)),_HV_);
-		SaveExportText.append("\n").append(Offset).append("").append(SaveRandText).append("_TEdit->Render(\"").append(GetID()).append("\",ImVec2(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append("),").append(BoolToString(Border)).append(");");
+		HVariableExport HV;
+		HV.VariableCode.append("\n").append(Offset).append("static TextEditor* ").append(SaveRandText).append("_TEdit;");
+		HV.Comment = "HPlugin - TextEditor";
+		EVariable->push_back(HV);
+
+		SaveExportText.append("\n// Init TextEditor");
+		SaveExportText.append("\n").append(SaveRandText).append("_TEdit = new TextEditor;");
+		SaveExportText.append("\n").append(SaveRandText).append("_TEdit->SetShowWhitespaces(").append(BoolToString(ShowWhitespaces)).append(");");
+		SaveExportText.append("\n").append(SaveRandText).append("_TEdit->SetLanguageDefinition(").append(LanguageDefinitionListToString(LanguageDefinitionListIndex)).append(");\n");
+
+		InitializationCodes->push_back(SaveExportText); // << Add to InitializationFunction
+
+		SaveExportText.clear();
+
+		SaveExportText.append("\n").append(Offset).append("").append(SaveRandText).append("_TEdit->Render(\"").append(GetID()).append("\",ImVec2(").append(std::to_string(WidgetSize->Get()->x)).append(",").append(std::to_string(WidgetSize->Get()->y)).append("),").append(BoolToString(Border)).append(");");
 		return SaveExportText;
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
 
-		Ed->Render(TextEditorTitleID, WidgetSize, Border);
+		Ed->Render(TextEditorTitleID->Get().c_str(), *WidgetSize->Get(), *Border->Get());
 
 		DrawLogicTick();
 		return;
 	}
 	virtual void DetailPanelWidget()override
 	{
-		ImGui::Checkbox("Border", &Border);
+		Border->Draw("Border", this);
+		TextEditorTitleID->Draw("TextEditorTitle ID", this);
+		//ImGui::Checkbox("Border", Border->Get());
 		if (ImGui::Checkbox("ShowWhitespaces", &ShowWhitespaces))
 			Ed->SetShowWhitespaces(ShowWhitespaces);
 		if (ImGui::BeginCombo("LanguageDefinition", TextEditorV::LanguageDefinitionList.at(LanguageDefinitionListIndex).c_str()))
@@ -285,21 +282,16 @@ public:
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["WidgetName"] = TextEditorTitleID;
-		J["Border"] = Border;
 		J["ShowWhitespaces"] = ShowWhitespaces;
 		J["LanguageDefinitionListIndex"] = LanguageDefinitionListIndex;
 		return J;
 	}
 	virtual void Paste(json Data)override {
 		PrePaste(Data);
-		std::string TrreNameS = Data["WidgetName"];
-		Border = Data["Border"];
 		ShowWhitespaces = Data["ShowWhitespaces"];
 		LanguageDefinitionListIndex = Data["LanguageDefinitionListIndex"];
 		Ed->SetLanguageDefinition(LanguageDefinitionListToFunction(LanguageDefinitionListIndex));
 
-		strcpy_s(TextEditorTitleID, TrreNameS.c_str());
 		return;
 	}
 
@@ -363,8 +355,12 @@ private:
 		}
 	}
 
-	char TextEditorTitleID[200];// = { "ToggleButton ID" };
-	bool Border;
+	//char TextEditorTitleID[200];// = { "ToggleButton ID" };
+	//bool Border;
+	//bool ShowWhitespaces;
+
+	HVString* TextEditorTitleID;
+	HVBool* Border;
 	bool ShowWhitespaces;
 	int LanguageDefinitionListIndex = 0;
 	TextEditor* Ed;

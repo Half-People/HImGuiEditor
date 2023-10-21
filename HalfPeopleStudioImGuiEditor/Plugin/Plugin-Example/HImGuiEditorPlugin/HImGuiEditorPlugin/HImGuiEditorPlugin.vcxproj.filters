@@ -1,19 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="標頭檔">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="資源檔">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="標頭檔\Inculd">
-      <UniqueIdentifier>{902fb6ce-5af6-4923-9aab-93334ade2a9e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="標頭檔\ImGui">
-      <UniqueIdentifier>{5c8e1520-60d7-4f81-82fc-3b1bf855c8c5}</UniqueIdentifier>
     </Filter>
     <Filter Include="PluginMain">
       <UniqueIdentifier>{901e7a16-88aa-4aa9-892a-90807b7c7da2}</UniqueIdentifier>
@@ -25,19 +15,29 @@
     <Filter Include="ImGui_Api">
       <UniqueIdentifier>{ac9d461e-e3b4-410b-b42c-0702cf91d044}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Inculds">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Inculds\Inculd">
+      <UniqueIdentifier>{902fb6ce-5af6-4923-9aab-93334ade2a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inculds\ImGui">
+      <UniqueIdentifier>{5c8e1520-60d7-4f81-82fc-3b1bf855c8c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inculds\ImNeoSequenc">
+      <UniqueIdentifier>{03d37dd6-db2a-4e54-8c12-188b634554d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HTranslate.h">
-      <Filter>標頭檔\Inculd</Filter>
-    </ClInclude>
-    <ClInclude Include="HWidget.h">
-      <Filter>標頭檔\Inculd</Filter>
+      <Filter>Inculds\Inculd</Filter>
     </ClInclude>
     <ClInclude Include="imgui.h">
-      <Filter>標頭檔\Inculd</Filter>
+      <Filter>Inculds\Inculd</Filter>
     </ClInclude>
     <ClInclude Include="imgui_internal.h">
-      <Filter>標頭檔\Inculd</Filter>
+      <Filter>Inculds\Inculd</Filter>
     </ClInclude>
     <ClInclude Include="HPlugin.h">
       <Filter>PluginMain</Filter>
@@ -48,26 +48,35 @@
     <ClInclude Include="pch.h">
       <Filter>Dll_Function</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuiTextEdit\ImGuiColorTextEdit-master\TextEditor.h">
       <Filter>ImGui_Api</Filter>
+    </ClInclude>
+    <ClInclude Include="HValue.h">
+      <Filter>Inculds\Inculd</Filter>
+    </ClInclude>
+    <ClInclude Include="ImNeoSequenc\imgui_neo_sequencer.h">
+      <Filter>Inculds\ImNeoSequenc</Filter>
+    </ClInclude>
+    <ClInclude Include="HWidget.h">
+      <Filter>Inculds\Inculd</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>Inculds\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>Inculds\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>Inculds\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>Inculds\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>Inculds\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>Inculds\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,23 +86,32 @@
     <ClCompile Include="pch.cpp">
       <Filter>Dll_Function</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>標頭檔\ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="ImGuiTextEdit\ImGuiColorTextEdit-master\TextEditor.cpp">
       <Filter>ImGui_Api</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>Inculds\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>Inculds\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>Inculds\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>Inculds\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>Inculds\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImNeoSequenc\imgui_neo_internal.cpp">
+      <Filter>Dll_Function</Filter>
+    </ClCompile>
+    <ClCompile Include="ImNeoSequenc\imgui_neo_sequencer.cpp">
+      <Filter>Dll_Function</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_neo_sequencer.cpp">
+      <Filter>Inculds\ImNeoSequenc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

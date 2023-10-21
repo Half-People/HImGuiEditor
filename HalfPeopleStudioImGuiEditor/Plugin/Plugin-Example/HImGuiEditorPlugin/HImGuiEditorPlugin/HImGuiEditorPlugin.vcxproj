@@ -107,8 +107,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\API\JSON\include;..\API\CURL\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>ImNeoSequenc;..\API\JSON\include;..\API\CURL\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,8 +144,9 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\API\JSON\include;..\API\CURL\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>ImNeoSequenc;..\API\JSON\include;..\API\CURL\include;ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,7 +160,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="HPlugin.h" />
     <ClInclude Include="HTranslate.h" />
-    <ClInclude Include="HWidget.h" />
+    <ClInclude Include="HValue.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="ImGuiTextEdit\ImGuiColorTextEdit-master\TextEditor.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -168,10 +170,13 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="imgui_internal.h" />
+    <ClInclude Include="ImNeoSequenc\imgui_neo_sequencer.h" />
+    <ClInclude Include="HWidget.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="imgui_neo_sequencer.cpp" />
     <ClCompile Include="ImGuiTextEdit\ImGuiColorTextEdit-master\TextEditor.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />

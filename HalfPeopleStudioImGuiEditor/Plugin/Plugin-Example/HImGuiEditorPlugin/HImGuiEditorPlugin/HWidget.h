@@ -1,11 +1,12 @@
 #pragma once
-#include <imgui_internal.h>
-//#include <imgui.h>
+//please use cpp 17 !!!!!!!!!!
+#include <imgui.h>
 #include <string>
 #include <vector>
 #include <iostream>
 #include "HArrow/HArrow.h"
 #include "HTranslate.h"
+#include "HValue.h"
 //#define GImGui  ((ImGuiContext*)GImGuiExtended) // To use custom extended context
 
 #ifdef Editor
@@ -17,11 +18,19 @@
 //bool HaveWidgetFocused = false;
 class HWidget;
 //HWidget* (*GetWidgetData)(int Index);
-
+//Deprecated Please use "Value"
+static std::vector<HVariableExport>* EVariable;
+static std::vector<HVariableExport>* ECacheVariable;
+static std::vector<std::string>* InitializationCodes;
 static HWidget** SelectWidget;
 static std::vector<HWidget*>* WidgetList;
 static std::vector<HWidget*>** HImGuiWidnowsWidgetList;
-
+static std::string BoolToString(bool B)
+{
+	if (B)
+		return "true";
+	return "false";
+}
 static void AddRightClickMenu(HWidget* Widget);
 static int Positioning = 10;
 static json ImVec2ToJson(ImVec2& Vec)
@@ -54,7 +63,8 @@ enum HWidgetFlag
 	HWidgetFlag_WindowRootWidget,
 	HWidgetFlag_WindowRootWidgetAndMove,
 	HWidgetFlag_Content,
-	HWidgetFlag_ContentMove
+	HWidgetFlag_ContentMove,
+	HWidgetFlag_MenuBar
 };
 struct HRect
 {
@@ -63,6 +73,7 @@ struct HRect
 	float right = 0;
 	float below = 0;
 };
+
 struct HWidgetExport
 {
 	std::vector<std::string> Inculd;
@@ -74,24 +85,22 @@ struct HWidgetExport
 	std::string ExportCode;
 };
 
-std::string GetRandText(int srand_, int Long = 5)
-{
-	srand(srand_);
-	static const char Buff[] = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-	std::string tmp_s;
-	tmp_s.reserve(Long);
-	for (size_t i = 0; i < Long; i++)
-	{
-		tmp_s += Buff[rand() % (sizeof(Buff) - 1)];
-	}
-	return tmp_s;
-}
-
 class HWidget
 {
 public:
+	HWidget()
+	{
+		if (!WidgetSize)
+			WidgetSize = new HVImVec2("HSize");
+		if (!MovePos)
+			MovePos = new HVImVec2("HPos");
+
+		HValues.AddHValue(MovePos);
+		HValues.AddHValue(WidgetSize);
+	}
 	~HWidget()
 	{
+		HAnimation::WidgetRemoveTimeLine(this);
 		//if(WidgetID > 0)
 		//	delete WidgetID;
 	}
@@ -114,6 +123,7 @@ public:
 	std::string* WidgetNameID = NULL;
 	std::vector<std::string>* Inculd;
 	std::vector<std::string>* RequestCompileFile;
+	HWidgetValues HValues;
 	std::string* Lib;
 	std::string* Function;
 	std::string* LibPath;
@@ -121,8 +131,8 @@ public:
 	char* WidgetID;
 	bool ShowDragSpace = true;
 	bool CanSelectWidget = true;
-	ImVec2 MovePos;
-	ImVec2 WidgetSize;
+	HVImVec2* MovePos;
+	HVImVec2* WidgetSize;
 	HArrow_SizeFlag HArrowFlag = HArrow_SizeFlag_Default;
 	void DrawPreLogic()
 	{
@@ -132,7 +142,7 @@ public:
 		}
 		else if (Flag == HWidgetFlag_Move || Flag == HWidgetFlag_ContentMove || Flag == HWidgetFlag_WindowRootWidgetAndMove)
 		{
-			ImGui::SetCursorPos(MovePos);
+			ImGui::SetCursorPos(*MovePos->Get());
 		}
 		else if (B)
 		{
@@ -143,7 +153,7 @@ public:
 		}
 		//if (MovePos.x == 0 && MovePos.y == 0)
 		//{
-		MovePos = ImGui::GetCursorPos();
+		*MovePos->Get() = ImGui::GetCursorPos();
 		//}
 
 		ImGui::BeginGroup();
@@ -265,7 +275,7 @@ public:
 					DrawWidgetRect();
 					//if(Flag == HWidgetFlag_Move)
 					//	HArray(MovePos, Positioning);
-					HResize(MovePos, WidgetSize, Positioning, HArrowFlag);
+					HResize(*MovePos->Get(), *WidgetSize->Get(), Positioning, HArrowFlag);
 				}
 			}
 		}
@@ -273,7 +283,7 @@ public:
 		{
 			if (*SelectWidget == this)
 			{
-				if (HArrow(MovePos, Positioning))
+				if (HArrow(*MovePos->Get(), Positioning))
 				{
 					if (Flag == HWidgetFlag_Content)
 					{
@@ -420,8 +430,8 @@ public:
 									SaveWidget->Flag = HWidgetFlag_Move;
 								}
 
-								SaveWidget->MovePos.x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
-								SaveWidget->MovePos.y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
+								SaveWidget->MovePos->Get()->x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
+								SaveWidget->MovePos->Get()->y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
 
 								Target->Subclass = SaveWidget;
 								return;
@@ -442,47 +452,24 @@ public:
 
 	void PreCopy(json& J)
 	{
-		J["WidgetPos"] = ImVec2ToJson(MovePos);
-		J["WidgetSize"] = ImVec2ToJson(WidgetSize);
+		//J["WidgetPos"] = ImVec2ToJson(MovePos->Get());
+		//J["WidgetSize"] = ImVec2ToJson(WidgetSize);
 		J["Flag"] = Flag;
 		J["ID"] = *WidgetNameID;
+		J["HValues"] = HValues.Save();
 	}
 
 	void PrePaste(json J)
 	{
-		MovePos = JsonToImVec2(J["WidgetPos"]);
-		WidgetSize = JsonToImVec2(J["WidgetSize"]);
+		//MovePos = JsonToImVec2(J["WidgetPos"]);
+		//WidgetSize = JsonToImVec2(J["WidgetSize"]);
 		Flag = J["Flag"];
+		HValues.Load(J["HValues"]);
 	}
 
-	//std::vector<HWidget*> GetAllContent()
-	//{
-	//	std::vector<HWidget*> SaveList;
-	//	HWidget* SaveWidget;
-	//	do
-	//	{
-	//		SaveWidget = Subclass;
-	//		if (SaveWidget)
-	//		{
-	//			SaveList.push_back(SaveWidget);
-	//		}
-	//	} while (SaveWidget);
-	//}
-
-	//struct ContentItems
-	//{
-	//	//std::string ID;
-	//	json Data;
-	//	//HWidgetFlag Flag;
-	//	//ImVec2 Pos;
-	//	std::vector<ContentItems> SubclassItems;
-	//};
-
-	//std::vector<ContentItems> CopyContent()
 	json CopyContent()
 	{
 		HWidget* SaveContent = Content;
-		//std::vector <ContentItems> OutData;
 		json OutData;
 		while (SaveContent)
 		{
@@ -502,7 +489,6 @@ public:
 		return OutData;
 	}
 
-	//void PasteContent(std::vector<ContentItems> In)
 	void PasteContent(json In)
 	{
 		HWidget* SaveWidget = NULL;// = Content;
@@ -513,7 +499,7 @@ public:
 			for (size_t i = 0; i < WidgetList->size(); i++)
 			{
 				json Widget = JsonContent["Data"];
-				if (*(WidgetList->at(i)->WidgetNameID) == Widget["ID"])
+				if (*WidgetList->at(i)->WidgetNameID == Widget["ID"])
 				{
 					HWidget* NowWidget = SaveWidget;
 
@@ -643,7 +629,7 @@ public:
 					}
 				}
 
-				*SelectWidget = NULL;
+				SelectWidget = NULL;
 				delete SaveWidget;
 			}
 			else if (SaveWidget->Flag != NewFlag)
@@ -803,7 +789,7 @@ public:
 	std::string GetID()
 	{
 		if (WidgetID)
-			return std::string(WidgetID).append("###").append(GetRandText((int)this));
+			return std::string(WidgetID).append("###").append(*WidgetNameID).append(std::to_string((int)this));
 		return "Not Widget ID";
 	}
 
@@ -821,6 +807,7 @@ public:
 
 	HWidgetExport ExportWidget(std::string Offset)
 	{
+		HValues.ExportValue(this, *EVariable, *ECacheVariable);
 		HWidgetExport Save;
 		//std::string Save;
 		if (Flag == HWidgetFlag_TurnRight)
@@ -830,10 +817,11 @@ public:
 		}
 		else if (Flag == HWidgetFlag_Move || Flag == HWidgetFlag_ContentMove || Flag == HWidgetFlag_WindowRootWidgetAndMove)
 		{
+			//EVariable.push_back(MovePos->GetVariableExport(this));
 			Save.ExportCode.append("\n").append(Offset);
-			Save.ExportCode.append("ImGui::SetCursorPos( ImVec2(");
-			Save.ExportCode.append(std::to_string(MovePos.x)).append(" , ").append(std::to_string(MovePos.y));
-			Save.ExportCode.append(") );\n");
+			Save.ExportCode.append("ImGui::SetCursorPos(");
+			Save.ExportCode.append(MovePos->AutoGetOutputValue(this));
+			Save.ExportCode.append(");\n");
 		}
 
 		Save.ExportCode.append(Export(Offset));
@@ -1086,6 +1074,7 @@ public:
 
 private:
 	bool B = false;
+
 	HWidgetExport* ContentExcessiveData = 0;
 
 	bool BeginDragDropTargetForHWidget()
@@ -1122,7 +1111,7 @@ private:
 
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragWidget"))
 			{
-				MoveWidget_RD(*SelectWidget, NewFlag);
+				MoveWidget_RD((HWidget*)payload->Data, NewFlag);
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -1144,7 +1133,7 @@ private:
 
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragWidget"))
 			{
-				MoveWidget_LT(*SelectWidget, NewFlag);
+				MoveWidget_LT((HWidget*)payload->Data, NewFlag);
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -1230,6 +1219,24 @@ static void DeleteWidget(HWidget* SaveWidget)
 	}
 }
 
+namespace RightClickMenuT
+{
+	static std::string RemoveWidget = "Remove Widget";
+	static std::string layout = "layout";
+	static std::string Default = "Default";
+	static std::string Move = "Move";
+	static std::string SortRight = "Sort Right";
+	static std::string ShowDragSpace = "ShowDragSpace";
+	static std::string CanSelect = "Can Select";
+}
+#define RightClickMenuInit TranslateObject.push_back(&RightClickMenuT::RemoveWidget);\
+TranslateObject.push_back(&RightClickMenuT::layout);\
+TranslateObject.push_back(&RightClickMenuT::Default);\
+TranslateObject.push_back(&RightClickMenuT::Move);\
+TranslateObject.push_back(&RightClickMenuT::SortRight);\
+TranslateObject.push_back(&RightClickMenuT::ShowDragSpace);\
+TranslateObject.push_back(&RightClickMenuT::CanSelect);
+
 void AddRightClickMenu(HWidget* Widget)
 {
 	if (!Widget)
@@ -1238,46 +1245,47 @@ void AddRightClickMenu(HWidget* Widget)
 	if (ImGui::BeginPopupContextItem(std::to_string((int)Widget).c_str()))
 	{
 		ImGui::Text(Widget->WidgetName->c_str());
-		if (ImGui::MenuItem("Remove Widget"))
+		ImGui::Separator();
+		if (ImGui::MenuItem(RightClickMenuT::RemoveWidget.c_str()))
 		{
 			DeleteWidget(Widget);
 		}
 
-		if (ImGui::BeginMenu("Move"))
+		if (ImGui::BeginMenu(RightClickMenuT::layout.c_str()))
 		{
 			if (Widget->Flag == HWidgetFlag_ContentMove || Widget->Flag == HWidgetFlag_Content)
 			{
-				if (ImGui::MenuItem("Default", "", Widget->Flag == HWidgetFlag_Content))
+				if (ImGui::MenuItem(RightClickMenuT::Default.c_str(), "", Widget->Flag == HWidgetFlag_Content))
 				{
 					Widget->Flag = HWidgetFlag_Content;
 				}
-				if (ImGui::MenuItem("Move", "", Widget->Flag == HWidgetFlag_ContentMove))
+				if (ImGui::MenuItem(RightClickMenuT::Move.c_str(), "", Widget->Flag == HWidgetFlag_ContentMove))
 				{
 					Widget->Flag = HWidgetFlag_ContentMove;
 				}
 			}
 			else if (Widget->Flag == HWidgetFlag_WindowRootWidget || Widget->Flag == HWidgetFlag_WindowRootWidgetAndMove)
 			{
-				if (ImGui::MenuItem("Default", "", Widget->Flag == HWidgetFlag_WindowRootWidget))
+				if (ImGui::MenuItem(RightClickMenuT::Default.c_str(), "", Widget->Flag == HWidgetFlag_WindowRootWidget))
 				{
 					Widget->Flag = HWidgetFlag_WindowRootWidget;
 				}
-				if (ImGui::Selectable("Move", Widget->Flag == HWidgetFlag_WindowRootWidgetAndMove))
+				if (ImGui::Selectable(RightClickMenuT::Move.c_str(), Widget->Flag == HWidgetFlag_WindowRootWidgetAndMove))
 				{
 					Widget->Flag = HWidgetFlag_WindowRootWidgetAndMove;
 				}
 			}
 			else
 			{
-				if (ImGui::Selectable("Sort Right", Widget->Flag == HWidgetFlag_TurnRight))
+				if (ImGui::Selectable(RightClickMenuT::SortRight.c_str(), Widget->Flag == HWidgetFlag_TurnRight))
 				{
 					Widget->Flag = HWidgetFlag_TurnRight;
 				}
-				if (ImGui::Selectable("Default", Widget->Flag == HWidgetFlag_Null))
+				if (ImGui::Selectable(RightClickMenuT::Default.c_str(), Widget->Flag == HWidgetFlag_Null))
 				{
 					Widget->Flag = HWidgetFlag_Null;
 				}
-				if (ImGui::Selectable("Move", Widget->Flag == HWidgetFlag_Move))
+				if (ImGui::Selectable(RightClickMenuT::Move.c_str(), Widget->Flag == HWidgetFlag_Move))
 				{
 					Widget->Flag = HWidgetFlag_Move;
 					//Widget->MovePos = ImGui::GetCursorPos();
@@ -1287,17 +1295,15 @@ void AddRightClickMenu(HWidget* Widget)
 			ImGui::EndMenu();
 		}
 
-		ImGui::MenuItem("ShowDragSpace", "", &Widget->ShowDragSpace);
+		ImGui::MenuItem(RightClickMenuT::ShowDragSpace.c_str(), "", &Widget->ShowDragSpace);
 
-		ImGui::MenuItem("CanSelectWidget", "", &Widget->CanSelectWidget);
+		ImGui::MenuItem(RightClickMenuT::CanSelect.c_str(), "", &Widget->CanSelectWidget);
 
 		ImGui::EndPopup();
 	}
-
-
 }
 
-extern "C" __declspec(dllexport)void InitHPlugin(ImGuiContext * MainContext, HWidget * *Select, EditMode * EdMode_, std::vector<HWidget*>**HImGuiWidnowsWidgetList_, std::vector<HWidget*>*WidgetList_)
+extern "C" __declspec(dllexport)void InitHPlugin(int* CurrentSequenFrame_, void** CurrentSequencer_, std::string(*GetWidgetName_)(HWidget * Widget), void (*TimeLineAddFrame_)(HWidget * Widget, HValue * Value), void (*WidgetRemoveTimeLine_)(HWidget * Widget), std::vector<HVariableExport>*EV, std::vector<HVariableExport>*ECV, std::vector<std::string>*initc, ImGuiContext * MainContext, HWidget * *Select, EditMode * EdMode_, std::vector<HWidget*>**HImGuiWidnowsWidgetList_, std::vector<HWidget*>*WidgetList_)
 {
 	ImGui::SetCurrentContext(MainContext);
 	SelectWidget = Select;
@@ -1305,4 +1311,13 @@ extern "C" __declspec(dllexport)void InitHPlugin(ImGuiContext * MainContext, HWi
 
 	HImGuiWidnowsWidgetList = HImGuiWidnowsWidgetList_;
 	WidgetList = WidgetList_;
+	InitializationCodes = initc;
+	ECacheVariable = ECV;
+	EVariable = EV;
+
+	HAnimation::GetWidgetName = GetWidgetName_;
+	HAnimation::TimeLineAddFrame = TimeLineAddFrame_;
+	HAnimation::WidgetRemoveTimeLine = WidgetRemoveTimeLine_;
+	HAnimation::CurrentSequencer = CurrentSequencer_;
+	HAnimation::CurrentSequenFrame = CurrentSequenFrame_;
 }
