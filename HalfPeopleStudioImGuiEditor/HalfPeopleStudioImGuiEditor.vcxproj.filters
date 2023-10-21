@@ -45,6 +45,9 @@
     <Filter Include="ImGui\ImGuiFileDiaolog">
       <UniqueIdentifier>{95683cfd-10f7-495f-abe1-8ef00878e763}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGui\im neo sequencer">
+      <UniqueIdentifier>{6335bd86-af52-4997-90ca-99791653f02f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -173,6 +176,18 @@
     <ClInclude Include="HWindows.h">
       <Filter>EditorRoot</Filter>
     </ClInclude>
+    <ClInclude Include="ImNeoSequenc\imgui_neo_internal.h">
+      <Filter>ImGui\im neo sequencer</Filter>
+    </ClInclude>
+    <ClInclude Include="ImNeoSequenc\imgui_neo_sequencer.h">
+      <Filter>ImGui\im neo sequencer</Filter>
+    </ClInclude>
+    <ClInclude Include="HAnimationSequencerPanel.h">
+      <Filter>Editor\EditorWidget</Filter>
+    </ClInclude>
+    <ClInclude Include="HValue.h">
+      <Filter>Editor\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -209,5 +224,12 @@
     <ClCompile Include="ImFileDialog\ImFileDialog.cpp">
       <Filter>ImGui\ImGuiFileDiaolog</Filter>
     </ClCompile>
+    <ClCompile Include="ImNeoSequenc\imgui_neo_internal.cpp">
+      <Filter>ImGui\im neo sequencer</Filter>
+    </ClCompile>
+    <ClCompile Include="ImNeoSequenc\imgui_neo_sequencer.cpp">
+      <Filter>ImGui\im neo sequencer</Filter>
+    </ClCompile>
+    <ClCompile Include="HAnimationSequencerPanel.cpp" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,8 @@ namespace PluginType
 {
 	typedef json(_cdecl* GetPluginInfo)();
 	typedef std::vector<HWidget*>(_cdecl* GetWidget)();
-	typedef void(_cdecl* Init)(ImGuiContext* CT, HWidget** Select, EditMode* EdMode_, std::vector<HWidget*>** HImGuiWidnowsWidgetList_, std::vector<HWidget*>* WidgetList_);
+	typedef void(_cdecl* Init)(int* CurrentSequenFrame_, void** CurrentSequencer_, std::string(*GetWidgetName_)(HWidget* Widget), void (*TimeLineAddFrame_)(HWidget* Widget, HValue* Value), void (*WidgetRemoveTimeLine_)(HWidget* Widget), std::vector<HVariableExport>* EV, std::vector<HVariableExport>* ECV, std::vector<std::string>* initc, ImGuiContext* CT, HWidget** Select, EditMode* EdMode_, std::vector<HWidget*>** HImGuiWidnowsWidgetList_, std::vector<HWidget*>* WidgetList_);
+	typedef void(_cdecl* UpdataNeoSequencerFunctions)(const ImVec4& (*GetStyleNeoSequencerColorVec4)(ImGuiNeoSequencerCol idx), ImGuiNeoSequencerStyle& (*GetNeoSequencerStyle)(), void (*PushNeoSequencerStyleColor)(ImGuiNeoSequencerCol idx, ImU32 col), void (*PopNeoSequencerStyleColor)(int count), bool (*BeginNeoSequencer)(const char* id, ImGui::FrameIndexType* frame, ImGui::FrameIndexType* startFrame, ImGui::FrameIndexType* endFrame, const ImVec2& size, ImGuiNeoSequencerFlags flags), void (*EndNeoSequencer)(), bool (*BeginNeoGroup)(const char* label, bool* open), void (*EndNeoGroup)(), bool (*BeginNeoTimeline)(const char* label, ImGui::FrameIndexType** keyframes, uint32_t keyframeCount, bool* open, ImGuiNeoTimelineFlags flags), void (*EndNeoTimeLine)(), bool (*BeginNeoTimelineEx)(const char* label, bool* open, ImGuiNeoTimelineFlags flags), void (*NeoKeyframe)(int32_t* value), bool (*IsNeoKeyframeHovered)(), bool (*IsNeoKeyframeSelected)(), bool (*IsNeoKeyframeRightClicked)(), void (*NeoClearSelection)(), bool (*NeoIsSelecting)(), bool (*NeoHasSelection)(), bool (*NeoIsDraggingSelection)(), bool (*NeoCanDeleteSelection)(), bool (*IsNeoKeyframeSelectionRightClicked)(), uint32_t(*GetNeoKeyframeSelectionSize)(), void (*GetNeoKeyframeSelection)(ImGui::FrameIndexType* selection), void (*SetSelectedTimeline)(const char* timelineLabel), bool (*IsNeoTimelineSelected)(ImGuiNeoTimelineIsSelectedFlags flags));
 }
 
 #if _WIN32
@@ -25,7 +26,8 @@ static void AddWidgetformPlugin(std::string Path)
 		return;
 	}
 	PluginType::GetWidget Fu = (PluginType::GetWidget)GetProcAddress(module, "GetWidget");
-	PluginType::Init InitFu = (PluginType::Init)GetProcAddress(module, "InitHPlugin");
+	PluginType::Init InitFu = (PluginType::Init)GetProcAddress(module, "InitHPlugin");//UpdataNeoSequencerFunction
+	PluginType::UpdataNeoSequencerFunctions UpdataNeoSequencerFunctionsFu = (PluginType::UpdataNeoSequencerFunctions)GetProcAddress(module, "UpdataNeoSequencerFunction");
 	if ((!Fu) || (!InitFu))
 	{
 		FreeLibrary(module);
@@ -33,7 +35,38 @@ static void AddWidgetformPlugin(std::string Path)
 	}
 	else
 	{
-		(*InitFu)(GImGui, &SelectWidget, &EdMode, &HImGuiWidnowsWidgetList, &WidgetList);
+		if (UpdataNeoSequencerFunctionsFu)
+		{
+			(*UpdataNeoSequencerFunctionsFu)(&ImGui::GetStyleNeoSequencerColorVec4,
+				&ImGui::GetNeoSequencerStyle,
+				&ImGui::PushNeoSequencerStyleColor,
+				&ImGui::PopNeoSequencerStyleColor,
+				&ImGui::BeginNeoSequencer,
+				&ImGui::EndNeoSequencer,
+				&ImGui::BeginNeoGroup,
+				&ImGui::EndNeoGroup,
+				&ImGui::BeginNeoTimeline,
+				&ImGui::EndNeoTimeLine,
+				&ImGui::BeginNeoTimelineEx,
+				&ImGui::NeoKeyframe,
+				&ImGui::IsNeoKeyframeHovered,
+				&ImGui::IsNeoKeyframeSelected,
+				&ImGui::IsNeoKeyframeRightClicked,
+				&ImGui::NeoClearSelection,
+				&ImGui::NeoIsSelecting,
+				&ImGui::NeoHasSelection,
+				&ImGui::NeoIsDraggingSelection,
+				&ImGui::NeoCanDeleteSelection,
+				&ImGui::IsNeoKeyframeSelectionRightClicked,
+				&ImGui::GetNeoKeyframeSelectionSize,
+				&ImGui::GetNeoKeyframeSelection,
+				&ImGui::SetSelectedTimeline,
+				&ImGui::IsNeoTimelineSelected);
+		}
+		else
+			std::cout << "\nThe plug-in is outdated and lacks the timeline but does not affect its use";
+
+		(*InitFu)(&HAnimation::CurrentSequenFrame,&HAnimation::CurrentSequencer,&GetWidgetName_CallBack,&TimeLineAddFrame_CallBack,&WidgetRemoveTimeLine_CallBack,&EVariable,&ECacheVariable,&InitializationCodes,GImGui, &SelectWidget, &EdMode, &HImGuiWidnowsWidgetList, &WidgetList);
 		std::vector<HWidget*> Buff = (*Fu)();
 
 		std::string PluginFolderName = Path.substr(0, Path.rfind("\\"));

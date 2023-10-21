@@ -211,6 +211,9 @@ void DrawMainMenuBar()
 
 			if (ImGui::Button("lz4 "))
 				OsOpenInShell("https://github.com/lz4/lz4");
+			ImGui::SameLine();
+			if (ImGui::Button("ClipboardXX"))
+				OsOpenInShell("https://github.com/Arian8j2/ClipboardXX/tree/master");
 
 			ImGui::Separator();
 			if (ImGui::Button(std::string(MainMenuBarT::AbouData6).c_str()))

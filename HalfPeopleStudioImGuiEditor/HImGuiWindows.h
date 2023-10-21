@@ -2,15 +2,15 @@
 #include <imgui.h>
 #include <string>
 #include <vector>
-#include "HWidget.h"
+//#include "HWidget.h"
+#include"HAnimationSequencerPanel.h"
 //#include "PagingPanel.h"
 #include <iostream>
-
 
 static std::string EditView = "EditViewport";
 #define InitEditViewport TranslateObject.push_back(&EditView);
 
-static ImTextureID EditViewBg,MouseModeImg,ArrowModeImg;
+static ImTextureID EditViewBg, MouseModeImg, ArrowModeImg;
 class HImGuiWindows;
 static std::vector<HImGuiWindows*> ImGuiWindows;
 static int SelectHImGuiWindows = 0;
@@ -20,9 +20,12 @@ public:
 	HImGuiWindows()
 	{
 		HImGuiWidnowsWidgetList = &Widget;
+		SequencerLists = &SequencerList;
 	}
 	~HImGuiWindows()
 	{
+		SequencerLists = 0;
+		HAnimation::CurrentSequencer = 0;
 		for (size_t i = 0; i < Widget.size(); i++)
 		{
 			HWidget* SaveWidget = Widget.at(i);
@@ -48,15 +51,71 @@ public:
 
 		ImGui::GetStyle() = GUIStyle;
 		FontBuff.PushFont();
-		if(HaveClose)
+		if (HaveClose)
 			ImGui::Begin(std::string(Title).append("### HWindows").c_str(), &Visible, WindowFlags);
 		else
 			ImGui::Begin(std::string(Title).append("### HWindows").c_str(), 0, WindowFlags);
 
-		for (size_t i = 0; i < Widget.size(); i++)
+		if (WindowFlags & ImGuiWindowFlags_::ImGuiWindowFlags_MenuBar)
 		{
-			Widget.at(i)->Draw();
+			if (ImGui::BeginMenuBar())
+			{
+				if (MenuBarWidgetBuffer.empty())
+				{
+					ImGui::Text("DropTarget");
+
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DragWidget"))
+						{
+							HWidget* SaveWidget = (HWidget*)payload->Data;//WidgetList.at(*(const int*)payload->Data);
+							Widget.push_back(SaveWidget->CreateSelfClass());
+							Widget.back()->Father = (HWidget*)this;
+							Widget.back()->Flag = HWidgetFlag_MenuBar;
+							Widget.back()->ID_ = Widget.size() - 1;
+						}
+						ImGui::EndDragDropTarget();
+					}
+				}
+				else
+				{
+					for (HWidget*& w : MenuBarWidgetBuffer)
+					{
+						w->Draw();
+					}
+				}
+
+				ImGui::EndMenuBar();
+			}
+
+
+
+			int i = 0;
+			for (HWidget*& w: Widget)
+			{
+				if (w->Flag != HWidgetFlag_MenuBar)
+					w->Draw();
+				else	
+					i++;
+			}
+
+			if (MenuBarWidgetBuffer.size() != i)
+			{
+				MenuBarWidgetBuffer.clear();
+				for (HWidget*& w : Widget)
+				{
+					if(w->Flag == HWidgetFlag_MenuBar)
+						MenuBarWidgetBuffer.push_back(w);
+				}
+			}
 		}
+		else
+			for (HWidget*& w : Widget)
+			{
+				w->Draw();
+			}
+
+
 
 		if (EdMode == EditMode_ArrowMove)
 		{
@@ -71,8 +130,8 @@ public:
 					Widget.push_back(SaveWidget->CreateSelfClass());
 					Widget.back()->Father = (HWidget*)this;
 					Widget.back()->Flag = HWidgetFlag_WindowRootWidgetAndMove;
-					Widget.back()->MovePos.x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
-					Widget.back()->MovePos.y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
+					Widget.back()->MovePos->Get()->x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
+					Widget.back()->MovePos->Get()->y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
 					Widget.back()->ID_ = Widget.size() - 1;
 				}
 				ImGui::EndDragDropTarget();
@@ -96,7 +155,6 @@ public:
 			}
 		}
 
-
 		ImGui::End();
 		FontBuff.PopFont();
 	}
@@ -104,12 +162,21 @@ public:
 	HWidgetExport Export(std::string Offset)
 	{
 		HWidgetExport ExBuff;
-		ExBuff.ExportCode = "static ImGuiWindowFlags H_ImGuiWindowFlag_";
-		ExBuff.ExportCode.append(GetRandText((int)this)).append(" = ").append(std::to_string(WindowFlags)).append(";");
+		HVariableExport HV;
+		HV.VariableCode = "static ImGuiWindowFlags H_ImGuiWindowFlag_";
+		HV.VariableCode.append(GetRandText((int)this)).append(" = ").append(std::to_string(WindowFlags)).append(";");
+		HV.Comment = std::string("Window - ").append(Title).append(" Flags");
+		EVariable.push_back(HV);
+
 		std::string OffsetBuff;
 		if (HaveClose)
 		{
-			ExBuff.ExportCode.append("\n").append(Offset).append("static bool ").append(GetRandText((int)this)).append("_IsVisible = ").append(BoolToString(DefaultOpen)).append(";");
+			//ExBuff.ExportCode.append("\n").append(Offset).append("static bool ").append(GetRandText((int)this)).append("_IsVisible = ").append(BoolToString(DefaultOpen)).append(";");
+
+			HV.VariableCode = std::string("\n").append(Offset).append("static bool ").append(GetRandText((int)this)).append("_IsVisible = ").append(BoolToString(DefaultOpen)).append(";");
+			HV.Comment = std::string("Window - ").append(Title).append(" Visible");
+			EVariable.push_back(HV);
+
 			ExBuff.ExportCode.append("\n").append(Offset).append("if(").append(GetRandText((int)this)).append("_IsVisible )\n").append(Offset).append("{\n");
 			OffsetBuff = Offset;
 			Offset = Offset.append("	");
@@ -123,9 +190,17 @@ public:
 			ExBuff.ExportCode.append("if (ImGui::Begin(").append("\"").append(Title).append("###").append(GetRandText((int)this)).append("\"").append(" , 0 , ").append("H_ImGuiWindowFlag_").append(GetRandText((int)this)).append("))\n").append(Offset).append("{\n");
 		}
 
-
 		std::string NewOffset = Offset;
 		NewOffset.append("	");
+
+		if (WindowFlags & ImGuiWindowFlags_MenuBar)
+		{
+			ExBuff.ExportCode.append("\n").append(NewOffset).append("if(ImGui::BeginMenuBar())\n").append(NewOffset).append("{\n");
+
+
+			ExBuff.ExportCode.append("\n").append(NewOffset).append("	ImGui::EndMenuBar();").append("\n").append(NewOffset).append("}\n");
+		}
+
 		for (size_t i = 0; i < Widget.size(); i++)
 		{
 			HWidgetExport Buff = Widget.at(i)->ExportWidget(NewOffset);
@@ -240,11 +315,10 @@ public:
 						ExBuff.InculdPath.push_back(Buff.InculdPath.at(i));
 				}
 			}
-
 		}
 		ExBuff.ExportCode.append("\n").append(Offset).append("}\n");
 		ExBuff.ExportCode.append(Offset).append("ImGui::End();\n");
-		if(HaveClose)
+		if (HaveClose)
 			ExBuff.ExportCode.append(OffsetBuff).append("}");
 		return ExBuff;
 	}
@@ -255,9 +329,18 @@ public:
 	{
 		json WindowSave;
 		json WidgetList;
+
+		json AnimationSequencer;
+		for (HAnimationSequencer& animation : SequencerList)
+		{
+			AnimationSequencer.push_back(animation.Save());
+		}
+
+		WindowSave["AnimationSequencer"] = AnimationSequencer;
+
 		// ---Save Widget List
 
-		// Load Widget 
+		// Load Widget
 		for (size_t i = 0; i < Widget.size(); i++)
 		{
 			HWidget* SaveWidget = Widget.at(i);
@@ -282,6 +365,7 @@ public:
 		//-- Save ImGuiWindow Data And WidgetList In Window Save
 		WindowSave["WindowData"] = WindowData;
 		WindowSave["WidgetList"] = WidgetList;
+
 		return WindowSave;
 	}
 
@@ -294,7 +378,6 @@ public:
 			{
 				HWidget* LoadWidgetSave = WidgetList.at(wl)->CreateSelfClass();
 				LoadWidgetSave->Paste(WidgetData["WidgetData"]);
-
 
 				if (LoadWidgetSave->Flag == HWidgetFlag_WindowRootWidget || LoadWidgetSave->Flag == HWidgetFlag_WindowRootWidgetAndMove)
 				{
@@ -336,14 +419,26 @@ public:
 		HaveClose = WindowData["HaveClose"];
 		DefaultOpen = WindowData["DefaultOpen"];
 		Visible = DefaultOpen;
+
+		json AnimationSequencer;
+		AnimationSequencer = J["AnimationSequencer"];
+		for (size_t i = 0; i < AnimationSequencer.size(); i++)
+		{
+			SequencerList.push_back(HAnimationSequencer());
+			SequencerList.back().Load(AnimationSequencer[i]);
+		}
 	}
 
 	std::vector<HWidget*> Widget;
-	char Title[120] = {"Debug"};
+	std::vector<HAnimationSequencer> SequencerList;
+	char Title[120] = { "Debug" };
 	bool HaveClose = false;
 	bool DefaultOpen = true;
 	bool Visible = true;
+
 private:
+
+	std::vector<HWidget*> MenuBarWidgetBuffer;
 
 	bool DrawInit()
 	{
@@ -351,16 +446,15 @@ private:
 		if (ImGui::Begin(std::string(EditView).append("###EditViewport").c_str()))
 		{
 			Save = false;
-			ImDrawList * DL = ImGui::GetWindowDrawList();
+			ImDrawList* DL = ImGui::GetWindowDrawList();
 			ImVec2 WindowSize = ImGui::GetWindowSize();
 			ImVec2 WindowPos = ImGui::GetWindowPos();
 
 			//ImVec2 SaveStartPos = ImVec2(WindowSize.x - 110,WindowPos.y);
 
-
 			if (WindowSize.x < WindowSize.y)
 			{
-				WindowPos.x += (WindowSize.x - WindowSize.y)/2;
+				WindowPos.x += (WindowSize.x - WindowSize.y) / 2;
 
 				WindowSize.x = WindowSize.y;
 				WindowSize.x += WindowPos.x;
@@ -368,32 +462,31 @@ private:
 			}
 			else
 			{
-				WindowPos.y += (WindowSize.y - WindowSize.x)/2;
+				WindowPos.y += (WindowSize.y - WindowSize.x) / 2;
 
 				WindowSize.y = WindowSize.x;
 				WindowSize.x += WindowPos.x;
 				WindowSize.y += WindowPos.y;
 			}
 
-			DL->AddImage(EditViewBg, ImVec2( WindowPos.x,WindowPos.y), WindowSize);
-
+			DL->AddImage(EditViewBg, ImVec2(WindowPos.x, WindowPos.y), WindowSize);
 
 			WindowSize = ImGui::GetWindowSize();
 			WindowPos = ImGui::GetWindowPos();
 			ImGui::SetCursorPosX(WindowSize.x - 110);
 
 			WindowPos.x += WindowSize.x;
-			
-			DL->AddRectFilled(ImVec2(WindowPos.x-115, WindowPos.y+30), ImVec2(WindowPos.x-5, WindowPos.y+65),ImColor(15,15,15),5);
 
-			if(EdMode == EditMode_Mouse)
+			DL->AddRectFilled(ImVec2(WindowPos.x - 115, WindowPos.y + 30), ImVec2(WindowPos.x - 5, WindowPos.y + 65), ImColor(15, 15, 15), 5);
+
+			if (EdMode == EditMode_Mouse)
 				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2, 0.2, 0.2, 1));
 			bool BTS = ImGui::ImageButton(MouseModeImg, ImVec2(20, 20));
-			if(EdMode == EditMode_Mouse)
+			if (EdMode == EditMode_Mouse)
 				ImGui::PopStyleColor();
-			if(BTS)
+			if (BTS)
 				EdMode = EditMode_Mouse;
-			
+
 			ImGui::SameLine();
 
 			if (EdMode == EditMode_ArrowMove)
@@ -404,7 +497,7 @@ private:
 			if (BTS)
 				EdMode = EditMode_ArrowMove;
 			ImGui::SameLine();
-			if (ImGui::BeginCombo("###ArrowMoveSize","",ImGuiComboFlags_NoPreview))
+			if (ImGui::BeginCombo("###ArrowMoveSize", "", ImGuiComboFlags_NoPreview))
 			{
 				ImGui::Text("Positioning");
 				ImGui::SetNextItemWidth(50);
@@ -422,15 +515,12 @@ private:
 			//	}
 			//}
 			//ImGui::EndTabBar();
-
-
 		}
-		ImGui::End();	
+		ImGui::End();
 
 		return Save;
 	}
 };
-
 
 static void RemoveAllHImGuiWindows()
 {

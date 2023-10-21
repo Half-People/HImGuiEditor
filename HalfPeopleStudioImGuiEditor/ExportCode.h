@@ -10,6 +10,8 @@
 
 namespace ExportCodeNS
 {
+	bool IsHaveAnimationSequencecr;
+
 	std::string GetExportStyle()
 	{
 		std::string SaveExportText;
@@ -29,7 +31,7 @@ namespace ExportCodeNS
 			{
 				SaveExportText.append("\n	ImFontConfig FontConfig;");
 				SaveExportText.append("\n	FontConfig.SizePixels = ").append(std::to_string(FontBuff.font_size)).append(";");
-				SaveExportText.append("\n	FontBuff = io.Fonts->AddFontDefault(&FontConfig);");
+				SaveExportText.append("\n	io.Fonts->AddFontDefault(&FontConfig);");
 			}
 			else if (FontBuff.OutputUsingSeparateFontFiles)
 			{
@@ -184,7 +186,8 @@ namespace ExportCodeNS
 		SaveCode.append("\n	while(").append(RootWindows->GetCod_WhetherToEnableRenderingLoop()).append(")\n	{\n	");
 		SaveCode.append("\n		// FrameInit\n");
 		SaveCode.append(RootWindows->GetCod_FrameInit());
-
+		if(IsHaveAnimationSequencecr)
+			SaveCode.append("\n		AnimationPlayer.updata(ImGui::GetIO().DeltaTime);");
 		SaveCode.append("\n		//DrawImGui");
 		SaveCode.append("\n		HImGui_GuiDraw();");
 
@@ -215,14 +218,38 @@ namespace ExportCodeNS
 		file.close();
 	}
 
+	bool GetHaveAnimationSequencecr()
+	{
+		bool Have = false;
+		for (HImGuiWindows *& W :ImGuiWindows)
+		{
+			if (!W->SequencerList.empty())
+			{
+				for ( HAnimationSequencer& S:W->SequencerList)
+				{
+					if (!S.empty())
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	void SpawnImGuiH_FunctionH(HWidgetExport& CodeBuff, std::string Path)
 	{
 		std::string SaveCode = "// Inculde Widget Inculd";
 
+		SaveCode.append("\n#include <algorithm>");
 		SaveCode.append("\n#include <imgui.h>");
 		SaveCode.append("\n#include <vector>\n");
+
 		SaveCode.append("\n//HLoadImage CallBack");
 		SaveCode.append("\nbool(*HLoadImage)(const unsigned char* imageData, ImTextureID & ImageBuffer, ImVec2 ImageSize);\n");
+
+
+		SaveCode.append("\n//-------------------WidgetFunction--");
 
 		for (size_t i = 0; i < CodeBuff.Inculd.size(); i++)
 		{
@@ -265,6 +292,23 @@ namespace ExportCodeNS
 			SaveCode.append("\n\n\n\n//--------------Font -  ").append(FontBuff.FontFileName);
 			SaveCode.append("\n").append(FontBuff.binary_to_compressed_c());
 		}
+
+		if (IsHaveAnimationSequencecr)
+		{
+			SaveCode.append("\n\n").append(HAnimation::CodeExportTool::InterpolationToolFunction()).append("\n");
+
+			SaveCode.append("\n//-------------------HAnimation------");
+			for (HImGuiWindows*& window : ImGuiWindows)
+			{
+				for (HAnimationSequencer& SQ : window->SequencerList)
+				{
+					SaveCode.append("\n// ImGuiWindow -").append(window->Title).append("\n");
+					SaveCode += SQ.GetAnimationFunctionExport();
+				}
+			}
+		}
+
+
 
 		std::ofstream file(Path.append("\\HImGui_Widget_Variable.h"));
 		file << SaveCode;
@@ -906,6 +950,10 @@ namespace ExportCodeNS
 
 	void ExportVS2019PorjectCallBack(std::string Path)
 	{
+		EVariable.clear();
+		ECacheVariable.clear();
+		IsHaveAnimationSequencecr = GetHaveAnimationSequencecr();
+
 		std::string ExportDir = std::string(Path).append("\\HImGuiEdit_Export_VS2019Porject");
 		_mkdir(ExportDir.c_str());
 		SpawnVSPorjectTool::SpawnSHL_File(ExportDir);
@@ -926,6 +974,8 @@ namespace ExportCodeNS
 
 	void ExportSourceCode(std::string Path)
 	{
+		ECacheVariable.clear();
+		EVariable.clear();
 		std::string ExportDir = std::string(Path).append("\\HImGuiEdit_Export_SourceCode");
 		_mkdir(ExportDir.c_str());
 

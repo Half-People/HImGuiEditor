@@ -31,6 +31,14 @@ void CreateDefaulWidget()
 
 void VerifyHWidgetList()
 {
+	std::cout << "\n All Widget Name";
+	int I = 0;
+	for (HWidget *&w :WidgetList)
+	{
+		std::cout << "\n" << I << ".    hex:" << w->WidgetName << "   ---   " << w->WidgetName->c_str();
+			I++;
+	}
+
 	for (size_t Q = 0; Q < WidgetList.size(); Q++)
 	{
 		std::string* SaveName = WidgetList.at(Q)->WidgetName;
@@ -43,7 +51,7 @@ void VerifyHWidgetList()
 			{
 				// std::cout << "Index : " << i << "     " << *WidgetList.at(i)->WidgetName << "    " << *SaveName;
 				std::cout << "\n ControlPanel -> VerifyHWidgetList -> Info -> Verifying :  " << Q + 1 << "/" << WidgetList.size() << "  SubProgress : " << i + 1 << "/" << WidgetList.size() << "    " << *SaveName << " <--> " << *WidgetList.at(i)->WidgetName;
-				if (*WidgetList.at(i)->WidgetName == *SaveName && i != Q)
+				if (*WidgetList.at(i)->WidgetName == *SaveName && (&WidgetList[i] != &WidgetList[Q]))
 				{
 					HaveTheSame = true;
 					int pos = SaveName->rfind("_");

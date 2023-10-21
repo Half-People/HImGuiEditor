@@ -83,6 +83,7 @@ static void DrawPagingPanel()
 					if (ImGui::BeginTabItem(std::string(ImGuiWindows.at(i)->Title).append("###Tab").append(std::to_string(i + 1)).c_str(), &wopen))
 					{
 						SelectHImGuiWindows = i;
+						SequencerLists = &ImGuiWindows.at(i)->SequencerList;
 						ImGui::EndTabItem();
 					}
 					if (!wopen)
@@ -104,6 +105,9 @@ static void DrawPagingPanel()
 							HImGuiWindows* Buff = ImGuiWindows.at(i);
 							ImGuiWindows.erase(ImGuiWindows.begin() + i);
 							delete Buff;
+
+							HAnimation::CurrentSequencer = 0;
+							SequencerLists = &ImGuiWindows.at(0)->SequencerList;
 							ImGui::CloseCurrentPopup();
 						}
 						ImGui::EndPopup();

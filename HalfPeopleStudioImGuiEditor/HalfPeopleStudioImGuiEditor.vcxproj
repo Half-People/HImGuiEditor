@@ -113,7 +113,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_UNICODE;UNICODE;Editor</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\API\lz4\include;..\API\CURL\include;..\API\JSON\include;..\API\stb_image;ImGuiNode;ImGui\backends;ImGui;..\API\GLFW\include;..\API\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\API\lz4\include;..\API\CURL\include;..\API\JSON\include;..\API\stb_image;ImGuiNode;ImGui\backends;ImGui;..\API\GLFW\include;..\API\GLEW\include;ImNeoSequenc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_UNICODE;UNICODE;Editor</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\API\lz4\include;..\API\CURL\include;..\API\JSON\include;..\API\stb_image;ImGuiNode;ImGui\backends;ImGui;..\API\GLFW\include;..\API\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\API\ClipboardXX\include;..\API\lz4\include;..\API\CURL\include;..\API\JSON\include;..\API\stb_image;ImGuiNode;ImGui\backends;ImGui;..\API\GLFW\include;..\API\GLEW\include;ImNeoSequenc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
@@ -172,11 +172,15 @@
     <ClInclude Include="ExportCodePanel.h" />
     <ClInclude Include="FileToolCallBack.h" />
     <ClInclude Include="FlagsList.h" />
+    <ClInclude Include="HAnimationSequencerPanel.h" />
     <ClInclude Include="HArrow\HArrow.h" />
     <ClInclude Include="HFont.h" />
+    <ClInclude Include="HValue.h" />
     <ClInclude Include="H_stb.h" />
     <ClInclude Include="ImFileDialogTool.h" />
     <ClInclude Include="ImFileDialog\ImFileDialog.h" />
+    <ClInclude Include="ImNeoSequenc\imgui_neo_internal.h" />
+    <ClInclude Include="ImNeoSequenc\imgui_neo_sequencer.h" />
     <ClInclude Include="KeyAndAutoSave.h" />
     <ClInclude Include="HImGuiStyle.h" />
     <ClInclude Include="File.h" />
@@ -208,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DefaultWidget.cpp" />
+    <ClCompile Include="HAnimationSequencerPanel.cpp" />
     <ClCompile Include="HWindows.cpp" />
     <ClCompile Include="ImFileDialog\ImFileDialog.cpp" />
     <ClCompile Include="ImGuiColorTextEdit\TextEditor.cpp" />
@@ -218,6 +223,8 @@
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="ImNeoSequenc\imgui_neo_internal.cpp" />
+    <ClCompile Include="ImNeoSequenc\imgui_neo_sequencer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

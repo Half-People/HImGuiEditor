@@ -4,3 +4,4 @@ static bool ShowControlPanel = true;
 static bool ShowDetailsPanel = true;
 static bool ShowPluginPanel = false;
 static bool ShowDeleteWidgetPanel = true;
+static bool ShowAnimationTimeList = true;

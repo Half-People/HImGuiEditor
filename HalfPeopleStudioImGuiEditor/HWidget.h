@@ -6,6 +6,7 @@
 #include <iostream>
 #include "HArrow/HArrow.h"
 #include "HTranslate.h"
+#include "HValue.h"
 //#define GImGui  ((ImGuiContext*)GImGuiExtended) // To use custom extended context
 
 #ifdef Editor
@@ -17,29 +18,13 @@
 //bool HaveWidgetFocused = false;
 class HWidget;
 //HWidget* (*GetWidgetData)(int Index);
-struct HVariableExport
-{
-	std::string VariableCode;
-	std::string Comment;
-};
+//Deprecated Please use "Value"
 static std::vector<HVariableExport> EVariable;
 static std::vector<HVariableExport> ECacheVariable;
 static std::vector<std::string> InitializationCodes;
 static HWidget* SelectWidget;
 static std::vector<HWidget*> WidgetList;
 static std::vector<HWidget*>* HImGuiWidnowsWidgetList;
-static std::string GetRandText(int srand_, int Long = 5)
-{
-	srand(srand_);
-	static const char Buff[] = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
-	std::string tmp_s;
-	tmp_s.reserve(Long);
-	for (size_t i = 0; i < Long; i++)
-	{
-		tmp_s += Buff[rand() % (sizeof(Buff) - 1)];
-	}
-	return tmp_s;
-}
 static std::string BoolToString(bool B)
 {
 	if (B)
@@ -78,7 +63,8 @@ enum HWidgetFlag
 	HWidgetFlag_WindowRootWidget,
 	HWidgetFlag_WindowRootWidgetAndMove,
 	HWidgetFlag_Content,
-	HWidgetFlag_ContentMove
+	HWidgetFlag_ContentMove,
+	HWidgetFlag_MenuBar
 };
 struct HRect
 {
@@ -102,8 +88,19 @@ struct HWidgetExport
 class HWidget
 {
 public:
+	HWidget()
+	{
+		if (!WidgetSize)
+			WidgetSize = new HVImVec2("HSize");
+		if (!MovePos)
+			MovePos = new HVImVec2("HPos");
+
+		HValues.AddHValue(MovePos);
+		HValues.AddHValue(WidgetSize);
+	}
 	~HWidget()
 	{
+		HAnimation::WidgetRemoveTimeLine(this);
 		//if(WidgetID > 0)
 		//	delete WidgetID;
 	}
@@ -126,6 +123,7 @@ public:
 	std::string* WidgetNameID = NULL;
 	std::vector<std::string>* Inculd;
 	std::vector<std::string>* RequestCompileFile;
+	HWidgetValues HValues;
 	std::string* Lib;
 	std::string* Function;
 	std::string* LibPath;
@@ -133,8 +131,8 @@ public:
 	char* WidgetID;
 	bool ShowDragSpace = true;
 	bool CanSelectWidget = true;
-	ImVec2 MovePos;
-	ImVec2 WidgetSize;
+	HVImVec2* MovePos;
+	HVImVec2* WidgetSize;
 	HArrow_SizeFlag HArrowFlag = HArrow_SizeFlag_Default;
 	void DrawPreLogic()
 	{
@@ -144,7 +142,7 @@ public:
 		}
 		else if (Flag == HWidgetFlag_Move || Flag == HWidgetFlag_ContentMove || Flag == HWidgetFlag_WindowRootWidgetAndMove)
 		{
-			ImGui::SetCursorPos(MovePos);
+			ImGui::SetCursorPos(*MovePos->Get());
 		}
 		else if (B)
 		{
@@ -155,7 +153,7 @@ public:
 		}
 		//if (MovePos.x == 0 && MovePos.y == 0)
 		//{
-		MovePos = ImGui::GetCursorPos();
+		*MovePos->Get() = ImGui::GetCursorPos();
 		//}
 
 		ImGui::BeginGroup();
@@ -277,7 +275,7 @@ public:
 					DrawWidgetRect();
 					//if(Flag == HWidgetFlag_Move)
 					//	HArray(MovePos, Positioning);
-					HResize(MovePos, WidgetSize, Positioning, HArrowFlag);
+					HResize(*MovePos->Get(), *WidgetSize->Get(), Positioning, HArrowFlag);
 				}
 			}
 		}
@@ -285,7 +283,7 @@ public:
 		{
 			if (SelectWidget == this)
 			{
-				if (HArrow(MovePos, Positioning))
+				if (HArrow(*MovePos->Get(), Positioning))
 				{
 					if (Flag == HWidgetFlag_Content)
 					{
@@ -432,8 +430,8 @@ public:
 									SaveWidget->Flag = HWidgetFlag_Move;
 								}
 
-								SaveWidget->MovePos.x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
-								SaveWidget->MovePos.y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
+								SaveWidget->MovePos->Get()->x = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
+								SaveWidget->MovePos->Get()->y = ImGui::GetMousePos().y - ImGui::GetWindowPos().y;
 
 								Target->Subclass = SaveWidget;
 								return;
@@ -454,17 +452,19 @@ public:
 
 	void PreCopy(json& J)
 	{
-		J["WidgetPos"] = ImVec2ToJson(MovePos);
-		J["WidgetSize"] = ImVec2ToJson(WidgetSize);
+		//J["WidgetPos"] = ImVec2ToJson(MovePos->Get());
+		//J["WidgetSize"] = ImVec2ToJson(WidgetSize);
 		J["Flag"] = Flag;
 		J["ID"] = *WidgetNameID;
+		J["HValues"] = HValues.Save();
 	}
 
 	void PrePaste(json J)
 	{
-		MovePos = JsonToImVec2(J["WidgetPos"]);
-		WidgetSize = JsonToImVec2(J["WidgetSize"]);
+		//MovePos = JsonToImVec2(J["WidgetPos"]);
+		//WidgetSize = JsonToImVec2(J["WidgetSize"]);
 		Flag = J["Flag"];
+		HValues.Load(J["HValues"]);
 	}
 
 	json CopyContent()
@@ -807,6 +807,7 @@ public:
 
 	HWidgetExport ExportWidget(std::string Offset)
 	{
+		HValues.ExportValue(this, EVariable, ECacheVariable);
 		HWidgetExport Save;
 		//std::string Save;
 		if (Flag == HWidgetFlag_TurnRight)
@@ -816,10 +817,11 @@ public:
 		}
 		else if (Flag == HWidgetFlag_Move || Flag == HWidgetFlag_ContentMove || Flag == HWidgetFlag_WindowRootWidgetAndMove)
 		{
+			//EVariable.push_back(MovePos->GetVariableExport(this));
 			Save.ExportCode.append("\n").append(Offset);
-			Save.ExportCode.append("ImGui::SetCursorPos( ImVec2(");
-			Save.ExportCode.append(std::to_string(MovePos.x)).append(" , ").append(std::to_string(MovePos.y));
-			Save.ExportCode.append(") );\n");
+			Save.ExportCode.append("ImGui::SetCursorPos(");
+			Save.ExportCode.append(MovePos->AutoGetOutputValue(this));
+			Save.ExportCode.append(");\n");
 		}
 
 		Save.ExportCode.append(Export(Offset));
@@ -1069,6 +1071,7 @@ public:
 
 		return Save;
 	}
+
 private:
 	bool B = false;
 

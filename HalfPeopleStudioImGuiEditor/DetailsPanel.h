@@ -36,19 +36,19 @@ void DrawDetailsPanel()
 			{
 				if (SelectWidget->HArrowFlag == HArrow_SizeFlag_OnlyX)
 				{
-					ImGui::DragFloat("Widget Size", &SelectWidget->WidgetSize.x,0.5,0,100000);
+					//ImGui::DragFloat("Widget Size", &SelectWidget->WidgetSize.x,0.5,0,100000);
+					SelectWidget->WidgetSize->Draw("Widget Size", SelectWidget);
 				}
 				else
 				{
 					if(SelectWidget->HArrowFlag == HArrow_SizeFlag_Default)
-						ImGui::DragFloat2(DetailsPanelT::WidgetSize.c_str(), (float*)&SelectWidget->WidgetSize,0.5,0,10000);
+						SelectWidget->WidgetSize->Draw(DetailsPanelT::WidgetSize.c_str(), SelectWidget);
+						//ImGui::DragFloat2(DetailsPanelT::WidgetSize.c_str(), (float*)&SelectWidget->WidgetSize,0.5,0,10000);
 				}
 
 				if(SelectWidget->Flag == HWidgetFlag_ContentMove || SelectWidget->Flag == HWidgetFlag_Move || SelectWidget->Flag == HWidgetFlag_WindowRootWidgetAndMove)
-					ImGui::DragFloat2(DetailsPanelT::WidgetPos.c_str(), (float*)&SelectWidget->MovePos,0.5,0,1000000);
-
-
-
+					SelectWidget->MovePos->Draw(DetailsPanelT::WidgetPos.c_str(), SelectWidget);
+					//ImGui::DragFloat2(DetailsPanelT::WidgetPos.c_str(), (float*)&SelectWidget->MovePos,0.5,0,1000000);
 				ImGui::TreePop();
 			}
 

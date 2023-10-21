@@ -12,7 +12,9 @@ public:
 	{
 		WidgetName = &DefaultWidgetButton;
 		WidgetNameID = &DefaultWidgetButtonID;
-		WidgetID = Text;
+		Text = new HVString("Text","Button",true);
+		WidgetID = Text->Get().data();
+		HValues.AddHValue(Text);
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
@@ -25,17 +27,16 @@ public:
 	}
 	virtual std::string Export(std::string Offset) override
 	{
-		if (WidgetSize.x == 0 && WidgetSize.y == 0)
+		if (WidgetSize->Get()->x == 0 && WidgetSize->Get()->y == 0)
 		{
-			return std::string(Offset).append("ImGui::Button( \"").append(GetID()).append("\" );");
+			return std::string(Offset).append("ImGui::Button( ").append(Text->AutoGetOutputValue(this)).append(" );");
 		}
-
-		return std::string(Offset).append("ImGui::Button( \"").append(GetID())/*.append("##").append(std::to_string(ID_))*/.append("\" , ImVec2( ").append(std::to_string(WidgetSize.x)).append(" , ").append(std::to_string(WidgetSize.y)).append(" ));");
+		return std::string(Offset).append("ImGui::Button( ").append(Text->AutoGetOutputValue(this))/*.append("##").append(std::to_string(ID_))*/.append(" , ").append(WidgetSize->AutoGetOutputValue(this)).append(");");
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::Button(GetID().c_str(), WidgetSize);
+		ImGui::Button(Text->Get().c_str(), *WidgetSize->Get());
 		DrawLogicTick();
 		return;
 	}
@@ -43,8 +44,8 @@ public:
 	{
 		//char Save[200] = {};
 		//strncpy(Save, Text.c_str(), sizeof(Save));
-
-		ImGui::InputText("Button Text", Text, 200);
+		Text->Draw("Text",this);
+		//ImGui::InputText("Button Text", Text, 200);
 		//ImGui::DragFloat2("Button Size", (float*)&WidgetSize, 0.2, 5);
 		return;
 	}
@@ -55,20 +56,20 @@ public:
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["WidgetName"] = Text;
+		//J["WidgetName"] = Text;
 		return J;
 	}
 	virtual void Paste(json Data)override {
 		PrePaste(Data);
-
-		std::string Name = Data["WidgetName"];
-		strcpy_s(Text, Name.c_str());
+		//std::string Name = Data["WidgetName"];
+		//strcpy_s(Text, Name.c_str());
 		return;
 	}
 
 private:
 	//std::string Text = "Button";
-	char Text[200] = { "Button" };
+	//char Text[200] = { "Button" };
+	HVString* Text;
 	//ImVec2 Size = ImVec2(0, 0);
 };
 static std::string DefaultWidgetText = "Text";
@@ -80,11 +81,15 @@ public:
 	{
 		WidgetName = &DefaultWidgetText;
 		WidgetNameID = &DefaultWidgetTextID;
-		WidgetID = TextData;
+
 		HArrowFlag = HArrow_SizeFlag_NotResize;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+
+		TextD = new HVString("Text","Text");
+		HValues.AddHValue(TextD);
+		WidgetID = TextD->Get().data();
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -94,12 +99,12 @@ public:
 	}
 	virtual std::string Export(std::string Offset) override
 	{
-		return std::string("\n").append(Offset).append("ImGui::Text(\"").append(TextData).append("\"); ");
+		return std::string("\n").append(Offset).append("ImGui::Text(\"").append(TextD->AutoGetOutputValue(this)).append("\"); ");
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::Text(TextData);
+		ImGui::Text(TextD->Get().data());
 		DrawLogicTick();
 		return;
 	}
@@ -108,7 +113,8 @@ public:
 		//char Save[200] = {};
 		//strncpy(Save, Text.c_str(), sizeof(Save));
 
-		ImGui::InputText("TextData", TextData, sizeof(TextData));
+		//ImGui::InputText("TextData", TextData, sizeof(TextData));
+		TextD->Draw("Text",this);
 
 		return;
 	}
@@ -117,20 +123,21 @@ public:
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["WidgetText"] = TextData;
+		//J["WidgetText"] = TextData;
 		return J;
 	}
 	virtual void Paste(json Data)override {
 		PrePaste(Data);
-		std::string ST = Data["WidgetText"];
+		//std::string ST = Data["WidgetText"];
 
-		strcpy_s(TextData, 200, ST.c_str());
+		//strcpy_s(TextData, 200, ST.c_str());
 
 		return;
 	}
 private:
 	//std::string Text = "Button";
-	char TextData[200] = { "Text" };
+	//char TextData[200] = { "Text" };
+	HVString* TextD;
 };
 static std::string DefaultWidgetTreeNode = "TreeNode";
 static std::string DefaultWidgetTreeNodeID = "TreeNode";
@@ -141,8 +148,12 @@ public:
 	{
 		WidgetName = &DefaultWidgetTreeNode;
 		WidgetNameID = &DefaultWidgetTreeNodeID;
-		WidgetID = TreeName;
 		HArrowFlag = HArrow_SizeFlag_NotResize;
+
+
+		TreeName = new HVString("TreeName", "Name",true);
+		HValues.AddHValue(TreeName);
+		WidgetID = TreeName->Get().data();
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -157,13 +168,13 @@ public:
 	}
 	virtual std::string Export(std::string Offset) override
 	{
-		return std::string(Offset).append("if(ImGui::TreeNode(\"").append(GetID()).append("\"))\n").append(Offset).append("{\n").append(GetItemsExport(Offset)).append("\n").append(Offset).append("	ImGui::TreePop();").append("\n").append(Offset).append("}");
+		return std::string(Offset).append("if(ImGui::TreeNode(").append(TreeName->AutoGetOutputValue(this)).append("))\n").append(Offset).append("{\n").append(GetItemsExport(Offset)).append("\n").append(Offset).append("	ImGui::TreePop();").append("\n").append(Offset).append("}");
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
 
-		if (ImGui::TreeNode(GetID().c_str()))
+		if (ImGui::TreeNode(TreeName->Get().data()))
 		{
 			//if (!Content)
 			//{
@@ -197,7 +208,9 @@ public:
 		//char Save[200] = {};
 		//strncpy(Save, Text.c_str(), sizeof(Save));
 
-		ImGui::InputText("TreeName", TreeName, 200);
+		//ImGui::InputText("TreeName", TreeName, 200);
+
+		TreeName->Draw("TreeName", this);
 
 		return;
 	}
@@ -206,21 +219,22 @@ public:
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["WidgetName"] = TreeName;
+		//J["WidgetName"] = TreeName;
 		return J;
 	}
 	virtual void Paste(json Data)override {
 		PrePaste(Data);
-		std::string TrreNameS = Data["WidgetName"];
+		//std::string TrreNameS = Data["WidgetName"];
 
-		strcpy_s(TreeName, TrreNameS.c_str());
+		//strcpy_s(TreeName, TrreNameS.c_str());
 		return;
 	}
 
 private:
 	//std::string Text = "Button";
 	//HWidget* HWidgetList;
-	char TreeName[200] = { "TreeNode" };
+	//char TreeName[200] = { "TreeNode" };
+	HVString* TreeName;
 };
 static std::string DefaultWidgetGroup = "Group";
 static std::string DefaultWidgetGroupID = "Group";
@@ -306,7 +320,12 @@ public:
 		WidgetName = &DefaultWidgetChild;
 		WidgetNameID = &DefaultWidgetChildID;
 		CanSelectWidget = false;
-		WidgetID = TextData;
+
+
+		TextData = new HVString("ID", "ChildID");
+		border = new HVBool("Border");
+		HValues.AddHValue(border);
+		WidgetID = TextData->Get().data();
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -327,8 +346,11 @@ public:
 		HV.VariableCode = SaveExportText;
 		SaveExportText.clear();
 		EVariable.push_back(HV);
+
+		//EVariable.push_back(border->GetVariableExport(this));
+		//EVariable.push_back(WidgetSize->GetVariableExport(this));
 		//if(ImGui::BeginChild(_HV_,ImVec2(_THV_,_THV_),_HV_,))
-		SaveExportText.append("\n").append(Offset).append("if(ImGui::BeginChild(\"").append(GetID()).append("\",ImVec2(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append("),").append(BoolToString(border)).append(",").append(SaveRandText).append("_ChildFlag ))");
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::BeginChild(\"").append(GetID()).append("\",").append(WidgetSize->AutoGetOutputValue(this)).append(",").append(border->AutoGetOutputValue(this)).append(",").append(SaveRandText).append("_ChildFlag ))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//	_HV_
@@ -344,7 +366,7 @@ public:
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		if (ImGui::BeginChild(GetID().c_str(), WidgetSize, border, ChildFlag))
+		if (ImGui::BeginChild(GetID().c_str(), *WidgetSize->Get(), *border->Get(), ChildFlag))
 		{
 			HWidgetDragSpace(Content);
 		}
@@ -357,11 +379,13 @@ public:
 		//char Save[200] = {};
 		//strncpy(Save, Text.c_str(), sizeof(Save));
 
-		ImGui::InputText("TextData", TextData, sizeof(TextData));
+		//ImGui::InputText("TextData", TextData, sizeof(TextData));
 		//ImGui::DragFloat2("Size", (float*)&WidgetSize);
-		ImGui::ToggleButton("BD ID", &border);
-		ImGui::SameLine();
-		ImGui::Text("Border");
+		//ImGui::ToggleButton("BD ID", &border.get);
+		TextData->Draw("ID", this);
+		border->Draw("Border",this);
+		//ImGui::SameLine();
+		//ImGui::Text("Border");
 
 		if (ImGui::TreeNode("Flags"))
 		{
@@ -398,21 +422,23 @@ public:
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["Border"] = border;
-		J["WidgetName"] = TextData;
+		//J["Border"] = border;
+		//J["WidgetName"] = TextData;
 		return J;
 	}
 	virtual void Paste(json Data)override {
-		border = Data["Border"];
+		//border = Data["Border"];
 		PrePaste(Data);
-		std::string TextS = Data["WidgetName"];
-		strcpy_s(TextData, TextS.c_str());
+		//std::string TextS = Data["WidgetName"];
+		//strcpy_s(TextData, TextS.c_str());
 		return;
 	}
 private:
 	//std::string Text = "Button";
-	char TextData[200] = { "Child ID" };
-	bool border = false;
+	//char TextData[200] = { "Child ID" };
+	//bool border = false;
+	HVString* TextData;
+	HVBool* border;
 	ImGuiWindowFlags ChildFlag;
 };
 static std::string DefaultWidgetInputText = "InputText";
@@ -424,8 +450,13 @@ public:
 	{
 		WidgetName = &DefaultWidgetInputText;
 		WidgetNameID = &DefaultWidgetInputTextID;
-		WidgetID = TextData;
+
 		HArrowFlag = HArrow_SizeFlag_OnlyX;
+		TextData = new HVString("Name", "InputText", true);
+		InputTextBuff = new HVString("data","",false,260,true,false);
+		WidgetID = TextData->Get().data();
+		HValues.AddHValue(TextData);
+		HValues.AddHValue(InputTextBuff);
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
@@ -443,17 +474,17 @@ public:
 		std::string SaveExportText;
 		HVariableExport HV;
 		//static char _HV__InputTextBuff = { _HV_ };
-		SaveExportText.append("\n").append("static char ").append(RandTextSave).append("_InputTextBuff[260] = { \"").append(InputTextDefault).append("\" };");
-		HV.VariableCode = SaveExportText;
-		SaveExportText.clear();
-		EVariable.push_back(HV);
+		//SaveExportText.append("\n").append("static char ").append(RandTextSave).append("_InputTextBuff[260] = { \"").append(InputTextDefault).append("\" };");
+		//HV.VariableCode = SaveExportText;
+		//SaveExportText.clear();
+		//EVariable.push_back(HV);
 
 		//static ImGuiInputTextFlags _HV__InputTextFlag = _HV_;
 		SaveExportText.append("\n").append("static ImGuiInputTextFlags ").append(RandTextSave).append("_InputTextFlag = ").append(std::to_string(InputTextFlag)).append(";");
 		HV.VariableCode = SaveExportText;
 		SaveExportText.clear();
 		EVariable.push_back(HV);
-		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputText(\"").append(GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append(std::to_string(260)).append(",").append(RandTextSave).append("_InputTextFlag))");
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputText(").append(TextData->AutoGetOutputValue(this)).append(",").append(InputTextBuff->AutoGetOutputValue(this)).append(",").append(std::to_string(260)).append(",").append(RandTextSave).append("_InputTextFlag))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//}
@@ -463,16 +494,18 @@ public:
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::SetNextItemWidth(WidgetSize.x);
-		ImGui::InputText(GetID().c_str(), InputTextBuff, IM_ARRAYSIZE(InputTextBuff), InputTextFlag);
+		ImGui::SetNextItemWidth(WidgetSize->Get()->x);
+		ImGui::InputText(GetID().c_str(), InputTextBuff->Get().data(), InputTextBuff->Get().size(), InputTextFlag);
 
 		DrawLogicTick();
 		return;
 	}
 	virtual void DetailPanelWidget()override
 	{
-		ImGui::InputText("InputTextLable", TextData, IM_ARRAYSIZE(TextData));
-		ImGui::InputText("TextDefault", InputTextDefault, IM_ARRAYSIZE(InputTextDefault));
+		//ImGui::InputText("InputTextLable", TextData, IM_ARRAYSIZE(TextData));
+		TextData->Draw("InputTextLable", this);
+		InputTextBuff->Draw("TextDefault", this);
+		//ImGui::InputText("TextDefault", InputTextDefault, IM_ARRAYSIZE(InputTextDefault));
 
 		if (ImGui::TreeNode("Flags"))
 		{
@@ -511,9 +544,9 @@ public:
 	virtual json Copy()override {
 		json J;
 		PreCopy(J);
-		J["WidgetText"] = TextData;
-		J["TextBuff"] = InputTextBuff;
-		J["TextDefault"] = InputTextDefault;
+		//J["WidgetText"] = TextData;
+		//J["TextBuff"] = InputTextBuff;
+		//J["TextDefault"] = InputTextDefault;
 		J["Falgs"] = InputTextFlag;
 		return J;
 	}
@@ -521,20 +554,22 @@ public:
 		PrePaste(Data);
 		std::string ST = Data["WidgetText"];
 
-		strcpy_s(TextData, 200, ST.c_str());
-		ST = Data["TextBuff"];
-		strcpy_s(InputTextBuff, 260, ST.c_str());
-		ST = Data["TextDefault"];
-		strcpy_s(InputTextDefault, 260, ST.c_str());
+		//strcpy_s(TextData, 200, ST.c_str());
+		//ST = Data["TextBuff"];
+		//strcpy_s(InputTextBuff, 260, ST.c_str());
+		//ST = Data["TextDefault"];
+		//strcpy_s(InputTextDefault, 260, ST.c_str());
 
 		InputTextFlag = Data["Falgs"];
 		return;
 	}
 private:
 	//std::string Text = "Button";
-	char TextData[200] = { "Text" };
-	char InputTextBuff[260];
-	char InputTextDefault[260] = { "InputText" };
+	//char TextData[200] = { "Text" };
+	HVString* TextData;
+	HVString* InputTextBuff;
+	//char InputTextBuff[260];
+	//char InputTextDefault[260] = { "InputText" };
 	ImGuiInputTextFlags InputTextFlag;
 };
 static std::string DefaultWidgetInputTextMultiline = "InputTextMultiline";
@@ -575,7 +610,7 @@ public:
 		SaveExportText.clear();
 		EVariable.push_back(HV);
 		//if(ImGui::InputText(_HV_,_HV__InputTextBuff,_HV_,))
-		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputTextMultiline(\"").append(GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append(std::to_string(260)).append(",").append("ImVec2(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append(")").append(",").append(RandTextSave).append("_InputTextFlag))");
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::InputTextMultiline(\"").append(GetID()).append("\",").append(RandTextSave).append("_InputTextBuff,").append(std::to_string(260)).append(",").append(WidgetSize->AutoGetOutputValue(this)).append(",").append(RandTextSave).append("_InputTextFlag))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//}
@@ -586,7 +621,7 @@ public:
 	{
 		DrawPreLogic();
 		//ImGui::SetNextItemWidth(WidgetSize.x);
-		ImGui::InputTextMultiline(GetID().c_str(), InputTextBuff, IM_ARRAYSIZE(InputTextBuff), WidgetSize, InputTextFlag);
+		ImGui::InputTextMultiline(GetID().c_str(), InputTextBuff, IM_ARRAYSIZE(InputTextBuff), *WidgetSize->Get(), InputTextFlag);
 
 		DrawLogicTick();
 		return;
@@ -670,6 +705,8 @@ public:
 		WidgetNameID = &DefaultWidgetDragFloatID;
 		WidgetID = TextData;
 		HArrowFlag = HArrow_SizeFlag_OnlyX;
+		DragBuff = new HVFloat("DragData",true,false);
+		HValues.AddHValue(DragBuff);
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -682,12 +719,9 @@ public:
 	{
 		std::string RandText = GetRandText((int)this);
 		std::string SaveExportText;
-		HVariableExport HV;
-		SaveExportText.append("\n").append("static float DragFloat_").append(RandText).append(" = ").append(std::to_string(DragBuff)).append(";");
-		HV.VariableCode = SaveExportText;
-		EVariable.push_back(HV);
+		//EVariable.push_back(DragBuff->GetVariableExport(this));
 		SaveExportText.clear();
-		SaveExportText.append("\n").append(Offset).append("if(DragFloat(").append(TextData).append(",&DragFloat_").append(RandText).append(" ,").append(std::to_string(Speed)).append(",").append(std::to_string(Mmin)).append(",").append(std::to_string(Mmax)).append(",\"").append(Mformat).append("\",").append(std::to_string(Mflage)).append("))");
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::DragFloat(\"").append(TextData).append("\",&").append(DragBuff->AutoGetOutputValue(this)).append(" ,").append(std::to_string(Speed)).append(",").append(std::to_string(Mmin)).append(",").append(std::to_string(Mmax)).append(",\"").append(Mformat).append("\",").append(std::to_string(Mflage)).append("))");
 		SaveExportText.append("\n").append(Offset).append("{");
 		SaveExportText.append("\n").append(Offset).append("}");
 		return SaveExportText;
@@ -695,8 +729,8 @@ public:
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::SetNextItemWidth(WidgetSize.x);
-		ImGui::DragFloat(GetID().c_str(), &DragBuff, Speed, Mmin, Mmax, Mformat, Mflage);
+		ImGui::SetNextItemWidth(WidgetSize->Get()->x);
+		ImGui::DragFloat(GetID().c_str(), DragBuff->Get(), Speed, Mmin, Mmax, Mformat, Mflage);
 		DrawLogicTick();
 		return;
 	}
@@ -705,6 +739,7 @@ public:
 		//char Save[200] = {};
 		//strncpy(Save, Text.c_str(), sizeof(Save));
 
+		DragBuff->Draw("DragBuff", this);
 		ImGui::InputText("TextData", TextData, sizeof(TextData));
 		ImGui::DragFloat("Speed", &Speed, 0.1, 0.01, 100000);
 		ImGui::DragFloat("min", &Mmin, 0.1, 0, 100000);
@@ -730,7 +765,7 @@ public:
 		json J;
 		PreCopy(J);
 		J["WidgetText"] = TextData;
-		J["Buff"] = DragBuff;
+		//J["Buff"] = DragBuff;
 		J["MSpeed"] = Speed;
 		J["SMin"] = Mmin;
 		J["SMax"] = Mmax;
@@ -743,7 +778,7 @@ public:
 		std::string ST = Data["WidgetText"];
 		strcpy_s(TextData, 200, ST.c_str());
 
-		DragBuff = Data["Buff"];
+		//DragBuff = Data["Buff"];
 		Speed = Data["MSpeed"];
 		Mmin = Data["SMin"];
 		Mmax = Data["SMax"];
@@ -757,7 +792,7 @@ public:
 private:
 	//std::string Text = "Button";
 	char TextData[200] = { "Text" };
-	float DragBuff;
+	HVFloat* DragBuff;
 	float Speed = 1;
 	float Mmin = 0;
 	float Mmax = 1;
@@ -935,7 +970,8 @@ public:
 		std::string SaveExportText;
 		//static ImVec4 ColorEditor3__HV_ = ImVec4(_THV_,_THV_,_THV_,_THV_);
 		//if(ColorEdit3(_HV_,(float*)&ColorEditor3__HV_  ,_THV_))
-		SaveExportText.append("\n").append(Offset).append("if(ImGui::ColorButton(\"").append(Text).append("###").append(GetID()).append("\",ImVec4(").append(std::to_string(DFColor.x)).append(",").append(std::to_string(DFColor.y)).append(",").append(std::to_string(DFColor.z)).append(",").append(std::to_string(DFColor.w)).append(")").append("  ,").append(std::to_string(Cflags)).append(",(").append(std::to_string(WidgetSize.x)).append(",").append(std::to_string(WidgetSize.y)).append(")))");
+		//EVariable.push_back(WidgetSize->GetVariableExport(this));
+		SaveExportText.append("\n").append(Offset).append("if(ImGui::ColorButton(\"").append(Text).append("###").append(GetID()).append("\",ImVec4(").append(std::to_string(DFColor.x)).append(",").append(std::to_string(DFColor.y)).append(",").append(std::to_string(DFColor.z)).append(",").append(std::to_string(DFColor.w)).append(")").append("  ,").append(std::to_string(Cflags)).append(",").append(WidgetSize->AutoGetOutputValue(this)).append("))");
 		//{
 		SaveExportText.append("\n").append(Offset).append("{");
 		//}
@@ -945,7 +981,7 @@ public:
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::ColorButton(std::string(Text).append("###").append(WidgetID).c_str(), DFColor, Cflags, WidgetSize);
+		ImGui::ColorButton(std::string(Text).append("###").append(WidgetID).c_str(), DFColor, Cflags, *WidgetSize->Get());
 		DrawLogicTick();
 		return;
 	}
@@ -1044,7 +1080,7 @@ public:
 		WidgetName = &DefaultWidgetImage;
 		WidgetNameID = &DefaultWidgetImageID;
 		WidgetID = Text;
-		WidgetSize = ImVec2(100, 100);
+		*WidgetSize->Get() = ImVec2(100, 100);
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -1064,17 +1100,17 @@ public:
 		HV.VariableCode = std::string("\nstatic ImTextureID ").append(RandText).append("_ImageTexture;");
 		EVariable.push_back(HV);
 		InitializationCodes.push_back(std::string("\nif(!HLoadImage(").append(RandText).append("_imageData,").append(RandText).append("_ImageTexture,ImVec2(").append(std::to_string(ImageSizeBuffer.x)).append(",").append(std::to_string(ImageSizeBuffer.y)).append(")").append("))\n{\nprintf(\"\\nLoadImage : false\");\n}"));
-
-		SaveExportText.append("\n").append(Offset).append("ImGui::Image( ").append(RandText).append("_ImageTexture , ").append("ImVec2(").append(std::to_string(WidgetSize.x)).append(", ").append(std::to_string(WidgetSize.y)).append("), ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
+		//EVariable.push_back(WidgetSize->GetVariableExport(this));
+		SaveExportText.append("\n").append(Offset).append("ImGui::Image( ").append(RandText).append("_ImageTexture , ").append(WidgetSize->AutoGetOutputValue(this)).append(", ImVec2(").append(std::to_string(UV0.x)).append(", ").append(std::to_string(UV0.y)).append("), ImVec2(").append(std::to_string(UV1.x)).append(", ").append(std::to_string(UV1.y)).append("), ImVec4(").append(std::to_string(tini_color.x)).append(", ").append(std::to_string(tini_color.y)).append(", ").append(std::to_string(tini_color.z)).append(", ").append(std::to_string(tini_color.w)).append("), ImVec4(").append(std::to_string(border_color.x)).append(", ").append(std::to_string(border_color.y)).append(", ").append(std::to_string(border_color.z)).append(", ").append(std::to_string(border_color.w)).append(")); ");
 		return SaveExportText;
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
 		if (ImageBuffer)
-			ImGui::Image(GLuintToImTextureID ImageBuffer, WidgetSize, UV0, UV1, tini_color, border_color);
+			ImGui::Image(GLuintToImTextureID ImageBuffer, *WidgetSize->Get(), UV0, UV1, tini_color, border_color);
 		else
-			ImGui::Image(*FileCallBack::DefaultLogo, WidgetSize, UV0, UV1, tini_color, border_color);
+			ImGui::Image(*FileCallBack::DefaultLogo, *WidgetSize->Get(), UV0, UV1, tini_color, border_color);
 		DrawLogicTick();
 		return;
 	}
@@ -1118,8 +1154,8 @@ public:
 			else
 			{
 				ImVec2 RecommendedSizes;
-				RecommendedSizes.x = EZ_Tool::GetRecommendedSizes(WidgetSize.x);
-				RecommendedSizes.y = EZ_Tool::GetRecommendedSizes(WidgetSize.y);
+				RecommendedSizes.x = EZ_Tool::GetRecommendedSizes(WidgetSize->Get()->x);
+				RecommendedSizes.y = EZ_Tool::GetRecommendedSizes(WidgetSize->Get()->y);
 				if (ImageSizeBuffer.x == RecommendedSizes.x && ImageSizeBuffer.y == RecommendedSizes.y)
 				{
 					ImGui::TextColored(ImVec4(0.160784, 0.878431, 0.0784314, 1), "Perfect picture size");
@@ -1377,6 +1413,8 @@ public:
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+		IsCheck = new HVBool("IsCheck",false,true,false);
+		HValues.AddHValue(IsCheck);
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -1388,26 +1426,24 @@ public:
 	virtual std::string Export(std::string Offset) override
 	{
 		std::string RandText = GetRandText((int)this);
-		HVariableExport HV;
-		HV.Comment = "Checkbox Value Buffer";
-		HV.VariableCode = std::string("\n").append(Offset).append("static bool ").append(RandText).append("_IsCheck = ").append(BoolToString(IsCheck)).append(";");
-		EVariable.push_back(HV);
-		return std::string("\n").append(Offset).append("ImGui::Checkbox(\"").append(TextData).append("\",&").append(RandText).append("_IsCheck").append("); ");
+		//HVariableExport HV;
+		//HV.Comment = "Checkbox Value Buffer";
+		//HV.VariableCode = std::string("\n").append(Offset).append("static bool ").append(RandText).append("_IsCheck = ").append(IsCheck->GetExportString(std::string(RandText).append("_IsCheck"))).append(";");
+		//EVariable.push_back(IsCheck->GetVariableExport(this, true));
+		return std::string("\n").append(Offset).append("ImGui::Checkbox(\"").append(TextData).append("\",&").append(IsCheck->AutoGetOutputValue(this)).append("); ");
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::Checkbox(TextData, &IsCheck);
+		ImGui::Checkbox(TextData, IsCheck->Get());
 		DrawLogicTick();
 		return;
 	}
 	virtual void DetailPanelWidget()override
 	{
-		//char Save[200] = {};
-		//strncpy(Save, Text.c_str(), sizeof(Save));
-
 		ImGui::InputText("TextData", TextData, sizeof(TextData));
-		ImGui::Checkbox("IsCheck", &IsCheck);
+		//DrawHValue(this, IsCheck, "IsCheck");
+		IsCheck->Draw("IsCheck", this);
 		return;
 	}
 	virtual HWidget* CreateSelfClass()override { return new Checkbox(); }
@@ -1416,21 +1452,20 @@ public:
 		json J;
 		PreCopy(J);
 		J["WidgetText"] = TextData;
-		J["IsCheck"] = IsCheck;
+		//J["IsCheck"] = IsCheck->Save();
 		return J;
 	}
 	virtual void Paste(json Data)override {
 		PrePaste(Data);
 		std::string ST = Data["WidgetText"];
-		IsCheck = Data["IsCheck"];
+		//IsCheck->Load(Data["IsCheck"]);
 		strcpy_s(TextData, 200, ST.c_str());
-
 		return;
 	}
 private:
 	//std::string Text = "Button";
-	bool IsCheck = false;
-	char TextData[200] = { "Text" };
+	HVBool* IsCheck = 0;
+	char TextData[200] = { "CheckBox" };
 };
 static std::string DefaultWidgetMyKnob = "MyKnob";
 static std::string DefaultWidgetMyKnobID = "MyKnob";
@@ -1492,7 +1527,6 @@ namespace ImGui
 
 )";
 }
-
 namespace ImGui
 {
 	// Implementing a simple custom widget using the public API.
@@ -1544,7 +1578,6 @@ namespace ImGui
 		return value_changed;
 	}
 }
-
 class MyKnob :public HWidget
 {
 public:
@@ -1558,6 +1591,8 @@ public:
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Move;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_Null;
 		//AvailableFlags |= HWidgetFlag::HWidgetFlag_TurnRight;
+		V = new HVFloat("Value",0,true,false);
+		HValues.AddHValue(V);
 	}
 
 	virtual void DrawIconForControlPanel()override
@@ -1568,18 +1603,18 @@ public:
 	}
 	virtual std::string Export(std::string Offset) override
 	{
-		std::string RandText = GetRandText((int)this);
-		HVariableExport HV;
-		HV.Comment = "MyKnob ValueBuffer";
-		HV.VariableCode = std::string("\n").append(Offset).append("static float ").append(RandText).append("_value = ").append(std::to_string(value)).append(";");
-		EVariable.push_back(HV);
+		//std::string RandText = GetRandText((int)this);
+		//HVariableExport HV;
+		//HV.Comment = "MyKnob ValueBuffer";
+		//HV.VariableCode = std::string("\n").append(Offset).append("static float ").append(RandText).append("_value = ").append(std::to_string(value)).append(";");
+		//EVariable.push_back(V->GetVariableExport(this));
 
-		return std::string("\n").append(Offset).append("ImGui::MyKnob(").append(std::to_string(size)).append(",\"").append(TextData).append("\",&").append(RandText).append("_value,").append(std::to_string(min_value)).append(",").append(std::to_string(max_value)).append("); ");
+		return std::string("\n").append(Offset).append("ImGui::MyKnob(").append(std::to_string(size)).append(",\"").append(TextData).append("\",&").append(V->AutoGetOutputValue(this)).append(",").append(std::to_string(min_value)).append(",").append(std::to_string(max_value)).append("); ");
 	}
 	virtual void Draw()override
 	{
 		DrawPreLogic();
-		ImGui::MyKnob(size, TextData, &value, min_value, max_value);
+		ImGui::MyKnob(size, TextData, V->Get(), min_value, max_value);
 		DrawLogicTick();
 		return;
 	}
@@ -1590,7 +1625,8 @@ public:
 
 		ImGui::InputText("label", TextData, sizeof(TextData));
 		ImGui::DragFloat("WidgetSize", &size, 5);
-		ImGui::DragFloat("Bace value", &value);
+		//ImGui::DragFloat("Bace value", &value);
+		V->Draw("Bace value",this);
 		ImGui::DragFloat("min value", &min_value, 1, -100000, max_value - 0.0001);
 		ImGui::DragFloat("max value", &max_value, 1, min_value);
 
@@ -1606,7 +1642,7 @@ public:
 		json J;
 		PreCopy(J);
 		J["WidgetText"] = TextData;
-		J["value"] = value;
+		//J["value"] = value;
 		J["size"] = size;
 		J["min_value"] = min_value;
 		J["max_value"] = max_value;
@@ -1615,7 +1651,7 @@ public:
 	virtual void Paste(json Data)override {
 		PrePaste(Data);
 		std::string ST = Data["WidgetText"];
-		value = Data["value"];
+		//value = Data["value"];
 		min_value = Data["min_value"];
 		max_value = Data["max_value"];
 		size = Data["size"];
@@ -1627,7 +1663,8 @@ private:
 	//std::string Text = "Button";
 	float min_value = 0;
 	float max_value = 1;
-	float value = 0;
+	//float value = 0;
+	HVFloat* V;
 	float size = 20;
 	char TextData[200] = { "Text" };
 };

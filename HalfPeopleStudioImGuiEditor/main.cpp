@@ -81,6 +81,7 @@ int main()
 	FileCallBack::HLoadImage3 = HLoadImage2;
 	FileCallBack::OsOpenInShell = OsOpenInShell;
 
+	InitAnimationSequencer();
 	CreateDefaulWidget();
 	LoadWidgetPlugin();
 	VerifyHWidgetList();
@@ -117,6 +118,7 @@ int main()
 		SplashScreen::DrawSplashScreen();
 		KeyTick();
 		DrawMainMenuBar();
+		DrawAnimationSequencerList();
 
 		DrawSettingPanel();
 		DrawControlPanel();
