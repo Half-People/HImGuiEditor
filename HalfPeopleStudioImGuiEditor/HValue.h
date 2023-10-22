@@ -225,7 +225,8 @@ public:
 					CurrentFrame = S_Fram;
 				else
 					Stop();
-			PlayingAnimation(CurrentFrame);
+			if(PlayingAnimation)
+				PlayingAnimation(CurrentFrame);
 		}
 		else
 		{

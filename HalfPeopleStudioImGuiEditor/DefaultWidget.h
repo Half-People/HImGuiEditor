@@ -99,7 +99,7 @@ public:
 	}
 	virtual std::string Export(std::string Offset) override
 	{
-		return std::string("\n").append(Offset).append("ImGui::Text(\"").append(TextD->AutoGetOutputValue(this)).append("\"); ");
+		return std::string("\n").append(Offset).append("ImGui::Text(").append(TextD->AutoGetOutputValue(this)).append("); ");
 	}
 	virtual void Draw()override
 	{
@@ -705,7 +705,7 @@ public:
 		WidgetNameID = &DefaultWidgetDragFloatID;
 		WidgetID = TextData;
 		HArrowFlag = HArrow_SizeFlag_OnlyX;
-		DragBuff = new HVFloat("DragData",true,false);
+		DragBuff = new HVFloat("DragData",0,true,false);
 		HValues.AddHValue(DragBuff);
 	}
 
