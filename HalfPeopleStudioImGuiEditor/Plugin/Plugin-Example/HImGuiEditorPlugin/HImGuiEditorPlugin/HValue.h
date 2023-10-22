@@ -118,21 +118,21 @@ namespace HAnimation
 		}
 
 		// this code by GPT-4
-		//I don¡¯t want to write it because it¡¯s too simple. ;)
+		//I donâ€™t want to write it because itâ€™s too simple. ;)
 		static void sortKeysAndValues(std::vector<int>& keys, std::vector<void*>& values) {
 			std::vector<std::pair<int, void*>> pairs;
 
-			// Œ¢æIºÍÖµ½M³ÉÒ»Œ¦K´æƒ¦ÔÚ pairs ÖĞ
+			// å°‡éµå’Œå€¼çµ„æˆä¸€å°ä¸¦å­˜å„²åœ¨ pairs ä¸­
 			for (size_t i = 0; i < keys.size(); ++i) {
 				pairs.emplace_back(keys[i], values[i]);
 			}
 
-			// ¸ù“şæIßMĞĞÅÅĞò
+			// æ ¹æ“šéµé€²è¡Œæ’åº
 			std::sort(pairs.begin(), pairs.end(), [](const auto& a, const auto& b) {
 				return a.first < b.first;
 				});
 
-			// Œ¢ÅÅĞòááµÄæIºÍÖµ´æ»ØÔ­Ê¼µÄæIºÍÖµ×ƒÁ¿
+			// å°‡æ’åºå¾Œçš„éµå’Œå€¼å­˜å›åŸå§‹çš„éµå’Œå€¼è®Šé‡
 			for (size_t i = 0; i < pairs.size(); ++i) {
 				keys[i] = pairs[i].first;
 				values[i] = pairs[i].second;
@@ -224,7 +224,8 @@ public:
 					CurrentFrame = S_Fram;
 				else
 					Stop();
-			PlayingAnimation(CurrentFrame);
+			if(PlayingAnimation)
+				PlayingAnimation(CurrentFrame);
 		}
 		else
 		{
