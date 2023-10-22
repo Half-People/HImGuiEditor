@@ -21,8 +21,13 @@ Contents
 how to use ?!
 ----------------------------------------
 1.Setup Porject And Style
-![1](https://github.com/Half-People/HImGuiEditor/assets/56476339/c745fbca-46c3-47f8-9d1d-04407a4c18ea)
+
+![ezgif-3-d55757c0af](https://github.com/Half-People/HImGuiEditor/assets/56476339/f12415b6-0b2a-4ebb-ae21-552c54493cba)
+
+
 2.Edit your ui
+
+![ezgif-3-b87597a306](https://github.com/Half-People/HImGuiEditor/assets/56476339/b07e63cb-227b-4625-a4b2-faf50446841c)
 
 
 Future Ideas
