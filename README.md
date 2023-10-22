@@ -34,7 +34,7 @@ Future Ideas
 - [ ] Add `Widget` creation tools (Use low-level methods)
 - [x] Organize and optimize the output project file structure
 - [ ] Add `Nod Editor` to interact with `Widget`
-- [ ] Add animation system
+- [x] Add animation system
 
 # Why we develop this product.
 
