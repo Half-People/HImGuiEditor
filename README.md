@@ -32,6 +32,7 @@ how to use ?!
 
 ![ezgif-3-b87597a306](https://github.com/Half-People/HImGuiEditor/assets/56476339/b07e63cb-227b-4625-a4b2-faf50446841c)
 
+3.Export and build
 
 Future Ideas
 ----------------------------------------
