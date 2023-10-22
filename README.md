@@ -60,6 +60,8 @@ The following are the APIs used
 
 [lz4 I use in Image compression when saving](https://github.com/lz4/lz4)
 
+[ClipboardXX for simple code copying](https://github.com/Arian8j2/ClipboardXX)
+
 There is also imgui API in the project
 --------------------------------------------------------------------------
 
