@@ -48,6 +48,7 @@ Future Ideas
 - [x] Organize and optimize the output project file structure
 - [ ] Add `Nod Editor` to interact with `Widget`
 - [x] Add animation system
+- [ ] Add post processing
 
 # Why we develop this product.
 
