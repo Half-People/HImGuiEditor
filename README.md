@@ -50,6 +50,10 @@ Future Ideas
 - [x] Add animation system
 - [ ] Add post processing
 
+Update schedule
+-------------------------------------
+1.Update HVString ID flashing bug in widget (Need to update files `HValue.h` , `DefaultWidget.h`)
+
 # Why we develop this product.
 
  The purpose is to make editing
