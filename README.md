@@ -53,6 +53,7 @@ Future Ideas
 Update schedule
 -------------------------------------
 1.Update HVString ID flashing bug in widget (Need to update files `HValue.h` , `DefaultWidget.h`)
+2.Update Translation function cannot be used Bug (Need to update files `HTranslation.h`) least important
 
 # Why we develop this product.
 
