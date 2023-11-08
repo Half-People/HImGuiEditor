@@ -46,7 +46,7 @@ Future Ideas
 - [ ] Add other underlying rendering methods (Vulkan - SDL)
 - [ ] Add `Widget` creation tools (Use low-level methods)
 - [x] Organize and optimize the output project file structure
-- [ ] Add `Nod Editor` to interact with `Widget`
+- [ ] Add `Nod Editor` to interact with `Widget` (using `node` to codeing `c++`)
 - [x] Add animation system
 - [ ] Add post processing
 
