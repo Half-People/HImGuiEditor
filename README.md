@@ -1,3 +1,5 @@
+> # The current situation
+> Recently, due to academic problems, the project update date will be postponed. sorry
 
 [Discord](https://discord.gg/JpkSc6EJQ7)
 
